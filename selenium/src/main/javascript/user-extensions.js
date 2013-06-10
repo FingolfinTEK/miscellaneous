@@ -1,6 +1,6 @@
 
-var PAGE_LOAD_TIMEOUT = 1500;
-var PAGE_PROCESS_TIMEOUT = 3000;
+var PAGE_LOAD_TIMEOUT = 3500;
+var PAGE_PROCESS_TIMEOUT = 5000;
 
 	
 function contains(array, obj) {
