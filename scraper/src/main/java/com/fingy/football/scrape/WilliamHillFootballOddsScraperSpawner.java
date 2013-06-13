@@ -1,9 +1,9 @@
-package com.fingy.scrape.spawner;
+package com.fingy.football.scrape;
 
 import java.util.Arrays;
 import java.util.Collection;
 
-import com.fingy.scrape.jsoup.WilliamHillFootballOddsScraper;
+import com.fingy.scrape.spawner.ScraperSpawner;
 
 public class WilliamHillFootballOddsScraperSpawner implements ScraperSpawner<WilliamHillFootballOddsScraper> {
 

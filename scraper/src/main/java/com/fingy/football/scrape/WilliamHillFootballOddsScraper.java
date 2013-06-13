@@ -1,4 +1,4 @@
-package com.fingy.scrape.jsoup;
+package com.fingy.football.scrape;
 
 import java.util.Collection;
 
@@ -6,9 +6,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 
-import com.fingy.scrape.football.MatchOdds;
-import com.fingy.scrape.football.MatchesByCompetition;
-import com.fingy.scrape.football.MatchesByDay;
+import com.fingy.football.MatchOdds;
+import com.fingy.football.MatchesByCompetition;
+import com.fingy.football.MatchesByDay;
 
 public class WilliamHillFootballOddsScraper extends AbstractMatchesByDayJsoupScraper {
 

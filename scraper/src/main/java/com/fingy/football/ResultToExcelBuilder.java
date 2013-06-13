@@ -1,4 +1,4 @@
-package com.fingy.scrape.football;
+package com.fingy.football;
 
 import java.util.Collection;
 

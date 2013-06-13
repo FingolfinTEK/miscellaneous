@@ -27,7 +27,7 @@ public abstract class AbstractJsoupScraper<T> extends AbstractScraper<T> {
 	}
 
 	private Document getPage(String scrapeUrl) throws IOException {
-		return Jsoup.connect(scrapeUrl).get();
+		return Jsoup.connect(scrapeUrl).timeout(0).get();
 	}
 
 }

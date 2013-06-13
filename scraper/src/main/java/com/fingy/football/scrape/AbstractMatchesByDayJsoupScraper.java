@@ -1,8 +1,9 @@
-package com.fingy.scrape.jsoup;
+package com.fingy.football.scrape;
 
 import org.jsoup.nodes.Document;
 
-import com.fingy.scrape.football.MatchesByDay;
+import com.fingy.football.MatchesByDay;
+import com.fingy.scrape.jsoup.AbstractJsoupScraper;
 
 public abstract class AbstractMatchesByDayJsoupScraper extends AbstractJsoupScraper<MatchesByDay> {
 
