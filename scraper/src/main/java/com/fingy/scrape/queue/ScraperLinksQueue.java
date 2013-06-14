@@ -58,23 +58,18 @@ public class ScraperLinksQueue {
 		return queuedLinks.peek();
 	}
 
-	public synchronized void addAndVisitIfNotVisited(final String linkToEnqueue) {
+	public synchronized void addIfNotVisited(final String linkToEnqueue) {
 		if (!isAlreadyVisited(linkToEnqueue))
-			enqueueAndVisit(linkToEnqueue);
+			add(linkToEnqueue);
 	}
 
 	private boolean isAlreadyVisited(String linkToEnqueue) {
 		return visitedLinks.contains(linkToEnqueue);
 	}
 
-	private void enqueueAndVisit(String linkToEnqueue) {
-		markVisited(linkToEnqueue);
-		add(linkToEnqueue);
-	}
-
-	public boolean delayedIsEmpty() throws InterruptedException {
+	public boolean delayedIsEmpty(long timeoutMillis) throws InterruptedException {
 		if (queuedLinks.isEmpty())
-			Thread.sleep(3000);
+			Thread.sleep(timeoutMillis);
 		return queuedLinks.isEmpty();
 	}
 

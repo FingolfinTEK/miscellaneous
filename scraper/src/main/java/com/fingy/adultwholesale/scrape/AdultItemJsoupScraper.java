@@ -7,12 +7,12 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.fingy.adultwholesale.AdultItem;
-import com.fingy.scrape.jsoup.AbstractJsoupScraper;
+import com.fingy.scrape.queue.ScraperLinksQueue;
 
-public class AdultItemJsoupScraper extends AbstractJsoupScraper<AdultItem> {
+public class AdultItemJsoupScraper extends AbstractAdultItemJsoupScraper {
 
-	public AdultItemJsoupScraper(String scrapeUrl) {
-		super(scrapeUrl);
+	public AdultItemJsoupScraper(String scrapeUrl, ScraperLinksQueue linksQueue) {
+		super(scrapeUrl, linksQueue);
 	}
 
 	@Override
@@ -25,9 +25,9 @@ public class AdultItemJsoupScraper extends AbstractJsoupScraper<AdultItem> {
 		final String description = scrapeDescriptionFromPage(page);
 		final String productUrl = getScrapeUrl();
 		final String imageUrl = scrapeImageUrlFromPage(page);
-		
+
+		linksQueue.markVisited(getScrapeUrl());
 		return new AdultItem(id, title, category, price, stockStatus, description, productUrl, imageUrl);
-		
 	}
 
 	private String scrapeIdFromPage(Document page) {
@@ -41,9 +41,9 @@ public class AdultItemJsoupScraper extends AbstractJsoupScraper<AdultItem> {
 	private String scrapeCategoryFromPage(Document page) {
 		final Elements navigation = page.select("#navBreadCrumb a");
 		final List<Element> onlyCategories = navigation.subList(1, navigation.size());
-		
+
 		String itemCategories = "";
-		for(Element category: onlyCategories) 
+		for(Element category: onlyCategories)
 			itemCategories += ">" + category.text();
 
 		return itemCategories.replaceFirst(">", "");

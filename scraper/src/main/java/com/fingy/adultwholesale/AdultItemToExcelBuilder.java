@@ -1,5 +1,8 @@
 package com.fingy.adultwholesale;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -10,84 +13,73 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class AdultItemToExcelBuilder {
 
-	private final Collection<AdultItem> adultItems;
-
 	private int currentRowNumber;
+
 	private XSSFWorkbook workbook;
 	private XSSFSheet sheet;
-	
-	public AdultItemToExcelBuilder(Collection<AdultItem> items) {
-		adultItems = new ArrayList<AdultItem>(items);
+
+	private Collection<AdultItem> adultItems;
+
+	public AdultItemToExcelBuilder writeToFile(String fileName) throws FileNotFoundException, IOException {
+		workbook.write(new FileOutputStream(fileName));
+		return this;
 	}
 
-	public XSSFWorkbook buildExcel() {
-		initBuilder();
-		
+	public AdultItemToExcelBuilder buildExcel(Collection<AdultItem> items) {
+		initBuilder(items);
+
 		addHeaderRow();
+
 		for (AdultItem item : adultItems) {
-			addItemToSheet(item);
+			addItemRowToSheet(item);
 		}
-		
-		return workbook;
+
+		sheet.autoSizeColumn(0);
+		return this;
 	}
 
-	private void initBuilder() {
+	private void initBuilder(Collection<? extends AdultItem> items) {
 		currentRowNumber = 0;
 		workbook = new XSSFWorkbook();
 		sheet = workbook.createSheet("Items");
+		adultItems = new ArrayList<AdultItem>(items);
 	}
 
 	private void addHeaderRow() {
-		Row row = sheet.createRow(currentRowNumber++);
-		Cell categoryCell = row.createCell(0);
-		categoryCell.setCellValue("Category");
-		
-		Cell itemIdCell = row.createCell(1);
-		itemIdCell.setCellValue("Item #");
-		
-		Cell titleCell = row.createCell(2);
-		titleCell.setCellValue("Title");
-		
-		Cell priceCell = row.createCell(3);
-		priceCell.setCellValue("Price");
-		
-		Cell stockStatusCell = row.createCell(4);
-		stockStatusCell.setCellValue("Stock status");
-
-		Cell descriptionCell = row.createCell(5);
-		descriptionCell.setCellValue("Description");
-		
-		Cell imageUrlCell = row.createCell(4);
-		imageUrlCell.setCellValue("Image URL");
-
-		Cell productUrlCell = row.createCell(5);
-		productUrlCell.setCellValue("Product URL");
+		createAndFillRow("Category", "Item #", "Title", "Price", "Stock status", "Description", "Image URL", "Product URL");
 	}
 
-	private void addItemToSheet(AdultItem adultItem) { 
+	private void createAndFillRow(String category, String id, String title, String price, String stockStatus, String description, String imageUrl,
+			String productUrl) {
 		Row row = sheet.createRow(currentRowNumber++);
+
 		Cell categoryCell = row.createCell(0);
-		categoryCell.setCellValue(adultItem.getCategory());
-		
+		categoryCell.setCellValue(category);
+
 		Cell itemIdCell = row.createCell(1);
-		itemIdCell.setCellValue(adultItem.getId());
-		
+		itemIdCell.setCellValue(id);
+
 		Cell titleCell = row.createCell(2);
-		titleCell.setCellValue(adultItem.getTitle());
-		
+		titleCell.setCellValue(title);
+
 		Cell priceCell = row.createCell(3);
-		priceCell.setCellValue(adultItem.getPrice());
-		
+		priceCell.setCellValue(price);
+
 		Cell stockStatusCell = row.createCell(4);
-		stockStatusCell.setCellValue(adultItem.getStockStatus());
+		stockStatusCell.setCellValue(stockStatus);
 
 		Cell descriptionCell = row.createCell(5);
-		descriptionCell.setCellValue(adultItem.getDescription());
-		
-		Cell imageUrlCell = row.createCell(4);
-		imageUrlCell.setCellValue(adultItem.getImageUrl());
+		descriptionCell.setCellValue(description);
 
-		Cell productUrlCell = row.createCell(5);
-		productUrlCell.setCellValue(adultItem.getProductUrl());
+		Cell imageUrlCell = row.createCell(6);
+		imageUrlCell.setCellValue(imageUrl);
+
+		Cell productUrlCell = row.createCell(7);
+		productUrlCell.setCellValue(productUrl);
+	}
+
+	private void addItemRowToSheet(AdultItem adultItem) {
+		createAndFillRow(adultItem.getCategory(), adultItem.getId(), adultItem.getTitle(), adultItem.getPrice(), adultItem.getStockStatus(),
+				adultItem.getDescription(), adultItem.getImageUrl(), adultItem.getProductUrl());
 	}
 }
