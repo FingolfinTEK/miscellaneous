@@ -9,7 +9,7 @@ import com.fingy.scrape.exception.ScrapeException;
 
 public abstract class AbstractScraper<T> implements Callable<T> {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private final String scrapeUrl;
 

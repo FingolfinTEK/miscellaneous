@@ -34,8 +34,14 @@ public class AdultItemToExcelBuilder {
 			addItemRowToSheet(item);
 		}
 
-		sheet.autoSizeColumn(0);
+		autoSizeColumns();
 		return this;
+	}
+
+	private void autoSizeColumns() {
+		for (int i = 0; i < 5; i++) {
+			sheet.autoSizeColumn(i);
+		}
 	}
 
 	private void initBuilder(Collection<? extends AdultItem> items) {

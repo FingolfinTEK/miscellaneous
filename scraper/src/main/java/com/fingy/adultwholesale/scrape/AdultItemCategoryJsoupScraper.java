@@ -1,6 +1,9 @@
 package com.fingy.adultwholesale.scrape;
 
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -10,38 +13,53 @@ import com.fingy.scrape.queue.ScraperLinksQueue;
 
 public class AdultItemCategoryJsoupScraper extends AbstractAdultItemJsoupScraper {
 
-	public AdultItemCategoryJsoupScraper(String scrapeUrl, ScraperLinksQueue linksQueue) {
-		super(scrapeUrl, linksQueue);
+	private static final String ITEM_URL = "https://www.adultwholesaledirect.com/customer/bulk/ajax_getbulkproductdetails.php?prod_id=";
+	private static final String CATEGORY_URL = "https://www.adultwholesaledirect.com/customer/bulk/ajax_getbulkproducts.php?categ_id=";
+
+	private static final Pattern ITEM_PATTERN = Pattern.compile("javascript: void\\(displayDetails\\((\\d+)\\)\\)");
+	private static final Pattern CATEGORY_PATTERN = Pattern.compile("javascript: void\\((changeCateg|toggleCateg)\\((\\d+)\\)\\)");
+
+	public AdultItemCategoryJsoupScraper(Map<String, String> cookies, String scrapeUrl, ScraperLinksQueue linksQueue) {
+		super(cookies, scrapeUrl, linksQueue);
 	}
 
 	@Override
 	protected AdultItem scrapePage(Document page) {
-		final List<Element> links = page.getElementsByTag("a");
-
-		for (Element link : links) {
-			final String href = removeZenIdFromLink(link.attr("href"));
-			if (shouldAcceptLink(href))
-				linksQueue.addIfNotVisited(href);
-		}
+		scrapePages(page);
+		scrapeCategories(page);
 
 		linksQueue.markVisited(getScrapeUrl());
 		return null;
 	}
 
-	private String removeZenIdFromLink(String href) {
-		return href.replaceAll("&zenid=[0-9a-zA-Z]+", "");
+	private void scrapePages(Document page) {
+		final List<Element> itemLinks = page.select("div.itemsList div.item span.title a");
+		for (Element itemLink : itemLinks) {
+			String link = extractItemLink(itemLink);
+			linksQueue.addIfNotVisited(link);
+		}
 	}
 
-	private boolean shouldAcceptLink(String href) {
-		return !getScrapeUrl().equals(href) && (isCategoryLink(href) || isItemDescriptionPage(href));
+	private void scrapeCategories(Document page) {
+		final List<Element> categoryLinks = page.select("a.categorylinkred");
+		for (Element categoryLink : categoryLinks) {
+			String link = extractCategoryLink(categoryLink);
+			linksQueue.addIfNotVisited(link);
+		}
 	}
 
-	private boolean isItemDescriptionPage(String href) {
-		return href.contains("products_id");
+	private String extractItemLink(Element itemLink) {
+		Matcher matcher = ITEM_PATTERN.matcher(itemLink.attr("onclick"));
+		if (matcher.matches())
+			return ITEM_URL + matcher.group(1);
+		return "";
 	}
 
-	private boolean isCategoryLink(String href) {
-		return href.contains("cPath");
+	private String extractCategoryLink(Element categoryLink) {
+		Matcher matcher = CATEGORY_PATTERN.matcher(categoryLink.attr("onclick"));
+		if (matcher.matches())
+			return CATEGORY_URL + matcher.group(2);
+		return "";
 	}
 
 }

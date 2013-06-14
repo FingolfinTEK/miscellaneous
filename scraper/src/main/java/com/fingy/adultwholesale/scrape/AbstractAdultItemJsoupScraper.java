@@ -1,6 +1,6 @@
 package com.fingy.adultwholesale.scrape;
 
-import java.io.IOException;
+import java.util.Map;
 
 import com.fingy.adultwholesale.AdultItem;
 import com.fingy.scrape.jsoup.AbstractJsoupScraper;
@@ -10,13 +10,13 @@ public abstract class AbstractAdultItemJsoupScraper extends AbstractJsoupScraper
 
 	protected ScraperLinksQueue linksQueue;
 
-	public AbstractAdultItemJsoupScraper(String scrapeUrl, ScraperLinksQueue linksQueue) {
-		super(scrapeUrl);
+	public AbstractAdultItemJsoupScraper(Map<String, String> cookies, String scrapeUrl, ScraperLinksQueue linksQueue) {
+		super(cookies, scrapeUrl);
 		this.linksQueue = linksQueue;
 	}
 
 	@Override
-	protected void processException(IOException e) {
+	protected void processException(Exception e) {
 		linksQueue.addIfNotVisited(getScrapeUrl());
 	}
 
