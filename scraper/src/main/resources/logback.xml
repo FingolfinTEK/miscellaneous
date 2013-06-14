@@ -11,7 +11,7 @@
 	<appender name="FILE"
 		class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<append>true</append>
-		<file>logs/etfvats/log.html</file>
+		<file>logs/log.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<!-- rollover daily or whenever the file size reaches 10MB -->
 			<fileNamePattern>logs/etfvats/log-%d{yyyy-MM-dd}.%i.html.gz
@@ -26,11 +26,7 @@
 		</encoder>
 	</appender>
 
-	<logger name="org.springframework" level="DEBUG" />
-	<logger name="org.springframework.cache" level="TRACE" />
-	<logger name="rs.ac.bg.etf.vats" level="DEBUG" />
-
-	<root level="WARN">
+	<root level="TRACE">
 		<appender-ref ref="FILE" />
 		<appender-ref ref="STDOUT" />
 	</root>

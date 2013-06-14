@@ -22,12 +22,16 @@ public class AdultItemCategoryJsoupScraper extends AbstractJsoupScraper<Object> 
 		final List<Element> links = page.getElementsByTag("a");
 
 		for (Element link : links) {
-			final String href = link.attr("href");
+			final String href = removeZenIdFromLink(link.attr("href"));
 			if (shouldAcceptLink(href))
 				linksQueue.addAndVisitIfNotVisited(href);
 		}
 
 		return "Done";
+	}
+
+	private String removeZenIdFromLink(String href) {
+		return href.replaceAll("&zenid=[0-9a-zA-Z]+", "");
 	}
 
 	private boolean shouldAcceptLink(String href) {

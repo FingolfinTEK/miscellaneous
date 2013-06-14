@@ -45,7 +45,12 @@ public class ScraperLinksQueue {
 	public synchronized String take() throws InterruptedException {
 		while (queuedLinks.isEmpty())
 			wait();
-		
+
+		return queuedLinks.poll();
+	}
+
+	public synchronized String take(long timeout) throws InterruptedException {
+		wait(timeout);
 		return queuedLinks.poll();
 	}
 
@@ -65,6 +70,12 @@ public class ScraperLinksQueue {
 	private void enqueueAndVisit(String linkToEnqueue) {
 		markVisited(linkToEnqueue);
 		add(linkToEnqueue);
+	}
+
+	public boolean delayedIsEmpty() throws InterruptedException {
+		if (queuedLinks.isEmpty())
+			Thread.sleep(3000);
+		return queuedLinks.isEmpty();
 	}
 
 }

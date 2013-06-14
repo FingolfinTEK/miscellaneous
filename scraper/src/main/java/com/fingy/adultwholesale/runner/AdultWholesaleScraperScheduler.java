@@ -27,7 +27,7 @@ public class AdultWholesaleScraperScheduler {
 			InterruptedException, ExecutionException {
 		LinkedBlockingQueue<Future<AdultItem>> futureLinks = new LinkedBlockingQueue<Future<AdultItem>>();
 		CompletionService<AdultItem> completionService = new ExecutorCompletionService<AdultItem>(
-				Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 5), futureLinks);
+				Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 4), futureLinks);
 		ExecutorService service = Executors.newCachedThreadPool();
 		ScraperLinksQueue linksQueue = new ScraperLinksQueue();
 		Future<Object> future = service.submit(new AdultItemCategoryJsoupScraper(
@@ -35,7 +35,8 @@ public class AdultWholesaleScraperScheduler {
 
 		future.get();
 
-		while (!linksQueue.isEmpty()) {
+		int scrapedLinksCount = 0;
+		while (!linksQueue.delayedIsEmpty() && scrapedLinksCount < 5000) {
 			final String link = linksQueue.take();
 
 			if (isCategoryLink(link))
@@ -44,18 +45,14 @@ public class AdultWholesaleScraperScheduler {
 				completionService.submit(new AdultItemJsoupScraper(link));
 		}
 
-		final AdultItem item = new AdultItemJsoupScraper(
-				"http://adultwholesaledirect.com/tour/index.php?main_page=product_info&cPath=127_144&products_id=5268")
-				.call();
+		if (!futureLinks.isEmpty()) {
+			final List<AdultItem> items = new ArrayList<AdultItem>();
+			for (Future<AdultItem> futureLink : futureLinks)
+				items.add(futureLink.get());
 
-		System.out.println(item);
-
-		final List<AdultItem> items = new ArrayList<AdultItem>();
-		for (Future<AdultItem> futureLink : futureLinks)
-			items.add(futureLink.get());
-
-		new AdultItemToExcelBuilder(items).buildExcel().write(
-			new FileOutputStream("C:/Users/Fingy/Desktop/wholesale.xlsx"));
+			new AdultItemToExcelBuilder(items).buildExcel().write(
+				new FileOutputStream("C:/Users/Fingy/Desktop/wholesale.xlsx"));
+		}
 	}
 
 	private static boolean isCategoryLink(String href) {
