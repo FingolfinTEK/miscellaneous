@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 public class ScraperLinksQueue {
@@ -13,8 +14,8 @@ public class ScraperLinksQueue {
 	private final Deque<String> queuedLinks;
 
 	public ScraperLinksQueue() {
-		queuedLinks = new LinkedList<String>();
-		visitedLinks = new LinkedHashSet<String>();
+		queuedLinks = new LinkedList<>();
+		visitedLinks = new LinkedHashSet<>();
 	}
 
 	public Collection<String> getVisitedLinks() {
@@ -29,6 +30,19 @@ public class ScraperLinksQueue {
 		return queuedLinks.isEmpty();
 	}
 
+	public boolean delayedIsEmpty(long timeoutMillis) {
+		if (queuedLinks.isEmpty())
+			sleep(timeoutMillis);
+		return queuedLinks.isEmpty();
+	}
+
+	private void sleep(long timeoutMillis) {
+		try {
+			Thread.sleep(timeoutMillis);
+		} catch (InterruptedException e) {
+		}
+	}
+
 	public synchronized int getVisitedSize() {
 		return visitedLinks.size();
 	}
@@ -38,8 +52,19 @@ public class ScraperLinksQueue {
 		notifyAll();
 	}
 
-	public synchronized void markVisited(String visitedLink) {
-		visitedLinks.add(visitedLink);
+	public synchronized void addAllIfNotVisited(List<String> linksToAdd) {
+		for (String linkToEnqueue : linksToAdd)
+			queuedLinks.add(linkToEnqueue);
+
+		notifyAll();
+	}
+
+	public synchronized void markVisited(String linkToMarkVisited) {
+		visitedLinks.add(linkToMarkVisited);
+	}
+
+	public synchronized void markAllVisited(Collection<String> linksToMarkVisited) {
+		visitedLinks.addAll(linksToMarkVisited);
 	}
 
 	public synchronized String take() throws InterruptedException {
@@ -65,12 +90,6 @@ public class ScraperLinksQueue {
 
 	private boolean isAlreadyVisited(String linkToEnqueue) {
 		return visitedLinks.contains(linkToEnqueue);
-	}
-
-	public boolean delayedIsEmpty(long timeoutMillis) throws InterruptedException {
-		if (queuedLinks.isEmpty())
-			Thread.sleep(timeoutMillis);
-		return queuedLinks.isEmpty();
 	}
 
 }

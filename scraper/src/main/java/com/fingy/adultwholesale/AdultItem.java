@@ -6,6 +6,7 @@ public class AdultItem {
 	private String title;
 	private String category;
 	private String price;
+	private String upc;
 	private String stockStatus;
 	private String description;
 	private String productUrl;
@@ -14,13 +15,14 @@ public class AdultItem {
 	public AdultItem() {
 	}
 
-	public AdultItem(String id, String title, String category, String price, String stockStatus, String description,
-			String productUrl, String imageUrl) {
+	public AdultItem(String id, String title, String category, String price, String upc, String stockStatus,
+			String description, String productUrl, String imageUrl) {
 		super();
 		this.id = id;
 		this.title = title;
 		this.category = category;
 		this.price = price;
+		this.upc = upc;
 		this.stockStatus = stockStatus;
 		this.description = description;
 		this.productUrl = productUrl;
@@ -57,6 +59,14 @@ public class AdultItem {
 
 	public void setPrice(String price) {
 		this.price = price;
+	}
+
+	public String getUpc() {
+		return upc;
+	}
+
+	public void setUpc(String upc) {
+		this.upc = upc;
 	}
 
 	public String getStockStatus() {

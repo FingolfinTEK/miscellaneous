@@ -39,7 +39,7 @@ public class AdultItemToExcelBuilder {
 	}
 
 	private void autoSizeColumns() {
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 6; i++) {
 			sheet.autoSizeColumn(i);
 		}
 	}
@@ -52,40 +52,44 @@ public class AdultItemToExcelBuilder {
 	}
 
 	private void addHeaderRow() {
-		createAndFillRow("Category", "Item #", "Title", "Price", "Stock status", "Description", "Image URL", "Product URL");
+		createAndFillRow("Category", "Item #", "Title", "Price", "UPC", "Stock status", "Description", "Image URL", "Product URL");
 	}
 
-	private void createAndFillRow(String category, String id, String title, String price, String stockStatus, String description, String imageUrl,
+	private void createAndFillRow(String category, String id, String title, String price, String upc, String stockStatus, String description, String imageUrl,
 			String productUrl) {
 		Row row = sheet.createRow(currentRowNumber++);
+		int cellIndex = 0;
 
-		Cell categoryCell = row.createCell(0);
+		Cell categoryCell = row.createCell(cellIndex++);
 		categoryCell.setCellValue(category);
 
-		Cell itemIdCell = row.createCell(1);
+		Cell itemIdCell = row.createCell(cellIndex++);
 		itemIdCell.setCellValue(id);
 
-		Cell titleCell = row.createCell(2);
+		Cell titleCell = row.createCell(cellIndex++);
 		titleCell.setCellValue(title);
 
-		Cell priceCell = row.createCell(3);
+		Cell priceCell = row.createCell(cellIndex++);
 		priceCell.setCellValue(price);
 
-		Cell stockStatusCell = row.createCell(4);
+		Cell upcCell = row.createCell(cellIndex++);
+		upcCell.setCellValue(upc);
+
+		Cell stockStatusCell = row.createCell(cellIndex++);
 		stockStatusCell.setCellValue(stockStatus);
 
-		Cell descriptionCell = row.createCell(5);
+		Cell descriptionCell = row.createCell(cellIndex++);
 		descriptionCell.setCellValue(description);
 
-		Cell imageUrlCell = row.createCell(6);
+		Cell imageUrlCell = row.createCell(cellIndex++);
 		imageUrlCell.setCellValue(imageUrl);
 
-		Cell productUrlCell = row.createCell(7);
+		Cell productUrlCell = row.createCell(cellIndex++);
 		productUrlCell.setCellValue(productUrl);
 	}
 
 	private void addItemRowToSheet(AdultItem adultItem) {
-		createAndFillRow(adultItem.getCategory(), adultItem.getId(), adultItem.getTitle(), adultItem.getPrice(), adultItem.getStockStatus(),
+		createAndFillRow(adultItem.getCategory(), adultItem.getId(), adultItem.getTitle(), adultItem.getPrice(), adultItem.getUpc(), adultItem.getStockStatus(),
 				adultItem.getDescription(), adultItem.getImageUrl(), adultItem.getProductUrl());
 	}
 }
