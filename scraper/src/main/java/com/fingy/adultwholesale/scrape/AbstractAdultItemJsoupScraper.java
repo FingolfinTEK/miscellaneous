@@ -17,7 +17,7 @@ public abstract class AbstractAdultItemJsoupScraper extends AbstractJsoupScraper
 
 	@Override
 	protected void processException(Exception e) {
-		linksQueue.addIfNotVisited(getScrapeUrl());
+		// linksQueue.addIfNotVisited(getScrapeUrl());
 	}
 
 }

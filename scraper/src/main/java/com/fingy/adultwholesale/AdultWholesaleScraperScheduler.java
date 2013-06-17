@@ -2,11 +2,14 @@ package com.fingy.adultwholesale;
 
 import static com.fingy.scrape.jsoup.AbstractJsoupScraper.USER_AGENT;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
@@ -18,6 +21,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.io.FileUtils;
 import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
@@ -44,14 +48,13 @@ public class AdultWholesaleScraperScheduler {
 	private ArrayList<AdultItem> items;
 	private AtomicInteger scrapedProductsCount;
 
-	public static void main(String[] args) throws FileNotFoundException, IOException, InterruptedException,
-			ExecutionException {
+	public static void main(String[] args) throws FileNotFoundException, IOException, InterruptedException, ExecutionException {
 		new AdultWholesaleScraperScheduler().doScrape();
 	}
 
 	public AdultWholesaleScraperScheduler() {
 		categoryScrapingThreadPool = createDefaultThreadPool();
-		itemScrapintThreadPool = createDefaultThreadPool();// Executors.newCachedThreadPool();
+		itemScrapintThreadPool = Executors.newCachedThreadPool();
 		itemScrapingCompletionService = new ExecutorCompletionService<>(itemScrapintThreadPool);
 		imageScrapingThreadPool = createDefaultThreadPool();
 		linksQueue = new ScraperLinksQueue();
@@ -62,6 +65,8 @@ public class AdultWholesaleScraperScheduler {
 	public void doScrape() throws ExecutionException, IOException {
 		System.getProperties().setProperty("socksProxyHost", "127.0.0.1");
 		System.getProperties().setProperty("socksProxyPort", "9150");
+
+		loadVisitedLinksFromFile();
 
 		doLogin();
 
@@ -76,9 +81,17 @@ public class AdultWholesaleScraperScheduler {
 		saveResultsToExcelAndDownloadImages();
 	}
 
+	private void loadVisitedLinksFromFile() {
+		try {
+			final List<String> visited = new ArrayList<>(FileUtils.readLines((new File("wholesale-visited.txt"))));
+			linksQueue.markAllVisited(visited);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	private void doLogin() throws IOException {
-		final Response response = Jsoup.connect(LOGIN_PAGE).data(LOGIN_CREDENTIALS).method(Method.POST)
-				.userAgent(USER_AGENT).execute();
+		final Response response = Jsoup.connect(LOGIN_PAGE).data(LOGIN_CREDENTIALS).method(Method.POST).userAgent(USER_AGENT).execute();
 		cookies = response.cookies();
 	}
 
@@ -105,7 +118,7 @@ public class AdultWholesaleScraperScheduler {
 					submitCategoryScrapingTask(link);
 				}
 
-				Thread.sleep(300);
+				Thread.sleep(100);
 			} catch (InterruptedException e) {
 			}
 		}
@@ -131,21 +144,30 @@ public class AdultWholesaleScraperScheduler {
 			}
 
 			createExcelSheetFromScrapedItems(items);
+			saveVisitedLinksToFile();
 
 			ExecutorService executorService = imageScrapingThreadPool;
-			ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(executorService, 5, TimeUnit.MINUTES);
+			ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(executorService, 10, TimeUnit.MINUTES);
 		}
 	}
 
+	private void saveVisitedLinksToFile() throws IOException {
+		Set<String> visited = new HashSet<>();
+
+		for (AdultItem item : items) {
+			visited.add(item.getProductUrl());
+		}
+
+		FileUtils.writeLines(new File("wholesale-visited.txt"), visited, true);
+	}
+
 	private void submitImageDownloadingTaskForItem(final AdultItem item) {
-		String fileName = "C:/Users/Fingy/Desktop/wholesale/" + item.getId();
+		String fileName = "./wholesale/" + item.getId();
 		imageScrapingThreadPool.execute(new JsoupImageDownloader(item.getImageUrl(), fileName, cookies));
 	}
 
-	private void createExcelSheetFromScrapedItems(final List<AdultItem> items) throws FileNotFoundException,
-			IOException {
-		new AdultItemToExcelBuilder().buildExcel(items).writeToFile(
-			"C:/Users/Fingy/Desktop/wholesale" + System.currentTimeMillis() + ".xlsx");
+	private void createExcelSheetFromScrapedItems(final List<AdultItem> items) throws FileNotFoundException, IOException {
+		new AdultItemToExcelBuilder().buildExcel(items).writeToFile("wholesale.xlsx");
 	}
 
 	private void submitCategoryScrapingTask(final String link) {
@@ -165,8 +187,7 @@ public class AdultWholesaleScraperScheduler {
 	}
 
 	private ExecutorService createDefaultThreadPool() {
-		return new ThreadPoolExecutor(AVAILABLE_PROCESSORS * 4, Integer.MAX_VALUE, 1, TimeUnit.MINUTES,
-				new LinkedBlockingQueue<Runnable>());
+		return new ThreadPoolExecutor(AVAILABLE_PROCESSORS * 6, Integer.MAX_VALUE, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>());
 	}
 
 	private boolean isItemDescriptionPage(String href) {
