@@ -3,9 +3,9 @@ package com.fingy.scrape.queue;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 public class ScraperLinksQueue {
@@ -22,6 +22,10 @@ public class ScraperLinksQueue {
 		return Collections.unmodifiableCollection(visitedLinks);
 	}
 
+	public Collection<String> getQueuedLinks() {
+		return Collections.unmodifiableCollection(new HashSet<>(queuedLinks));
+	}
+
 	public synchronized int getSize() {
 		return queuedLinks.size();
 	}
@@ -30,15 +34,15 @@ public class ScraperLinksQueue {
 		return queuedLinks.isEmpty();
 	}
 
-	public boolean delayedIsEmpty(long timeoutMillis) {
+	public synchronized boolean delayedIsEmpty(long timeoutMillis) {
 		if (queuedLinks.isEmpty())
-			sleep(timeoutMillis);
+			waitWithTimeout(timeoutMillis);
 		return queuedLinks.isEmpty();
 	}
 
-	private void sleep(long timeoutMillis) {
+	private void waitWithTimeout(long timeoutMillis) {
 		try {
-			Thread.sleep(timeoutMillis);
+			wait(timeoutMillis);
 		} catch (InterruptedException e) {
 		}
 	}
@@ -52,7 +56,7 @@ public class ScraperLinksQueue {
 		notifyAll();
 	}
 
-	public synchronized void addAllIfNotVisited(List<String> linksToAdd) {
+	public synchronized void addAllIfNotVisited(Collection<String> linksToAdd) {
 		for (String linkToEnqueue : linksToAdd)
 			queuedLinks.add(linkToEnqueue);
 

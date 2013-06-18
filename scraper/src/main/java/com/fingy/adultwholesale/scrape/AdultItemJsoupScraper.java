@@ -45,20 +45,23 @@ public class AdultItemJsoupScraper extends AbstractAdultItemJsoupScraper {
 
 	private String scrapeCategoryFromPage(Document page) {
 		final Elements navigation = page.select("td.pagetitle a");
+
 		String itemCategories = extractCategoryFromNavigationElements(navigation);
 		return itemCategories.replaceFirst(CATEGORY_SEPARATOR, "");
 	}
 
 	private String extractCategoryFromNavigationElements(final Elements navigation) {
-		if (navigation.size() > 1) {
+		if (navigation.isEmpty())
+			return "N/A";
+		else {
 			final List<Element> onlyCategories = navigation.subList(1, navigation.size());
 
 			String itemCategories = "";
 			for (Element category : onlyCategories)
 				itemCategories += CATEGORY_SEPARATOR + category.text();
+
 			return itemCategories;
-		} else
-			return navigation.first().text().trim();
+		}
 	}
 
 	private String scrapePriceFromPage(Document page) {
