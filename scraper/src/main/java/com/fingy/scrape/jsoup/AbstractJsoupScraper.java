@@ -3,6 +3,7 @@ package com.fingy.scrape.jsoup;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -16,6 +17,8 @@ public abstract class AbstractJsoupScraper<T> extends AbstractScraper<T> {
 
 	public static final String USER_AGENT = "Mozilla/5.0 (X11; U; Linux i586; en-US; rv:1.7.3) Gecko/20040924 Epiphany/1.4.4 (Ubuntu)";
 
+	private static AtomicBoolean sessionExpired = new AtomicBoolean();
+
 	private Map<String, String> cookies;
 
 	public AbstractJsoupScraper(String scrapeUrl) {
@@ -27,15 +30,25 @@ public abstract class AbstractJsoupScraper<T> extends AbstractScraper<T> {
 		this.cookies = cookies;
 	}
 
+	public static boolean isSessionExpired() {
+		return sessionExpired.get();
+	}
+
+	public static void setSessionExpired(boolean isExpired) {
+		sessionExpired.set(isExpired);
+	}
+
 	protected abstract T scrapePage(Document page);
 
 	@Override
 	protected T scrapeLink(String scrapeUrl) {
+		if (isSessionExpired())
+			throw new ScrapeException("Session expired");
 		try {
 			final Document page = getPage(scrapeUrl);
 			return scrapePage(page);
 		} catch (Exception e) {
-			logger.error("Exception occured", e);
+			// logger.error("Exception occured", e);
 			processException(e);
 			throw new ScrapeException("Exception parsing link " + getScrapeUrl(), e);
 		}

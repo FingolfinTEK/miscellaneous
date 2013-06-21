@@ -6,13 +6,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -27,17 +26,18 @@ import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
 
+import com.fingy.adultwholesale.scrape.AbstractAdultItemJsoupScraper;
 import com.fingy.adultwholesale.scrape.AdultItemCategoryJsoupScraper;
 import com.fingy.adultwholesale.scrape.AdultItemJsoupScraper;
 import com.fingy.concurrent.ExecutorsUtil;
-import com.fingy.scrape.JsoupImageDownloader;
 import com.fingy.scrape.queue.ScraperLinksQueue;
 
 public class AdultWholesaleScraperScheduler {
 
-	private static final int CATEGORY_TIMEOUT = 300000;
+	private static final int CATEGORY_TIMEOUT = 15000;
 	private static final String WHOLESALE_QUEUED_TXT = "wholesale-queued.txt";
 	private static final String WHOLESALE_VISITED_TXT = "wholesale-visited.txt";
+	private static final String WHOLESALE_CATEGORIES_TXT = "wholesale-categories.txt";
 	private static final String DEFAULT_OUTPUT_EXCEL = "wholesale";
 
 	private static final String[] LOGIN_CREDENTIALS = new String[] { "username", "47198", "pass", "hithlum" };
@@ -46,17 +46,15 @@ public class AdultWholesaleScraperScheduler {
 
 	private static final int AVAILABLE_PROCESSORS = Runtime.getRuntime().availableProcessors();
 
-	private static Set<String> discoveredCategories = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
-
 	private Map<String, String> cookies;
 
 	private ExecutorService categoryScrapingThreadPool;
-	private ExecutorService imageScrapingThreadPool;
 	private ExecutorService itemScrapintThreadPool;
 	private ExecutorCompletionService<AdultItem> itemScrapingCompletionService;
 
 	private ScraperLinksQueue linksQueue;
 	private Set<String> queuedProducts;
+	private Set<String> discoveredCategories;
 	private List<AdultItem> items;
 
 	private AtomicInteger scrapedProductsCount;
@@ -64,7 +62,8 @@ public class AdultWholesaleScraperScheduler {
 	private String inputExcel;
 	private String outputExcel;
 
-	public static void main(String[] args) throws FileNotFoundException, IOException, InterruptedException, ExecutionException {
+	public static void main(String[] args) throws FileNotFoundException, IOException, InterruptedException,
+			ExecutionException {
 		scrapeWhileThereAreResults();
 		Thread.sleep(5000);
 		scrapeWhileThereAreResults();
@@ -74,7 +73,8 @@ public class AdultWholesaleScraperScheduler {
 		int count = 0;
 		int iteration = 0;
 		do {
-			count = new AdultWholesaleScraperScheduler(getInputFileForIteration(iteration), getOutputFileForIteration(iteration)).doScrape();
+			count = new AdultWholesaleScraperScheduler(getInputFileForIteration(iteration),
+					getOutputFileForIteration(iteration)).doScrape();
 			iteration++;
 		} while (count > 0);
 	}
@@ -89,12 +89,12 @@ public class AdultWholesaleScraperScheduler {
 
 	public AdultWholesaleScraperScheduler(final String inputExcelFile, final String outputExcelFile) {
 		categoryScrapingThreadPool = createDefaultThreadPool();
-		imageScrapingThreadPool = createThreadPoolForImageDownload();
 		itemScrapintThreadPool = createDefaultThreadPool();
 		itemScrapingCompletionService = new ExecutorCompletionService<>(itemScrapintThreadPool);
 
 		linksQueue = new ScraperLinksQueue();
 		queuedProducts = new HashSet<>();
+		discoveredCategories = new LinkedHashSet<>();
 		items = new ArrayList<>();
 
 		scrapedProductsCount = new AtomicInteger();
@@ -107,19 +107,23 @@ public class AdultWholesaleScraperScheduler {
 		System.getProperties().setProperty("socksProxyHost", "127.0.0.1");
 		System.getProperties().setProperty("socksProxyPort", "9150");
 
-		loadVisitedLinksFromFile();
-		loadQueuedLinksFromFile();
-		loadCategories();
-
+		AdultItemJsoupScraper.setSessionExpired(false);
 		doLogin();
 
+		loadVisitedLinksFromFile();
+		loadQueuedLinksFromFile();
+		submitScrapingTasksWhileThereIsEnoughWork();
+
+		loadCategories();
 		processEntryPage();
+
 		submitScrapingTasksWhileThereIsEnoughWork();
 		saveResultsToExcelAndDownloadImages();
 
-		ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(categoryScrapingThreadPool, 10, TimeUnit.MINUTES);
-		ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(itemScrapintThreadPool, 40, TimeUnit.MINUTES);
-
+		ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(categoryScrapingThreadPool, 1, TimeUnit.MINUTES);
+		ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(itemScrapintThreadPool, 1, TimeUnit.MINUTES);
+		
+		System.out.println("AdultWholesaleScraperScheduler.doScrape() - " + items.size());
 		return items.size();
 	}
 
@@ -142,15 +146,28 @@ public class AdultWholesaleScraperScheduler {
 	}
 
 	private void loadCategories() {
-		linksQueue.addAllIfNotVisited(discoveredCategories);
+		try {
+			final List<String> categories = new ArrayList<>(FileUtils.readLines((new File(WHOLESALE_CATEGORIES_TXT))));
+			discoveredCategories.addAll(categories);
+
+			int numberOfCategories = categories.size();
+			for (int i = 0; i < numberOfCategories; i++) {
+				String category = categories.get(numberOfCategories - i - 1);
+				linksQueue.addIfNotVisited(category);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void doLogin() throws IOException {
-		final Response response = Jsoup.connect(LOGIN_PAGE).data(LOGIN_CREDENTIALS).method(Method.POST).userAgent(USER_AGENT).timeout(0).execute();
+		final Response response = Jsoup.connect(LOGIN_PAGE).data(LOGIN_CREDENTIALS).method(Method.POST)
+				.userAgent(USER_AGENT).timeout(0).execute();
 		cookies = response.cookies();
 	}
 
 	private void processEntryPage() throws ExecutionException {
+		System.out.println("AdultWholesaleScraperScheduler.processEntryPage()");
 		try {
 			Callable<AdultItem> entryPageTask = new AdultItemCategoryJsoupScraper(cookies, STARTING_URL, linksQueue);
 			categoryScrapingThreadPool.submit(entryPageTask).get();
@@ -160,10 +177,14 @@ public class AdultWholesaleScraperScheduler {
 	}
 
 	private void submitScrapingTasksWhileThereIsEnoughWork() {
+		System.out.println("AdultWholesaleScraperScheduler.submitScrapingTasksWhileThereIsEnoughWork()");
 		while (stillHaveLinksToBeScraped()) {
-			String link;
+			if (AbstractAdultItemJsoupScraper.isSessionExpired()) {
+				System.out.println("Session expired, breaking");
+				break;
+			}
 			try {
-				link = linksQueue.take();
+				String link = linksQueue.take();
 
 				if (isItemDescriptionPage(link)) {
 					submitItemScrapingTask(link);
@@ -177,8 +198,10 @@ public class AdultWholesaleScraperScheduler {
 			}
 		}
 
-		System.out.println("submitScrapingTasksWhileThereIsEnoughWork() - discovered " + discoveredCategories.size() + " categories");
-		System.out.println("submitScrapingTasksWhileThereIsEnoughWork() - discovered " + queuedProducts.size() + " new items");
+		System.out.println("submitScrapingTasksWhileThereIsEnoughWork() - discovered " + discoveredCategories.size()
+				+ " categories");
+		System.out.println("submitScrapingTasksWhileThereIsEnoughWork() - discovered " + queuedProducts.size()
+				+ " new items");
 	}
 
 	private boolean stillHaveLinksToBeScraped() {
@@ -186,6 +209,7 @@ public class AdultWholesaleScraperScheduler {
 	}
 
 	private void saveResultsToExcelAndDownloadImages() throws FileNotFoundException, IOException {
+		System.out.println("AdultWholesaleScraperScheduler.saveResultsToExcelAndDownloadImages()");
 		if (scrapedProductsCount.get() > 0) {
 			items.clear();
 			for (int i = 0; i < scrapedProductsCount.get(); i++) {
@@ -194,16 +218,15 @@ public class AdultWholesaleScraperScheduler {
 					final AdultItem item = future.get();
 
 					items.add(item);
-					submitImageDownloadingTaskForItem(item);
 				} catch (Exception e) {
+					break;
 				}
 			}
 
 			createExcelSheetFromScrapedItems(items);
 			saveVisitedLinksToFile();
 			saveQueuedLinksToFile();
-
-			ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(imageScrapingThreadPool, 40, TimeUnit.MINUTES);
+			saveCategoriesToFile();
 		}
 	}
 
@@ -225,12 +248,13 @@ public class AdultWholesaleScraperScheduler {
 		FileUtils.writeLines(new File(WHOLESALE_QUEUED_TXT), queuedProducts);
 	}
 
-	private void submitImageDownloadingTaskForItem(final AdultItem item) {
-		String fileName = "./wholesale/" + item.getId();
-		imageScrapingThreadPool.execute(new JsoupImageDownloader(item.getImageUrl(), fileName, cookies));
+	private void saveCategoriesToFile() throws IOException {
+		FileUtils.writeLines(new File(WHOLESALE_CATEGORIES_TXT), discoveredCategories, true);
 	}
 
-	private void createExcelSheetFromScrapedItems(final List<AdultItem> items) throws FileNotFoundException, IOException {
+	private void createExcelSheetFromScrapedItems(final List<AdultItem> items) throws FileNotFoundException,
+			IOException {
+		System.out.println("AdultWholesaleScraperScheduler.createExcelSheetFromScrapedItems()");
 		new AdultItemToExcelBuilder().openExcel(inputExcel).appendToExcel(items).writeToFile(outputExcel);
 	}
 
@@ -251,11 +275,8 @@ public class AdultWholesaleScraperScheduler {
 	}
 
 	private ExecutorService createDefaultThreadPool() {
-		return new ThreadPoolExecutor(AVAILABLE_PROCESSORS * 10, Integer.MAX_VALUE, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>());
-	}
-
-	private ExecutorService createThreadPoolForImageDownload() {
-		return new ThreadPoolExecutor(AVAILABLE_PROCESSORS * 40, Integer.MAX_VALUE, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>());
+		return new ThreadPoolExecutor(AVAILABLE_PROCESSORS * 20, Integer.MAX_VALUE, 1, TimeUnit.MINUTES,
+				new LinkedBlockingQueue<Runnable>());
 	}
 
 	private boolean isItemDescriptionPage(String href) {

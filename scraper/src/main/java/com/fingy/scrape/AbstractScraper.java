@@ -25,10 +25,10 @@ public abstract class AbstractScraper<T> implements Callable<T> {
 
 	public T call() {
 		try {
-			logger.debug("Scraping link " + scrapeUrl);
+			 logger.debug("Scraping link " + scrapeUrl);
 			return scrapeLink(scrapeUrl);
 		} catch (ScrapeException e) {
-			logger.error("Exception occured", e);
+			// logger.error("Exception occurred", e);
 			throw e;
 		}
 	}

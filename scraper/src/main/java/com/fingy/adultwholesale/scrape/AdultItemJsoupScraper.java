@@ -20,7 +20,7 @@ public class AdultItemJsoupScraper extends AbstractAdultItemJsoupScraper {
 	}
 
 	@Override
-	protected AdultItem scrapePage(Document page) {
+	protected AdultItem doScrapePage(Document page) {
 		final String id = scrapeIdFromPage(page);
 		final String title = scrapeTitleFromPage(page);
 		final String category = scrapeCategoryFromPage(page);
