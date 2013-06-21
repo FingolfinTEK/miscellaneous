@@ -15,8 +15,8 @@ public class AdultItem {
 	public AdultItem() {
 	}
 
-	public AdultItem(String id, String title, String category, String price, String upc, String stockStatus,
-			String description, String productUrl, String imageUrl) {
+	public AdultItem(String id, String title, String category, String price, String upc, String stockStatus, String description, String productUrl,
+			String imageUrl) {
 		super();
 		this.id = id;
 		this.title = title;
@@ -103,8 +103,39 @@ public class AdultItem {
 
 	@Override
 	public String toString() {
-		return "AdultItem [id=" + id + ", title=" + title + ", category=" + category + ", price=" + price
-				+ ", stockStatus=" + stockStatus + ", description=" + description + ", productUrl=" + productUrl
-				+ ", imageUrl=" + imageUrl + "]";
+		return "AdultItem [id=" + id + ", title=" + title + ", category=" + category + ", price=" + price + ", stockStatus=" + stockStatus + ", description="
+				+ description + ", productUrl=" + productUrl + ", imageUrl=" + imageUrl + "]";
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((productUrl == null) ? 0 : productUrl.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		AdultItem other = (AdultItem) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		if (productUrl == null) {
+			if (other.productUrl != null)
+				return false;
+		} else if (!productUrl.equals(other.productUrl))
+			return false;
+		return true;
+	}
+
 }

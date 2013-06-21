@@ -12,10 +12,12 @@ public class ScraperLinksQueue {
 
 	private final Set<String> visitedLinks;
 	private final Deque<String> queuedLinks;
+	private final Set<String> queuedLinksSet;
 
 	public ScraperLinksQueue() {
-		queuedLinks = new LinkedList<>();
 		visitedLinks = new LinkedHashSet<>();
+		queuedLinks = new LinkedList<>();
+		queuedLinksSet = new HashSet<>();
 	}
 
 	public Collection<String> getVisitedLinks() {
@@ -23,7 +25,7 @@ public class ScraperLinksQueue {
 	}
 
 	public Collection<String> getQueuedLinks() {
-		return Collections.unmodifiableCollection(new HashSet<>(queuedLinks));
+		return Collections.unmodifiableCollection(queuedLinksSet);
 	}
 
 	public synchronized int getSize() {
@@ -52,13 +54,19 @@ public class ScraperLinksQueue {
 	}
 
 	public synchronized void add(String linkToEnqueue) {
-		queuedLinks.add(linkToEnqueue);
-		notifyAll();
+		if (!queuedLinksSet.contains(linkToEnqueue)) {
+			queuedLinks.add(linkToEnqueue);
+			queuedLinksSet.add(linkToEnqueue);
+			notifyAll();
+		}
 	}
 
 	public synchronized void addAllIfNotVisited(Collection<String> linksToAdd) {
 		for (String linkToEnqueue : linksToAdd)
-			queuedLinks.add(linkToEnqueue);
+			if (!queuedLinksSet.contains(linkToEnqueue)) {
+				queuedLinks.add(linkToEnqueue);
+				queuedLinksSet.add(linkToEnqueue);
+			}
 
 		notifyAll();
 	}
@@ -75,12 +83,19 @@ public class ScraperLinksQueue {
 		while (queuedLinks.isEmpty())
 			wait();
 
-		return queuedLinks.poll();
+		String taken = queuedLinks.poll();
+		if (taken != null)
+			queuedLinksSet.remove(taken);
+
+		return taken;
 	}
 
 	public synchronized String take(long timeout) throws InterruptedException {
 		wait(timeout);
-		return queuedLinks.poll();
+
+		String taken = queuedLinks.poll();
+		queuedLinksSet.remove(taken);
+		return taken;
 	}
 
 	public String peek() {

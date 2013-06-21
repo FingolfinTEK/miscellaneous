@@ -48,7 +48,6 @@ public abstract class AbstractJsoupScraper<T> extends AbstractScraper<T> {
 			final Document page = getPage(scrapeUrl);
 			return scrapePage(page);
 		} catch (Exception e) {
-			// logger.error("Exception occured", e);
 			processException(e);
 			throw new ScrapeException("Exception parsing link " + getScrapeUrl(), e);
 		}

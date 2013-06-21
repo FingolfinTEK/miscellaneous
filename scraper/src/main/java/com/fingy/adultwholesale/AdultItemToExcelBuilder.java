@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Row;
@@ -58,7 +57,7 @@ public class AdultItemToExcelBuilder {
 		}
 	}
 
-	public AdultItemToExcelBuilder appendToExcel(List<AdultItem> items) {
+	public AdultItemToExcelBuilder appendToExcel(Collection<AdultItem> items) {
 		adultItems = items;
 		sheet = workbook.getSheetAt(0);
 

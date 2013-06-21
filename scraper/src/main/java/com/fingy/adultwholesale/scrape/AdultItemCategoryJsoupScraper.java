@@ -33,7 +33,7 @@ public class AdultItemCategoryJsoupScraper extends AbstractAdultItemJsoupScraper
 		scrapeNextPage(page);
 
 		linksQueue.markVisited(getScrapeUrl());
-		return null;
+		return new AdultItem("", "", "", "", "", "", "", getScrapeUrl(), "");
 	}
 
 	private void scrapePages(Document page) {
@@ -81,9 +81,9 @@ public class AdultItemCategoryJsoupScraper extends AbstractAdultItemJsoupScraper
 
 	private void scrapeNextPage(Document page) {
 		final Elements pageLinks = page.select("div.pag a");
-		
-		if (!pageLinks.isEmpty()) {
-			String link = extractNextLink(pageLinks.last().attr("href"));
+
+		for (Element linkElement : pageLinks) {
+			String link = extractNextLink(linkElement.attr("href"));
 			linksQueue.addIfNotVisited(link);
 		}
 	}
@@ -95,7 +95,7 @@ public class AdultItemCategoryJsoupScraper extends AbstractAdultItemJsoupScraper
 			String id = categoryIdMatcher.matches() ? categoryIdMatcher.group(1) : "0";
 			return String.format(CATEGORY_URL, id, nextPageMatcher.group(1));
 		}
-			
+
 		return "";
 	}
 
