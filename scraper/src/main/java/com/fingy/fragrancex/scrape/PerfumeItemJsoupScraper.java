@@ -7,6 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.fingy.fragrancex.PerfumeItem;
@@ -50,8 +51,13 @@ public class PerfumeItemJsoupScraper extends AbstractJsoupScraper<PerfumeItem> {
 	}
 
 	private String scrapePriceFromPage(Document page) {
-		Elements product = page.getElementsContainingText(task.getSizeOrType());
-		return product.isEmpty() ? "N/A" : getTagTextFromCssQuery(product.first(), "p.new-price.sans.mtn.pbn");
+		Elements products = page.select(".product-info");
+		for (Element product : products) {
+			String text = product.text();
+			if (text.contains(task.getSizeOrType()))
+				return getTagTextFromCssQuery(product.parent(), "p.new-price");
+		}
+		return "N/A";
 	}
 
 	private String scrapeImageUrlFromPage(Document page) {
@@ -72,8 +78,8 @@ public class PerfumeItemJsoupScraper extends AbstractJsoupScraper<PerfumeItem> {
 	}
 
 	public static void main(String[] args) {
-		String id = "498159";
-		String sizeOrType = "1.7 oz Eau De Parfum Spray";
+		String id = "464221";
+		String sizeOrType = "0.05 oz Vial (sample)";
 		PerfumeItem perfume = new PerfumeItemJsoupScraper(new FragrancexTask(0, id, sizeOrType)).call();
 		System.out.println(perfume);
 	}

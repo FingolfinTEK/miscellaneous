@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -52,7 +51,7 @@ public class AdultItemToExcelBuilder {
 			}
 
 			workbook = WorkbookFactory.create(excelFile);
-		} catch (IOException | InvalidFormatException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

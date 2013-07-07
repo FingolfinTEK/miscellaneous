@@ -23,7 +23,7 @@ public class GoogleSearchScript {
 
     private static final String DATE_SEARCH_QUERY = "&tbs=cdr:1,cd_min:%s,cd_max:%s";
 
-    private static final String BASE_SEARCH_QUERY = "https://www.google.com/search?num=100&lr=&hl=en&as_qdr=all&pws=0&biw=1333&bih=618&q=github+api+oauth&oq=github+api+oauth"
+    private static final String BASE_SEARCH_QUERY = "http://www.google.com/search?num=100&lr=&hl=en&as_qdr=all&pws=0&biw=1333&bih=618&q=github+api+oauth&oq=github+api+oauth"
                                                           + "&gs_l=serp.3..0l3j0i22i30l7.3439.8439.0.8766.8.7.1.0.0.0.231.855.3j3j1.7.0...0.0...1c.1.15.serp.5XqCgUzeSqU";
 
     private final WebDriver     driver;

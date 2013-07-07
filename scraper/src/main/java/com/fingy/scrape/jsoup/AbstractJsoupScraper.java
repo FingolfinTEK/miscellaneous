@@ -15,7 +15,7 @@ import com.fingy.scrape.exception.ScrapeException;
 
 public abstract class AbstractJsoupScraper<T> extends AbstractScraper<T> {
 
-	public static final String USER_AGENT = "Mozilla/5.0 (X11; U; Linux i586; en-US; rv:1.7.3) Gecko/20040924 Epiphany/1.4.4 (Ubuntu)";
+	public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0";
 
 	private static AtomicBoolean sessionExpired = new AtomicBoolean();
 
@@ -27,7 +27,7 @@ public abstract class AbstractJsoupScraper<T> extends AbstractScraper<T> {
 
 	public AbstractJsoupScraper(Map<String, String> cookies, String scrapeUrl) {
 		super(scrapeUrl);
-		this.cookies = cookies;
+		this.setCookies(cookies);
 	}
 
 	public static boolean isSessionExpired() {
@@ -53,16 +53,25 @@ public abstract class AbstractJsoupScraper<T> extends AbstractScraper<T> {
 		}
 	}
 
-	private Document getPage(String scrapeUrl) throws IOException {
-		return Jsoup.connect(scrapeUrl).userAgent(USER_AGENT).cookies(cookies).timeout(0).get();
+	protected Document getPage(String scrapeUrl) throws IOException {
+		return Jsoup.connect(scrapeUrl).userAgent(USER_AGENT).cookies(getCookies()).timeout(0).get();
 	}
 
 	protected void processException(Exception e) {
+		logger.debug("Exception occurred", e);
 	}
 
 	protected String getTagTextFromCssQuery(Element elementToQuery, String cssQuery) {
 		Elements element = elementToQuery.select(cssQuery);
 		return element.isEmpty() ? "N/A" : element.first().text().trim();
+	}
+
+	public Map<String, String> getCookies() {
+		return cookies;
+	}
+
+	public void setCookies(Map<String, String> cookies) {
+		this.cookies = cookies;
 	}
 
 }

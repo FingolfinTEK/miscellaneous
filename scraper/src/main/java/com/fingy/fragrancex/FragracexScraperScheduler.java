@@ -47,7 +47,7 @@ public class FragracexScraperScheduler {
 
 	public FragracexScraperScheduler(String inputPath, String outputPath, String imagePath) {
 		itemScrapintThreadPool = createDefaultThreadPool();
-		itemScrapingCompletionService = new ExecutorCompletionService<>(itemScrapintThreadPool);
+		itemScrapingCompletionService = new ExecutorCompletionService<PerfumeItem>(itemScrapintThreadPool);
 		imageScrapingThreadPool = createDefaultThreadPool();
 		inputFilePath = inputPath;
 		outputFilePath = outputPath;
@@ -64,7 +64,7 @@ public class FragracexScraperScheduler {
 		File workbookFile = new File(inputFilePath);
 		try {
 			produceTasks(workbookFile);
-		} catch (InvalidFormatException | IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -100,7 +100,8 @@ public class FragracexScraperScheduler {
 			}
 		}
 
-		try (FileOutputStream outputStream = new FileOutputStream(new File(outputFilePath))) {
+		try {
+			FileOutputStream outputStream = new FileOutputStream(new File(outputFilePath));
 			System.out.println("Writing workbook to file");
 			workbook.write(outputStream);
 			System.out.println("Finished writing workbook to file");
@@ -113,13 +114,20 @@ public class FragracexScraperScheduler {
 	}
 
 	private void submitImageDownloadingTaskForItem(final PerfumeItem item) {
-		String fileName = imageDirPath + item.getId();
-		Map<String, String> cookies = Collections.<String, String> emptyMap();
-		imageScrapingThreadPool.execute(new JsoupImageDownloader(item.getImageUrl(), fileName, cookies));
+		String imagePath = imageDirPath + item.getId();
+
+		if (imageNotAlreadyDownloaded(imagePath)) {
+			Map<String, String> cookies = Collections.<String, String> emptyMap();
+			imageScrapingThreadPool.execute(new JsoupImageDownloader(item.getImageUrl(), imagePath, cookies));
+		}
+	}
+
+	private boolean imageNotAlreadyDownloaded(String imagePath) {
+		return !new File(imagePath + ".jpeg").exists() && !new File(imagePath + ".png").exists();
 	}
 
 	private ThreadPoolExecutor createDefaultThreadPool() {
-		return new ThreadPoolExecutor(AVAILABLE_PROCESSORS * 6, Integer.MAX_VALUE, 1, TimeUnit.MINUTES,
+		return new ThreadPoolExecutor(AVAILABLE_PROCESSORS * 10, Integer.MAX_VALUE, 1, TimeUnit.MINUTES,
 				new LinkedBlockingQueue<Runnable>());
 	}
 

@@ -19,19 +19,20 @@ import com.fingy.scrape.JsoupImageDownloader;
 
 public class AdultWholesaleImageDownloaderScheduler {
 
-	private static final String IMAGE_URL = "https://www.adultwholesaledirect.com/customer/displayimagewm.php?id=";
+	private static final String IMAGE_URL = "http://www.adultwholesaledirect.com/customer/displayimagewm.php?id=";
 	private static final int AVAILABLE_PROCESSORS = Runtime.getRuntime().availableProcessors();
 
 	private Set<String> imageIdsToDownload;
 	private ExecutorService imageScrapingThreadPool;
 	private String imageIdsFilePath;
 
-	public static void main(String[] args) throws FileNotFoundException, IOException, InterruptedException, ExecutionException {
+	public static void main(String[] args) throws FileNotFoundException, IOException, InterruptedException,
+			ExecutionException {
 		new AdultWholesaleImageDownloaderScheduler("wholesale-images.txt").doScrape();
 	}
 
 	public AdultWholesaleImageDownloaderScheduler(final String imageIdsFile) {
-		imageScrapingThreadPool = createDefaultThreadPool(); //Executors.newCachedThreadPool();
+		imageScrapingThreadPool = createDefaultThreadPool(); // Executors.newCachedThreadPool();
 		imageIdsFilePath = imageIdsFile;
 	}
 
@@ -39,13 +40,14 @@ public class AdultWholesaleImageDownloaderScheduler {
 		System.getProperties().setProperty("socksProxyHost", "127.0.0.1");
 		System.getProperties().setProperty("socksProxyPort", "9150");
 
-		imageIdsToDownload = new HashSet<>(FileUtils.readLines(new File(imageIdsFilePath)));
+		imageIdsToDownload = new HashSet<String>(FileUtils.readLines(new File(imageIdsFilePath)));
 
 		for (String imageId : imageIdsToDownload) {
-			String imagePath = "wholesale/" + imageId;
+			String imagePath = "C:/Users/Fingy/Desktop/wholesale/" + imageId;
 			File imageFile = new File(imagePath + ".jpeg");
 			if (!imageFile.exists()) {
-				imageScrapingThreadPool.execute(new JsoupImageDownloader(IMAGE_URL + imageId, imagePath, Collections.<String, String>emptyMap()));
+				imageScrapingThreadPool.execute(new JsoupImageDownloader(IMAGE_URL + imageId, imagePath, Collections
+						.<String, String> emptyMap()));
 			}
 		}
 
@@ -54,6 +56,7 @@ public class AdultWholesaleImageDownloaderScheduler {
 	}
 
 	private ExecutorService createDefaultThreadPool() {
-		return new ThreadPoolExecutor(AVAILABLE_PROCESSORS * 40, Integer.MAX_VALUE, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>());
+		return new ThreadPoolExecutor(AVAILABLE_PROCESSORS * 40, Integer.MAX_VALUE, 1, TimeUnit.MINUTES,
+				new LinkedBlockingQueue<Runnable>());
 	}
 }

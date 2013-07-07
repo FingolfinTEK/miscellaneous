@@ -61,7 +61,7 @@ public abstract class AbstractExcelWorksheetBasedTaskProducer {
 
 	private String readSizeOrTypeFromRow(Row row) {
 		Cell sizeOrTypeCell = row.getCell(INDEX_OF_SIZE_COLUMN);
-		return sizeOrTypeCell.getStringCellValue();
+		return sizeOrTypeCell.getStringCellValue().replaceAll("--", "").replaceAll(" +", " ").trim();
 	}
 
 	private FragrancexTask createTaskFromRowData(int i, String id, String sizeOrType) {

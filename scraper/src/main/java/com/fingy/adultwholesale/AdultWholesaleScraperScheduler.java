@@ -32,14 +32,14 @@ import com.fingy.scrape.queue.ScraperLinksQueue;
 
 public class AdultWholesaleScraperScheduler {
 
-	private static final int CATEGORY_TIMEOUT = 30000;
+	private static final int CATEGORY_TIMEOUT = 10000;
 	private static final String WHOLESALE_QUEUED_TXT = "wholesale-queued.txt";
 	private static final String WHOLESALE_VISITED_TXT = "wholesale-visited.txt";
 	private static final String DEFAULT_OUTPUT_EXCEL = "wholesale";
 
 	private static final String[] LOGIN_CREDENTIALS = new String[] { "username", "47198", "pass", "hithlum" };
-	private static final String LOGIN_PAGE = "https://www.adultwholesaledirect.com/login.php";
-	private static final String STARTING_URL = "https://www.adultwholesaledirect.com/customer/bulk/ajax_getbulkcategories.php";
+	private static final String LOGIN_PAGE = "http://www.adultwholesaledirect.com/login.php";
+	private static final String STARTING_URL = "http://www.adultwholesaledirect.com/customer/bulk/ajax_getbulkcategories.php";
 
 	private static final int AVAILABLE_PROCESSORS = Runtime.getRuntime().availableProcessors();
 
@@ -56,7 +56,6 @@ public class AdultWholesaleScraperScheduler {
 	private Set<String> scrapedCategories;
 	private Set<AdultItem> scrapedItems;
 
-	private String inputExcel;
 	private String outputExcel;
 
 	public static void main(String[] args) throws FileNotFoundException, IOException, InterruptedException, ExecutionException {
@@ -67,34 +66,27 @@ public class AdultWholesaleScraperScheduler {
 
 	private static void scrapeWhileThereAreResults() throws ExecutionException, IOException {
 		int count = 0;
-		int iteration = 0;
 		do {
-			count = new AdultWholesaleScraperScheduler(getInputFileForIteration(iteration), getOutputFileForIteration(iteration)).doScrape();
-			iteration++;
+			count = new AdultWholesaleScraperScheduler(getOutputFileForIteration()).doScrape();
 		} while (count > 0);
 	}
 
-	private static String getOutputFileForIteration(int iteration) {
-		return DEFAULT_OUTPUT_EXCEL + (iteration + 1) % 2 + ".xlsx";
+	private static String getOutputFileForIteration() {
+		return DEFAULT_OUTPUT_EXCEL + System.currentTimeMillis() + ".xlsx";
 	}
 
-	private static String getInputFileForIteration(int iteration) {
-		return DEFAULT_OUTPUT_EXCEL + iteration % 2 + ".xlsx";
-	}
-
-	public AdultWholesaleScraperScheduler(final String inputExcelFile, final String outputExcelFile) {
+	public AdultWholesaleScraperScheduler(final String outputExcelFile) {
 		categoryScrapingThreadPool = createDefaultThreadPool();
 		itemScrapintThreadPool = createDefaultThreadPool();
-		categoryScrapingCompletionService = new ExecutorCompletionService<>(categoryScrapingThreadPool);
-		itemScrapingCompletionService = new ExecutorCompletionService<>(itemScrapintThreadPool);
+		categoryScrapingCompletionService = new ExecutorCompletionService<AdultItem>(categoryScrapingThreadPool);
+		itemScrapingCompletionService = new ExecutorCompletionService<AdultItem>(itemScrapintThreadPool);
 
 		linksQueue = new ScraperLinksQueue();
-		queuedProducts = new HashSet<>();
-		queuedCategories = new LinkedHashSet<>();
-		scrapedCategories = new LinkedHashSet<>();
-		scrapedItems = new LinkedHashSet<>();
+		queuedProducts = new HashSet<String>();
+		queuedCategories = new LinkedHashSet<String>();
+		scrapedCategories = new LinkedHashSet<String>();
+		scrapedItems = new LinkedHashSet<AdultItem>();
 
-		inputExcel = inputExcelFile;
 		outputExcel = outputExcelFile;
 	}
 
@@ -110,9 +102,9 @@ public class AdultWholesaleScraperScheduler {
 
 		processEntryPageIfNeeded();
 		submitScrapingTasksWhileThereIsEnoughWork();
-
-		ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(categoryScrapingThreadPool, 5, TimeUnit.MINUTES);
-		ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(itemScrapintThreadPool, 5, TimeUnit.MINUTES);
+		
+		ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(categoryScrapingThreadPool, 10, TimeUnit.SECONDS);
+		ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(itemScrapintThreadPool, 10, TimeUnit.SECONDS);
 
 		saveResultsToExcelAndDownloadImages();
 		saveVisitedLinksToFile();
@@ -124,7 +116,7 @@ public class AdultWholesaleScraperScheduler {
 
 	private void loadVisitedLinksFromFile() {
 		try {
-			final Set<String> visited = new HashSet<>(FileUtils.readLines((new File(WHOLESALE_VISITED_TXT))));
+			final Set<String> visited = new HashSet<String>(FileUtils.readLines((new File(WHOLESALE_VISITED_TXT))));
 			linksQueue.markAllVisited(visited);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -133,7 +125,7 @@ public class AdultWholesaleScraperScheduler {
 
 	private void loadQueuedLinksFromFile() {
 		try {
-			final Set<String> queued = new HashSet<>(FileUtils.readLines((new File(WHOLESALE_QUEUED_TXT))));
+			final Set<String> queued = new HashSet<String>(FileUtils.readLines((new File(WHOLESALE_QUEUED_TXT))));
 			linksQueue.addAllIfNotVisited(queued);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -173,6 +165,7 @@ public class AdultWholesaleScraperScheduler {
 					queuedCategories.add(link);
 				}
 			} catch (InterruptedException e) {
+				break;
 			}
 		}
 
@@ -227,7 +220,7 @@ public class AdultWholesaleScraperScheduler {
 	private void saveVisitedLinksToFile() throws IOException {
 		System.out.println("AdultWholesaleScraperScheduler.saveVisitedLinksToFile()");
 
-		Set<String> visited = new HashSet<>(scrapedCategories);
+		Set<String> visited = new HashSet<String>(scrapedCategories);
 
 		for (AdultItem item : scrapedItems) {
 			visited.add(item.getProductUrl());
@@ -251,11 +244,11 @@ public class AdultWholesaleScraperScheduler {
 
 	private void createExcelSheetFromScrapedItems(final Collection<AdultItem> items) throws FileNotFoundException, IOException {
 		System.out.println("AdultWholesaleScraperScheduler.createExcelSheetFromScrapedItems()");
-		new AdultItemToExcelBuilder().openExcel(inputExcel).appendToExcel(items).writeToFile(outputExcel);
+		new AdultItemToExcelBuilder().buildExcel(items).writeToFile(outputExcel);
 	}
 
 	private ExecutorService createDefaultThreadPool() {
-		return new ThreadPoolExecutor(AVAILABLE_PROCESSORS * 5, Integer.MAX_VALUE, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>());
+		return new ThreadPoolExecutor(AVAILABLE_PROCESSORS * 10, Integer.MAX_VALUE, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>());
 	}
 
 	private boolean isItemDescriptionPage(String href) {

@@ -15,9 +15,9 @@ public class ScraperLinksQueue {
 	private final Set<String> queuedLinksSet;
 
 	public ScraperLinksQueue() {
-		visitedLinks = new LinkedHashSet<>();
-		queuedLinks = new LinkedList<>();
-		queuedLinksSet = new HashSet<>();
+		visitedLinks = new LinkedHashSet<String>();
+		queuedLinks = new LinkedList<String>();
+		queuedLinksSet = new HashSet<String>();
 	}
 
 	public Collection<String> getVisitedLinks() {
@@ -63,12 +63,16 @@ public class ScraperLinksQueue {
 
 	public synchronized void addAllIfNotVisited(Collection<String> linksToAdd) {
 		for (String linkToEnqueue : linksToAdd)
-			if (!queuedLinksSet.contains(linkToEnqueue)) {
+			if (isNotAlreadyQueuedAndNotVisited(linkToEnqueue)) {
 				queuedLinks.add(linkToEnqueue);
 				queuedLinksSet.add(linkToEnqueue);
 			}
 
 		notifyAll();
+	}
+
+	private boolean isNotAlreadyQueuedAndNotVisited(String linkToEnqueue) {
+		return !queuedLinksSet.contains(linkToEnqueue) && !visitedLinks.contains(linkToEnqueue);
 	}
 
 	public synchronized void markVisited(String linkToMarkVisited) {

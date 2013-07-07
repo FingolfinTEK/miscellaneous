@@ -13,7 +13,7 @@ import com.fingy.scrape.queue.ScraperLinksQueue;
 public class AdultItemJsoupScraper extends AbstractAdultItemJsoupScraper {
 
 	private static final String CATEGORY_SEPARATOR = " > ";
-	private static final String IMAGE_URL = "https://www.adultwholesaledirect.com/customer/displayimagewm.php?id=";
+	private static final String IMAGE_URL = "http://www.adultwholesaledirect.com/customer/displayimagewm.php?id=";
 
 	public AdultItemJsoupScraper(Map<String, String> cookies, String scrapeUrl, ScraperLinksQueue linksQueue) {
 		super(cookies, scrapeUrl, linksQueue);

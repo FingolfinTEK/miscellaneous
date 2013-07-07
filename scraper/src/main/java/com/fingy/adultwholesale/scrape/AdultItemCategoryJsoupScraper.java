@@ -13,8 +13,8 @@ import com.fingy.scrape.queue.ScraperLinksQueue;
 
 public class AdultItemCategoryJsoupScraper extends AbstractAdultItemJsoupScraper {
 
-	private static final String ITEM_URL = "https://www.adultwholesaledirect.com/customer/bulk/ajax_getbulkproductdetails.php?prod_id=";
-	private static final String CATEGORY_URL = "https://www.adultwholesaledirect.com/customer/bulk/ajax_getbulkproducts.php?categ_id=%s&start=%s&browseby=1&displayType=1&rppt=96";
+	private static final String ITEM_URL = "http://www.adultwholesaledirect.com/customer/bulk/ajax_getbulkproductdetails.php?prod_id=";
+	private static final String CATEGORY_URL = "http://www.adultwholesaledirect.com/customer/bulk/ajax_getbulkproducts.php?categ_id=%s&start=%s&browseby=1&displayType=1&rppt=96";
 
 	private static final Pattern ITEM_PATTERN = Pattern.compile("javascript: void\\(displayDetails\\((\\d+)\\)\\)");
 	private static final Pattern PAGE_PATTERN = Pattern.compile("javascript: void\\(changeStart\\((\\d+)\\)\\)");
