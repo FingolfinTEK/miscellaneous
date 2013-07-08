@@ -27,14 +27,11 @@ import com.fingy.aprod.scrape.FirstAdPageJsoupScraper;
 import com.fingy.concurrent.ExecutorsUtil;
 import com.fingy.scrape.jsoup.HttpClientParserUtil;
 import com.fingy.scrape.queue.ScraperLinksQueue;
-import com.fingy.scrape.security.util.TorUtil;
 
 public class AprodScraperScheduler {
 
 	private static final int CATEGORY_TIMEOUT = 20000;
 	private static final int AVAILABLE_PROCESSORS = Runtime.getRuntime().availableProcessors();
-
-	private static boolean shouldUseTor = false;
 
 	private ExecutorService categoryScrapingThreadPool;
 	private ExecutorService contactScrapingThreadPool;
@@ -45,32 +42,10 @@ public class AprodScraperScheduler {
 	private Set<Contact> scrapedItems;
 	private String outputExcel;
 
-	public static void main(String[] args) throws FileNotFoundException, IOException, InterruptedException,
-			ExecutionException {
-		scrapeWhileThereAreResults();
-		// new AprodScraperScheduler(getOutputFileForIteration()).doScrape();
-	}
-
-	private static void scrapeWhileThereAreResults() throws ExecutionException, IOException, InterruptedException {
-
-		int count = 0;
-		do {
-			if (shouldUseTor) {
-				TorUtil.stopTor();
-				TorUtil.startAndUseTorAsProxy();
-				Thread.sleep(30000);
-			} else {
-				TorUtil.disableSocksProxy();
-			}
-
-			count = new AprodScraperScheduler(getOutputFileForIteration()).doScrape();
-
-			if (shouldUseTor) {
-				TorUtil.stopTor();
-			}
-
-			Thread.sleep(60000);
-		} while (count > 0);
+	public static void main(String[] args) throws FileNotFoundException, IOException, InterruptedException, ExecutionException {
+		// scrapeWhileThereAreResults();
+		int count = new AprodScraperScheduler(getOutputFileForIteration()).doScrape();
+		System.exit(count);
 	}
 
 	private static String getOutputFileForIteration() {
@@ -102,7 +77,7 @@ public class AprodScraperScheduler {
 
 			AdultItemJsoupScraper.setSessionExpired(false);
 			createSession();
-			submitAdPageScrapingTasksWhileThereIsEnoughWork();
+			submitScrapingTasksWhileThereIsEnoughWork();
 
 			ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(categoryScrapingThreadPool, 10, TimeUnit.MINUTES);
 			ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(contactScrapingThreadPool, 10, TimeUnit.MINUTES);
@@ -115,7 +90,7 @@ public class AprodScraperScheduler {
 			queuedSize = saveQueuedLinksToFile();
 		}
 
-		System.out.println("doScrape() - " + scrapedItems.size());
+		System.out.println("Scraped items: " + scrapedItems.size());
 		return queuedSize;
 	}
 
@@ -127,6 +102,7 @@ public class AprodScraperScheduler {
 		try {
 			final Set<String> visited = new HashSet<String>(FileUtils.readLines((new File("visited.txt"))));
 			linksQueue.markAllVisited(visited);
+			System.out.println("Found " + visited.size() + " visited links");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -136,12 +112,13 @@ public class AprodScraperScheduler {
 		try {
 			final Set<String> queued = new HashSet<String>(FileUtils.readLines((new File("queued.txt"))));
 			linksQueue.addAllIfNotVisited(queued);
+			System.out.println("Found " + queued.size() + " queued links; queue size: " + linksQueue.getSize());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	private void submitAdPageScrapingTasksWhileThereIsEnoughWork() {
+	private void submitScrapingTasksWhileThereIsEnoughWork() {
 		System.out.println("submitScrapingTasksWhileThereIsEnoughWork()");
 		while (stillHaveLinksToBeScraped()) {
 			if (AbstractAdultItemJsoupScraper.isSessionExpired()) {
@@ -159,8 +136,8 @@ public class AprodScraperScheduler {
 					submitContactScrapingTask(link);
 				}
 
-				// long sleepInterval = 500 + new Random(System.currentTimeMillis()).nextInt(1500);
-				// Thread.sleep(sleepInterval);
+				 long sleepInterval = new Random(System.currentTimeMillis()).nextInt(500);
+				 Thread.sleep(sleepInterval);
 			} catch (InterruptedException e) {
 				break;
 			}
@@ -205,11 +182,12 @@ public class AprodScraperScheduler {
 		}
 
 		// createExcelSheetFromScrapedItems(scrapedItems);
-		FileUtils.writeLines(new File("contacts.txt"), scrapedItems, true);
+		File contactsFile = new File("contacts.txt");
+		System.out.println(contactsFile.getAbsolutePath());
+		FileUtils.writeLines(contactsFile, scrapedItems, true);
 	}
 
-	public void createExcelSheetFromScrapedItems(final Collection<Contact> items) throws FileNotFoundException,
-			IOException {
+	public void createExcelSheetFromScrapedItems(final Collection<Contact> items) throws FileNotFoundException, IOException {
 		System.out.println("createExcelSheetFromScrapedItems()");
 		new ContactToExcelBuilder().buildExcel(items).writeToFile(outputExcel);
 	}
@@ -217,7 +195,9 @@ public class AprodScraperScheduler {
 	private void saveVisitedLinksToFile() {
 		try {
 			System.out.println("saveVisitedLinksToFile()");
-			FileUtils.writeLines(new File("visited.txt"), linksQueue.getVisitedLinks());
+			File visitedFile = new File("visited.txt");
+			System.out.println(visitedFile.getAbsolutePath());
+			FileUtils.writeLines(visitedFile, linksQueue.getVisitedLinks());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -232,7 +212,9 @@ public class AprodScraperScheduler {
 			temp.addAll(queuedLinks);
 			temp.removeAll(linksQueue.getVisitedLinks());
 
-			FileUtils.writeLines(new File("queued.txt"), temp);
+			File queuedFile = new File("queued.txt");
+			System.out.println(queuedFile.getAbsolutePath());
+			FileUtils.writeLines(queuedFile, temp);
 
 			return temp.size();
 		} catch (IOException e) {
@@ -243,8 +225,7 @@ public class AprodScraperScheduler {
 	}
 
 	private ExecutorService createDefaultThreadPool() {
-		return new ThreadPoolExecutor(AVAILABLE_PROCESSORS * 5, Integer.MAX_VALUE, 1, TimeUnit.MINUTES,
-				new LinkedBlockingQueue<Runnable>());
+		return new ThreadPoolExecutor(AVAILABLE_PROCESSORS * 5, Integer.MAX_VALUE, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>());
 	}
 
 	// private boolean isAdDescriptionPage(String href) {

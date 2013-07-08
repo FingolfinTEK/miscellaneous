@@ -5,20 +5,25 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class TorUtil {
 
 	private static final byte[] NEW_IDENTITY_COMMAND_BYTES = "SIGNAL NEWNYM".getBytes();
-	
+
+	private static Logger logger = LoggerFactory.getLogger(TorUtil.class);
+
 	private static Process torProcess;
 
 	public static void requestNewIdentity() {
 		try {
 			Map<Object, Object> backup = copySystemProperties();
 			disableSocksProxy();
-			
+
 			Socket socket = new Socket("127.0.0.1", 9151);
 			socket.getOutputStream().write(NEW_IDENTITY_COMMAND_BYTES);
-			
+
 			restoreSystemProperties(backup);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -46,7 +51,8 @@ public class TorUtil {
 	public static void startTor() {
 		try {
 			if (torProcess == null || processTerminated())
-				torProcess = Runtime.getRuntime().exec("C:/Users/Fingy/Downloads/Tor Browser/Start Tor Browser.exe");
+				torProcess = Runtime.getRuntime().exec("C:/Users/milos.milivojevic/Downloads/Tor Browser/start.exe");
+			logger.debug("Started Tor");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -60,7 +66,7 @@ public class TorUtil {
 		}
 		return true;
 	}
-	
+
 	public static void startAndUseTorAsProxy() {
 		startTor();
 		useTorAsProxy();
@@ -71,6 +77,7 @@ public class TorUtil {
 			Runtime.getRuntime().exec("Taskkill /IM tbb-firefox.exe /F").waitFor();
 			Runtime.getRuntime().exec("Taskkill /IM vidalia.exe /F").waitFor();
 			Runtime.getRuntime().exec("Taskkill /IM tor.exe /F").waitFor();
+			logger.debug("Stopped Tor");
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}

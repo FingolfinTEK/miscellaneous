@@ -7,11 +7,13 @@ import javax.net.ssl.TrustManager;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
@@ -24,11 +26,11 @@ import org.jsoup.nodes.Document;
 import com.fingy.scrape.security.TrustAllCertificates;
 
 public class HttpClientParserUtil {
-	
+
 	private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0";
 
 	private static HttpClient httpClient = getNewHttpClient();
-	
+
 	public static void resetClient() {
 		httpClient = getNewHttpClient();
 	}
@@ -46,9 +48,21 @@ public class HttpClientParserUtil {
 			registry.register(new Scheme("https", 443, sf));
 
 			ClientConnectionManager manager = new ThreadSafeClientConnManager(registry);
-			return new DefaultHttpClient(manager);
+			DefaultHttpClient defaultHttpClient = new DefaultHttpClient(manager);
+			addProxyIfNeeded(defaultHttpClient);
+			return defaultHttpClient;
 		} catch (Exception e) {
 			return new DefaultHttpClient();
+		}
+	}
+
+	private static void addProxyIfNeeded(DefaultHttpClient defaultHttpClient) {
+		String proxyPort = System.getProperty("http.proxyPort");
+		String proxyHost = System.getProperty("http.proxyHost");
+
+		if (proxyPort != null && proxyHost != null) {
+			HttpHost proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort));
+			defaultHttpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
 		}
 	}
 
