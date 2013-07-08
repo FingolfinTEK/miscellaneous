@@ -34,7 +34,7 @@ public class AprodScraperScheduler {
 	private static final int CATEGORY_TIMEOUT = 20000;
 	private static final int AVAILABLE_PROCESSORS = Runtime.getRuntime().availableProcessors();
 
-	private static boolean shouldUseTor = true;
+	private static boolean shouldUseTor = false;
 
 	private ExecutorService categoryScrapingThreadPool;
 	private ExecutorService contactScrapingThreadPool;
@@ -52,7 +52,7 @@ public class AprodScraperScheduler {
 	}
 
 	private static void scrapeWhileThereAreResults() throws ExecutionException, IOException, InterruptedException {
-		
+
 		int count = 0;
 		do {
 			if (shouldUseTor) {
@@ -62,7 +62,7 @@ public class AprodScraperScheduler {
 			} else {
 				TorUtil.disableSocksProxy();
 			}
-			
+
 			count = new AprodScraperScheduler(getOutputFileForIteration()).doScrape();
 
 			if (shouldUseTor) {
@@ -93,7 +93,7 @@ public class AprodScraperScheduler {
 		int queuedSize = 0;
 		try {
 			HttpClientParserUtil.resetClient();
-			
+
 			loadVisitedLinksFromFile();
 			loadQueuedLinksFromFile();
 
@@ -159,8 +159,8 @@ public class AprodScraperScheduler {
 					submitContactScrapingTask(link);
 				}
 
-				long sleepInterval = 500 + new Random(System.currentTimeMillis()).nextInt(1500);
-				Thread.sleep(sleepInterval);
+				// long sleepInterval = 500 + new Random(System.currentTimeMillis()).nextInt(1500);
+				// Thread.sleep(sleepInterval);
 			} catch (InterruptedException e) {
 				break;
 			}
