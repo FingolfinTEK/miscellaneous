@@ -40,12 +40,13 @@ public class ContactJsoupScraper extends AbstractAprodJsoupScraper<Contact> {
 
 	@Override
 	protected Contact scrapePage(Document page) {
+		String category = scrapeCategoryFromPage(page);
 		String name = scrapeNameFromPage(page);
 		String phoneNumber = scrapePhoneNumberFromPage(page);
 
 		if (isValidNumber(phoneNumber)) {
 			linksQueue.markVisited(getScrapeUrl());
-			return new Contact(name, phoneNumber);
+			return new Contact(category, name, phoneNumber);
 		}
 
 		AbstractJsoupScraper.setSessionExpired(true);
@@ -53,8 +54,8 @@ public class ContactJsoupScraper extends AbstractAprodJsoupScraper<Contact> {
 		throw new ScrapeException("Session expired!");
 	}
 
-	private boolean isValidNumber(String phoneNumber) {
-		return !phoneNumber.contains("limitet");
+	private String scrapeCategoryFromPage(Document page) {
+		return getTagTextFromCssQuery(page, "div.offerhead table.breadcrumb li:last-child a").trim();
 	}
 
 	private String scrapeNameFromPage(Document page) {
@@ -95,6 +96,10 @@ public class ContactJsoupScraper extends AbstractAprodJsoupScraper<Contact> {
 	private String cleanPhoneNumber(String phoneNumberString) {
 		return phoneNumberString.replaceAll("\"", "").replaceAll("<\\/span> *<span class=\\block\\>", ",")
 				.replaceAll("<span class=\\block\\>", "").replaceAll("<\\/span>", "");
+	}
+
+	private boolean isValidNumber(String phoneNumber) {
+		return !phoneNumber.contains("limitet");
 	}
 
 	public static void main(String[] args) throws IOException {

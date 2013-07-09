@@ -1,18 +1,25 @@
 package com.fingy.aprod;
 
+import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class Contact {
+public class Contact implements Comparable<Contact>{
 
-	public static final String FORBIDDEN_MESSAGE = "El\u00e9rted a maxim\u00e1lis limitet. Pr\u00f3b\u00e1lkozz \u00fajra egy \u00f3ra m\u00falva!";
+	private static final String FORBIDDEN_MESSAGE_FRAGMENT = "limitet";
 
+	private final String category;
 	private final String name;
 	private final String phoneNumber;
 
-	public Contact(String name, String phoneNumber) {
+	public Contact(String category, String name, String phoneNumber) {
+		this.category = category;
 		this.name = name;
 		this.phoneNumber = phoneNumber;
+	}
+
+	public String getCategory() {
+		return category;
 	}
 
 	public String getName() {
@@ -25,7 +32,7 @@ public class Contact {
 
 	@Override
 	public String toString() {
-		return name + ", " + phoneNumber;
+		return category + ", " + name + ", " + phoneNumber;
 	}
 
 	@Override
@@ -55,7 +62,16 @@ public class Contact {
 	}
 
 	public boolean isValid() {
-		return !"N/A".equals(phoneNumber) && !phoneNumber.contains("limitet");
+		return !"N/A".equals(phoneNumber) && !phoneNumber.contains(FORBIDDEN_MESSAGE_FRAGMENT);
+	}
+
+	@Override
+	public int compareTo(Contact o) {
+		CompareToBuilder builder = new CompareToBuilder();
+		builder.append(category, o.category);
+		builder.append(name, o.name);
+		builder.append(phoneNumber, o.phoneNumber);
+		return builder.toComparison();
 	}
 
 }
