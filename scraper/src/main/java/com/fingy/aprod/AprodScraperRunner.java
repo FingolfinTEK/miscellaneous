@@ -33,18 +33,20 @@ public class AprodScraperRunner {
 			if (shouldUseTor) {
 				TorUtil.stopTor();
 				TorUtil.startAndUseTorAsProxy();
-				Thread.sleep(30000);
+				Thread.sleep(45000);
 			} else {
 				TorUtil.disableSocksProxy();
 			}
 
 			count = runScraper();
+			System.out.println("Scraper finished with count " + count);
 
 			if (shouldUseTor) {
 				TorUtil.stopTor();
 			}
 
-			Thread.sleep(60000);
+			shutDown();
+			Thread.sleep(30000);
 		} while (count > 0);
 	}
 

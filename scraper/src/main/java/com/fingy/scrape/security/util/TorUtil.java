@@ -51,7 +51,7 @@ public class TorUtil {
 	public static void startTor() {
 		try {
 			if (torProcess == null || processTerminated())
-				torProcess = Runtime.getRuntime().exec("C:/Users/milos.milivojevic/Downloads/Tor Browser/start.exe");
+				torProcess = Runtime.getRuntime().exec("C:/Users/Fingy/Downloads/Tor Browser/Start Tor Browser.exe");
 			logger.debug("Started Tor");
 		} catch (IOException e) {
 			e.printStackTrace();
