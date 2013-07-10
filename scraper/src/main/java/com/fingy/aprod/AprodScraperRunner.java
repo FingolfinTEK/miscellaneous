@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import com.fingy.scrape.security.util.TorUtil;
 
-
 public class AprodScraperRunner {
 
 	private static final String USE_TOR_PARAM_NAME = "useTor";
@@ -39,9 +38,9 @@ public class AprodScraperRunner {
 		}
 
 		if (shouldUseTor) {
-			TorUtil.stopTor();
 			TorUtil.startAndUseTorAsProxy();
 			sleep();
+			TorUtil.authenticate();
 		} else {
 			TorUtil.disableSocksProxy();
 		}

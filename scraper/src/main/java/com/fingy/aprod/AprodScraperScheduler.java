@@ -180,7 +180,7 @@ public class AprodScraperScheduler {
 	}
 
 	private void saveResults() throws FileNotFoundException, IOException {
-		while (true) {
+		for (int i = 0; i < queuedLinks.size(); i++) {
 			try {
 				final Future<Contact> future = contactScrapingCompletionService.poll(20, TimeUnit.SECONDS);
 				Contact contact = future.get();
@@ -191,7 +191,6 @@ public class AprodScraperScheduler {
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
-				break;
 			}
 		}
 

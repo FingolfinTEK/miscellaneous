@@ -1,16 +1,22 @@
 package com.fingy.scrape.security.util;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TorUtil {
 
-	private static final byte[] NEW_IDENTITY_COMMAND_BYTES = "SIGNAL NEWNYM".getBytes();
+	private static final String AUTHENTICATE_COMMAND = "\"AUTHENTICATE\"\n";
+	private static final String NEW_IDENTITY_COMMAND = "\"SIGNAL\" \"NEWNYM\"\n";
+	private static final String SHUTDOWN_IDENTITY_COMMAND = "\"SIGNAL\" \"SHUTDOWN\"\n";
+	private static final String TERMINATE_IDENTITY_COMMAND = "\"SIGNAL TERM\"\n";
 
 	private static final String TOR_SOKCS_HOST = "127.0.0.1";
 	private static final String TOR_SOKCS_PORT = "9150";
@@ -28,17 +34,39 @@ public class TorUtil {
 	}
 
 	public static void requestNewIdentity() {
+		Map<Object, Object> backup = copySystemProperties();
+		disableSocksProxy();
+
+		executeTorCommand(NEW_IDENTITY_COMMAND);
+		restoreSystemProperties(backup);
+	}
+
+	private static void executeTorCommand(String command) {
 		try {
-			Map<Object, Object> backup = copySystemProperties();
-			disableSocksProxy();
-
 			Socket socket = new Socket(TOR_SOKCS_HOST, 9151);
-			socket.getOutputStream().write(NEW_IDENTITY_COMMAND_BYTES);
+			socket.getOutputStream().write(command.getBytes());
 
-			restoreSystemProperties(backup);
+			BufferedReader reader = IOUtils.toBufferedReader(new InputStreamReader(socket.getInputStream()));
+			System.out.println("Received response from TOR" + reader.readLine());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static void shutdownTor() {
+		Map<Object, Object> backup = copySystemProperties();
+		disableSocksProxy();
+
+		executeTorCommand(SHUTDOWN_IDENTITY_COMMAND);
+		restoreSystemProperties(backup);
+	}
+
+	public static void terminateTor() {
+		Map<Object, Object> backup = copySystemProperties();
+		disableSocksProxy();
+
+		executeTorCommand(TERMINATE_IDENTITY_COMMAND);
+		restoreSystemProperties(backup);
 	}
 
 	private static void restoreSystemProperties(Map<?, ?> backup) {
@@ -93,13 +121,19 @@ public class TorUtil {
 
 	public static void stopTor() {
 		try {
+			shutdownTor();
 			Runtime.getRuntime().exec("Taskkill /IM tbb-firefox.exe /F").waitFor();
 			Runtime.getRuntime().exec("Taskkill /IM vidalia.exe /F").waitFor();
+			terminateTor();
 			Runtime.getRuntime().exec("Taskkill /IM tor.exe /F").waitFor();
 			logger.debug("Stopped Tor");
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static void authenticate() {
+		executeTorCommand(AUTHENTICATE_COMMAND);
 	}
 
 }
