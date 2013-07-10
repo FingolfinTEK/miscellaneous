@@ -61,14 +61,18 @@ public class ScraperLinksQueue {
 		}
 	}
 
-	public synchronized void addAllIfNotVisited(Collection<String> linksToAdd) {
+	public synchronized int addAllIfNotVisited(Collection<String> linksToAdd) {
+		int numberAdded = 0;
+
 		for (String linkToEnqueue : linksToAdd)
 			if (isNotAlreadyQueuedAndNotVisited(linkToEnqueue)) {
+				numberAdded++;
 				queuedLinks.add(linkToEnqueue);
 				queuedLinksSet.add(linkToEnqueue);
 			}
 
 		notifyAll();
+		return numberAdded;
 	}
 
 	private boolean isNotAlreadyQueuedAndNotVisited(String linkToEnqueue) {

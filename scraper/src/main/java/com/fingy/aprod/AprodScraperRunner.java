@@ -14,7 +14,10 @@ import org.slf4j.LoggerFactory;
 
 import com.fingy.scrape.security.util.TorUtil;
 
+
 public class AprodScraperRunner {
+
+	private static final String USE_TOR_PARAM_NAME = "useTor";
 
 	private static boolean shouldUseTor = false;
 
@@ -24,29 +27,41 @@ public class AprodScraperRunner {
 	private static Thread errorStreamPrinter;
 
 	public static void main(String[] args) throws ExecutionException, IOException, InterruptedException {
+		setUpTorIfNeeded(args);
 		scrapeWhileThereAreResults();
+		stopTor();
+	}
+
+	private static void setUpTorIfNeeded(String[] args) {
+		if (args.length == 2) {
+			shouldUseTor = USE_TOR_PARAM_NAME.equals(args[0]);
+			TorUtil.setTorBundleLocation(args[1]);
+		}
+
+		if (shouldUseTor) {
+			TorUtil.stopTor();
+			TorUtil.startAndUseTorAsProxy();
+			sleep();
+		} else {
+			TorUtil.disableSocksProxy();
+		}
+	}
+
+	private static void sleep() {
+		try {
+			Thread.sleep(45000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private static void scrapeWhileThereAreResults() throws ExecutionException, IOException, InterruptedException {
 		int count = 0;
 		do {
-			if (shouldUseTor) {
-				TorUtil.stopTor();
-				TorUtil.startAndUseTorAsProxy();
-				Thread.sleep(45000);
-			} else {
-				TorUtil.disableSocksProxy();
-			}
-
+			TorUtil.requestNewIdentity();
 			count = runScraper();
-			System.out.println("Scraper finished with count " + count);
-
-			if (shouldUseTor) {
-				TorUtil.stopTor();
-			}
-
 			shutDown();
-			Thread.sleep(30000);
+			sleep();
 		} while (count > 0);
 	}
 
@@ -62,27 +77,8 @@ public class AprodScraperRunner {
 		errorStreamPrinter = new InputStreamPrinterThread(scraperProcess.getErrorStream());
 		errorStreamPrinter.start();
 
-		scraperProcess.waitFor();
+		System.out.println("Scraper finished with count " + scraperProcess.waitFor());
 		return scraperProcess.exitValue();
-	}
-
-	private static String generateCommand() {
-		final String classPath = ManagementFactory.getRuntimeMXBean().getClassPath();
-
-		final StringBuilder cmd = new StringBuilder();
-		cmd.append("java ");
-		cmd.append("-cp \"").append(classPath).append("\" ");
-		appendVMArguments(cmd);
-		cmd.append(AprodScraperScheduler.class.getName());
-
-		return cmd.toString();
-	}
-
-	private static void appendVMArguments(final StringBuilder cmd) {
-		final List<String> vmArguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
-		for (String argument : vmArguments)
-			if (argument.startsWith("-D"))
-				cmd.append(argument).append(" ");
 	}
 
 	protected static void addShutdownHookToCloseTheProcess() {
@@ -105,6 +101,35 @@ public class AprodScraperRunner {
 
 		if (scraperProcess != null) {
 			scraperProcess.destroy();
+		}
+	}
+
+	private static String generateCommand() {
+		final String classPath = ManagementFactory.getRuntimeMXBean().getClassPath();
+
+		final StringBuilder cmd = new StringBuilder();
+		cmd.append("java ");
+		cmd.append("-cp \"").append(classPath).append("\" ");
+		appendVMArguments(cmd);
+		cmd.append(AprodScraperScheduler.class.getName());
+
+		return cmd.toString();
+	}
+
+	private static void appendVMArguments(final StringBuilder cmd) {
+		if (shouldUseTor) {
+			cmd.append(TorUtil.getTorProxyVMArguments()).append(" ");
+		}
+
+		final List<String> vmArguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
+		for (String argument : vmArguments)
+			if (argument.startsWith("-D"))
+				cmd.append(argument).append(" ");
+	}
+
+	private static void stopTor() {
+		if (shouldUseTor) {
+			TorUtil.stopTor();
 		}
 	}
 

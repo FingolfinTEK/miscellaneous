@@ -94,8 +94,22 @@ public class ContactJsoupScraper extends AbstractAprodJsoupScraper<Contact> {
 	}
 
 	private String cleanPhoneNumber(String phoneNumberString) {
-		return phoneNumberString.replaceAll("\"", "").replaceAll("<\\/span> *<span class=\\block\\>", ",")
+		String extractedPhoneNumbers = extractMultiplePhoneNumbers(phoneNumberString);
+		String cleanedPhoneNumbers = removeIllegalCharacters(extractedPhoneNumbers);
+		return separateMultiplePhoneNumbersBySpaceInsteadOfDash(cleanedPhoneNumbers);
+	}
+
+	private String extractMultiplePhoneNumbers(String phoneNumberString) {
+		return phoneNumberString.replaceAll("<\\/span>*<span class=\\block\\>", ",")
 				.replaceAll("<span class=\\block\\>", "").replaceAll("<\\/span>", "");
+	}
+
+	private String removeIllegalCharacters(String phoneNumberString) {
+		return phoneNumberString.replaceAll("[ \\-\"]+", "");
+	}
+
+	private String separateMultiplePhoneNumbersBySpaceInsteadOfDash(String phoneNumberString) {
+		return phoneNumberString.replaceAll(",", " ");
 	}
 
 	private boolean isValidNumber(String phoneNumber) {
@@ -104,7 +118,7 @@ public class ContactJsoupScraper extends AbstractAprodJsoupScraper<Contact> {
 
 	public static void main(String[] args) throws IOException {
 		System.out.println(new ContactJsoupScraper(
-				"http://aprod.hu/hirdetes/modell-munka-budapesten-ID19hdj.html#aab5e98961;promoted",
+				"http://aprod.hu/hirdetes/budapestxvii-fouton-elado-egy-azonnal-bekoltozheto-ikerhaz-resz-ID16BcJ.html#aab5e98961;promoted",
 				new ScraperLinksQueue()).call());
 	}
 }

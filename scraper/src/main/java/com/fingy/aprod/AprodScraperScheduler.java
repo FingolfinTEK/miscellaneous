@@ -3,9 +3,11 @@ package com.fingy.aprod;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -40,7 +42,6 @@ public class AprodScraperScheduler {
 	private ScraperLinksQueue linksQueue;
 	private Set<String> queuedLinks;
 	private Set<Contact> scrapedItems;
-	private String outputExcel;
 
 	public static void main(String[] args) throws FileNotFoundException, IOException, InterruptedException, ExecutionException {
 		// scrapeWhileThereAreResults();
@@ -56,18 +57,17 @@ public class AprodScraperScheduler {
 	public AprodScraperScheduler(final String outputExcelFile) {
 		adPageScrapingThreadPool = createDefaultThreadPool();
 		contactScrapingThreadPool = Executors.newSingleThreadExecutor();
-		contactScrapingCompletionService = new ExecutorCompletionService<Contact>(contactScrapingThreadPool);
+		contactScrapingCompletionService = new ExecutorCompletionService<>(contactScrapingThreadPool);
 
 		linksQueue = new ScraperLinksQueue();
-		queuedLinks = new LinkedHashSet<String>();
-		scrapedItems = new LinkedHashSet<Contact>();
-
-		outputExcel = outputExcelFile;
+		queuedLinks = new LinkedHashSet<>();
+		scrapedItems = new LinkedHashSet<>();
 	}
 
 	public int doScrape() {
 		int queuedSize = 0;
 		try {
+			loadContactsFromFile();
 			loadVisitedLinksFromFile();
 			loadQueuedLinksFromFile();
 
@@ -81,7 +81,7 @@ public class AprodScraperScheduler {
 			ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(adPageScrapingThreadPool, 10, TimeUnit.MINUTES);
 			ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(contactScrapingThreadPool, 10, TimeUnit.MINUTES);
 
-			saveResultsToExcelAndDownloadImages();
+			saveResults();
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -91,6 +91,18 @@ public class AprodScraperScheduler {
 
 		System.out.println("Scraped items: " + scrapedItems.size());
 		return queuedSize;
+	}
+
+	private void loadContactsFromFile() {
+		try {
+			final List<String> lines = FileUtils.readLines((new File("contacts.txt")));
+			for(String line : lines) {
+				scrapedItems.add(Contact.fromString(line));
+			}
+			System.out.println("Loaded " + lines.size() + " contacts");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void createSession() throws IOException {
@@ -135,7 +147,7 @@ public class AprodScraperScheduler {
 					submitContactScrapingTask(link);
 				}
 
-				 long sleepInterval = new Random(System.currentTimeMillis()).nextInt(1500);
+				 long sleepInterval = new Random(System.currentTimeMillis()).nextInt(500);
 				 Thread.sleep(sleepInterval);
 			} catch (InterruptedException e) {
 				break;
@@ -167,7 +179,7 @@ public class AprodScraperScheduler {
 		}
 	}
 
-	private void saveResultsToExcelAndDownloadImages() throws FileNotFoundException, IOException {
+	private void saveResults() throws FileNotFoundException, IOException {
 		while (true) {
 			try {
 				final Future<Contact> future = contactScrapingCompletionService.poll(20, TimeUnit.SECONDS);
@@ -183,15 +195,11 @@ public class AprodScraperScheduler {
 			}
 		}
 
-		// createExcelSheetFromScrapedItems(scrapedItems);
-		File contactsFile = new File("contacts.txt");
-		System.out.println(contactsFile.getAbsolutePath());
-		FileUtils.writeLines(contactsFile, scrapedItems, true);
-	}
+		final List<Contact> forSorting = new ArrayList<>(scrapedItems);
+		Collections.sort(forSorting);
 
-	public void createExcelSheetFromScrapedItems(final Collection<Contact> items) throws FileNotFoundException, IOException {
-		System.out.println("createExcelSheetFromScrapedItems()");
-		new ContactToExcelBuilder().buildExcel(items).writeToFile(outputExcel);
+		File contactsFile = new File("contacts.txt");
+		FileUtils.writeLines(contactsFile, forSorting);
 	}
 
 	private void saveVisitedLinksToFile() {

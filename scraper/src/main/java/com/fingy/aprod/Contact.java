@@ -1,10 +1,13 @@
 package com.fingy.aprod;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class Contact implements Comparable<Contact>{
+
+	private static final String N_A = "N/A";
 
 	private static final String FORBIDDEN_MESSAGE_FRAGMENT = "limitet";
 
@@ -32,12 +35,13 @@ public class Contact implements Comparable<Contact>{
 
 	@Override
 	public String toString() {
-		return category + ", " + name + ", " + phoneNumber;
+		return category + "#" + name + "#" + phoneNumber;
 	}
 
 	@Override
 	public int hashCode() {
 		HashCodeBuilder hashCodeBuilder = new HashCodeBuilder();
+		hashCodeBuilder.append(category);
 		hashCodeBuilder.append(name);
 		hashCodeBuilder.append(phoneNumber);
 		return hashCodeBuilder.toHashCode();
@@ -56,13 +60,22 @@ public class Contact implements Comparable<Contact>{
 		}
 		Contact other = (Contact) obj;
 		EqualsBuilder equalsBuilder = new EqualsBuilder();
+		equalsBuilder.append(category, other.category);
 		equalsBuilder.append(name, other.name);
 		equalsBuilder.append(phoneNumber, other.phoneNumber);
 		return equalsBuilder.isEquals();
 	}
 
 	public boolean isValid() {
-		return !"N/A".equals(phoneNumber) && !phoneNumber.contains(FORBIDDEN_MESSAGE_FRAGMENT);
+		return isNameValid() && isPhoneNumberValid();
+	}
+
+	private boolean isNameValid() {
+		return false;
+	}
+
+	private boolean isPhoneNumberValid() {
+		return !StringUtils.isNotBlank(phoneNumber) && !N_A.equals(phoneNumber) && !phoneNumber.contains(FORBIDDEN_MESSAGE_FRAGMENT);
 	}
 
 	@Override
@@ -72,6 +85,11 @@ public class Contact implements Comparable<Contact>{
 		builder.append(name, o.name);
 		builder.append(phoneNumber, o.phoneNumber);
 		return builder.toComparison();
+	}
+
+	public static Contact fromString(String contactData) {
+		String[] data = contactData.split("#");
+		return new Contact(data[0], data[1], data[2]);
 	}
 
 }
