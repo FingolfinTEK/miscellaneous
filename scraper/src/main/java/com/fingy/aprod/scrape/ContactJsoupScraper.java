@@ -84,7 +84,7 @@ public class ContactJsoupScraper extends AbstractAprodJsoupScraper<Contact> {
 	private String getPhoneNumberByAjax(String requestId) {
 		try {
 			String phoneNumberUrl = "http://aprod.hu/ajax/misc/contact/phone/" + requestId + "/";
-			String phoneNumberString = HttpClientParserUtil.delayedGetPageAsStringFromUrl(500, phoneNumberUrl);
+			String phoneNumberString = HttpClientParserUtil.getPageAsStringFromUrl(phoneNumberUrl);
 			return cleanPhoneNumber(phoneNumberString);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -100,8 +100,7 @@ public class ContactJsoupScraper extends AbstractAprodJsoupScraper<Contact> {
 	}
 
 	private String extractMultiplePhoneNumbers(String phoneNumberString) {
-		return phoneNumberString.replaceAll("<\\/span>*<span class=\\block\\>", ",")
-				.replaceAll("<span class=\\block\\>", "").replaceAll("<\\/span>", "");
+		return phoneNumberString.replaceAll("<\\/span>*<span class=\\block\\>", ",").replaceAll("<span class=\\block\\>", "").replaceAll("<\\/span>", "");
 	}
 
 	private String removeIllegalCharacters(String phoneNumberString) {

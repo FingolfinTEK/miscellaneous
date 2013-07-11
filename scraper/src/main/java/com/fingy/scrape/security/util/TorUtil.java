@@ -37,7 +37,7 @@ public class TorUtil {
 			Socket socket = new Socket(TOR_SOKCS_HOST, 9151);
 
 			for (String command : commands) {
-				System.out.println("Seding command to Tor: " + command);
+				System.out.print("Seding command to Tor: " + command);
 				socket.getOutputStream().write(command.getBytes());
 
 				InputStreamReader torResponseReader = new InputStreamReader(socket.getInputStream());
@@ -52,20 +52,16 @@ public class TorUtil {
 		restoreSystemProperties(backup);
 	}
 
-	public static void authenticate() {
-		executeTorCommands(AUTHENTICATE_COMMAND);
-	}
-
 	public static void requestNewIdentity() {
 		executeTorCommands(AUTHENTICATE_COMMAND, NEW_IDENTITY_COMMAND);
 	}
 
 	public static void shutdownTor() {
-		executeTorCommands(SHUTDOWN_IDENTITY_COMMAND);
+		executeTorCommands(AUTHENTICATE_COMMAND, SHUTDOWN_IDENTITY_COMMAND);
 	}
 
 	public static void terminateTor() {
-		executeTorCommands(TERMINATE_IDENTITY_COMMAND);
+		executeTorCommands(AUTHENTICATE_COMMAND, TERMINATE_IDENTITY_COMMAND);
 	}
 
 	private static void restoreSystemProperties(Map<?, ?> backup) {
@@ -121,12 +117,20 @@ public class TorUtil {
 	public static void stopTor() {
 		try {
 			shutdownTor();
-			Runtime.getRuntime().exec("Taskkill /IM tbb-firefox.exe /F").waitFor();
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} finally {
+			forciblyTerminateProcesses();
+		}
+	}
+
+	private static void forciblyTerminateProcesses() {
+		try {
 			Runtime.getRuntime().exec("Taskkill /IM vidalia.exe /F").waitFor();
-			terminateTor();
 			Runtime.getRuntime().exec("Taskkill /IM tor.exe /F").waitFor();
 			logger.debug("Stopped Tor");
-		} catch (IOException | InterruptedException e) {
+		} catch (InterruptedException | IOException e) {
 			e.printStackTrace();
 		}
 	}

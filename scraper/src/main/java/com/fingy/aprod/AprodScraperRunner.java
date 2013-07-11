@@ -47,6 +47,7 @@ public class AprodScraperRunner {
 
 	private static void sleep() {
 		try {
+			System.out.println("Waiting 45 seconds for Tor to start");
 			Thread.sleep(45000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -56,9 +57,9 @@ public class AprodScraperRunner {
 	private static void scrapeWhileThereAreResults() throws ExecutionException, IOException, InterruptedException {
 		int count = 0;
 		do {
-			TorUtil.requestNewIdentity();
 			count = runScraper();
 			shutDown();
+			TorUtil.requestNewIdentity();
 			sleep();
 		} while (count > 0);
 	}

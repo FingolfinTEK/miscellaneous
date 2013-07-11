@@ -12,7 +12,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
@@ -47,13 +46,19 @@ public class HttpClientParserUtil {
 			registry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
 			registry.register(new Scheme("https", 443, sf));
 
-			ClientConnectionManager manager = new ThreadSafeClientConnManager(registry);
-			DefaultHttpClient defaultHttpClient = new DefaultHttpClient(manager);
-			addProxyIfNeeded(defaultHttpClient);
-			return defaultHttpClient;
+			ThreadSafeClientConnManager manager = new ThreadSafeClientConnManager(registry);
+			manager.setDefaultMaxPerRoute(10);
+
+			return createDefaultHttpClient(manager);
 		} catch (Exception e) {
 			return new DefaultHttpClient();
 		}
+	}
+
+	private static HttpClient createDefaultHttpClient(ThreadSafeClientConnManager manager) {
+		DefaultHttpClient defaultHttpClient = new DefaultHttpClient(manager);
+		addProxyIfNeeded(defaultHttpClient);
+		return defaultHttpClient;
 	}
 
 	private static void addProxyIfNeeded(DefaultHttpClient defaultHttpClient) {

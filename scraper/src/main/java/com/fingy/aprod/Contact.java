@@ -71,11 +71,11 @@ public class Contact implements Comparable<Contact>{
 	}
 
 	private boolean isNameValid() {
-		return false;
+		return StringUtils.isNotBlank(name);
 	}
 
 	private boolean isPhoneNumberValid() {
-		return !StringUtils.isNotBlank(phoneNumber) && !N_A.equals(phoneNumber) && !phoneNumber.contains(FORBIDDEN_MESSAGE_FRAGMENT);
+		return StringUtils.isNotBlank(phoneNumber) && !N_A.equals(phoneNumber) && !phoneNumber.contains(FORBIDDEN_MESSAGE_FRAGMENT);
 	}
 
 	@Override
