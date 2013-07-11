@@ -3,9 +3,10 @@
 
 AvoidDiskWrites 1
 ControlPort 9151
-DataDirectory C:/Users/milos.milivojevic/Downloads/Tor Browser/Data/Tor
+DataDirectory .\Data\Tor\
 DirReqStatistics 0
 GeoIPFile .\Data\Tor\geoip
 Log notice stdout
+HashedControlPassword 16:538B627BA7932BD860168BA735AB3150694F8AD7CE8F2EA7B7D6C522B4
 SocksListenAddress 127.0.0.1
-SocksPort 9050
+SocksPort 9150

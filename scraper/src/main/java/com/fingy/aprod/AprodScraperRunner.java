@@ -32,15 +32,14 @@ public class AprodScraperRunner {
 	}
 
 	private static void setUpTorIfNeeded(String[] args) {
-		if (args.length == 2) {
+		if (args.length == 1) {
 			shouldUseTor = USE_TOR_PARAM_NAME.equals(args[0]);
-			TorUtil.setTorBundleLocation(args[1]);
 		}
 
 		if (shouldUseTor) {
+			TorUtil.stopTor();
 			TorUtil.startAndUseTorAsProxy();
 			sleep();
-			TorUtil.authenticate();
 		} else {
 			TorUtil.disableSocksProxy();
 		}

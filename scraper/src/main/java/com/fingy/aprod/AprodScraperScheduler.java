@@ -43,7 +43,8 @@ public class AprodScraperScheduler {
 	private Set<String> queuedLinks;
 	private Set<Contact> scrapedItems;
 
-	public static void main(String[] args) throws FileNotFoundException, IOException, InterruptedException, ExecutionException {
+	public static void main(String[] args) throws FileNotFoundException, IOException, InterruptedException,
+			ExecutionException {
 		// scrapeWhileThereAreResults();
 		int count = new AprodScraperScheduler(getOutputFileForIteration()).doScrape();
 		HttpClientParserUtil.resetClient();
@@ -96,7 +97,7 @@ public class AprodScraperScheduler {
 	private void loadContactsFromFile() {
 		try {
 			final List<String> lines = FileUtils.readLines((new File("contacts.txt")));
-			for(String line : lines) {
+			for (String line : lines) {
 				scrapedItems.add(Contact.fromString(line));
 			}
 			System.out.println("Loaded " + lines.size() + " contacts");
@@ -147,8 +148,8 @@ public class AprodScraperScheduler {
 					submitContactScrapingTask(link);
 				}
 
-				 long sleepInterval = new Random(System.currentTimeMillis()).nextInt(500);
-				 Thread.sleep(sleepInterval);
+				long sleepInterval = new Random(System.currentTimeMillis()).nextInt(500);
+				Thread.sleep(sleepInterval);
 			} catch (InterruptedException e) {
 				break;
 			}
@@ -234,7 +235,8 @@ public class AprodScraperScheduler {
 	}
 
 	private ExecutorService createDefaultThreadPool() {
-		return new ThreadPoolExecutor(AVAILABLE_PROCESSORS * 5, Integer.MAX_VALUE, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>());
+		return new ThreadPoolExecutor(AVAILABLE_PROCESSORS * 5, Integer.MAX_VALUE, 1, TimeUnit.MINUTES,
+				new LinkedBlockingQueue<Runnable>());
 	}
 
 	// private boolean isAdDescriptionPage(String href) {
