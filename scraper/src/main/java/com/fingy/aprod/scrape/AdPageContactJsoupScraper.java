@@ -25,8 +25,7 @@ public class AdPageContactJsoupScraper extends AbstractAprodJsoupScraper<String>
 	@Override
 	protected String scrapePage(Document page) {
 		Collection<String> adLinksFromPage = getAdLinksFromPage(page);
-		int newAds = linksQueue.addAllIfNotVisited(adLinksFromPage);
-		logger.debug("Discovered " + newAds + " new ads");
+		linksQueue.addAllIfNotVisited(adLinksFromPage);
 		return getScrapeUrl();
 	}
 

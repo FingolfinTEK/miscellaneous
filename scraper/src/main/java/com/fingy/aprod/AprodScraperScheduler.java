@@ -36,33 +36,29 @@ public class AprodScraperScheduler {
 	private static final int AVAILABLE_PROCESSORS = Runtime.getRuntime().availableProcessors();
 
 	private ExecutorService adPageScrapingThreadPool;
-	private ExecutorService contactScrapingThreadPool;
 	private ExecutorCompletionService<Contact> contactScrapingCompletionService;
 
 	private ScraperLinksQueue linksQueue;
 	private Set<String> queuedLinks;
 	private Set<Contact> scrapedItems;
 
-	public static void main(String[] args) throws FileNotFoundException, IOException, InterruptedException,
-			ExecutionException {
-		// scrapeWhileThereAreResults();
-		int count = new AprodScraperScheduler(getOutputFileForIteration()).doScrape();
+	private File contactsFile;
+
+	public static void main(String[] args) throws FileNotFoundException, IOException, InterruptedException, ExecutionException {
+		int count = new AprodScraperScheduler(args[0]).doScrape();
 		HttpClientParserUtil.resetClient();
 		System.exit(count);
 	}
 
-	private static String getOutputFileForIteration() {
-		return "aprod-" + System.currentTimeMillis() + ".xlsx";
-	}
-
-	public AprodScraperScheduler(final String outputExcelFile) {
-		adPageScrapingThreadPool = createDefaultThreadPool();
-		contactScrapingThreadPool = Executors.newSingleThreadExecutor();
-		contactScrapingCompletionService = new ExecutorCompletionService<>(contactScrapingThreadPool);
+	public AprodScraperScheduler(final String contactsFilePath) {
+		adPageScrapingThreadPool = Executors.newSingleThreadExecutor();
+		contactScrapingCompletionService = new ExecutorCompletionService<>(adPageScrapingThreadPool);
 
 		linksQueue = new ScraperLinksQueue();
 		queuedLinks = new LinkedHashSet<>();
 		scrapedItems = new LinkedHashSet<>();
+
+		contactsFile = new File(contactsFilePath);
 	}
 
 	public int doScrape() {
@@ -72,16 +68,12 @@ public class AprodScraperScheduler {
 			loadVisitedLinksFromFile();
 			loadQueuedLinksFromFile();
 
-			new FirstAdPageJsoupScraper("http://aprod.hu/budapest/", linksQueue).call();
-			new FirstAdPageJsoupScraper("http://aprod.hu/budapest/?search[offer_seek]=seek", linksQueue).call();
+			adPageScrapingThreadPool.submit(new FirstAdPageJsoupScraper("http://aprod.hu/budapest/", linksQueue));
+			adPageScrapingThreadPool.submit(new FirstAdPageJsoupScraper("http://aprod.hu/budapest/?search[offer_seek]=seek", linksQueue));
 
 			AdultItemJsoupScraper.setSessionExpired(false);
 			createSession();
 			submitScrapingTasksWhileThereIsEnoughWork();
-
-			ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(adPageScrapingThreadPool, 10, TimeUnit.MINUTES);
-			ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(contactScrapingThreadPool, 10, TimeUnit.MINUTES);
-
 			saveResults();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -96,7 +88,7 @@ public class AprodScraperScheduler {
 
 	private void loadContactsFromFile() {
 		try {
-			final List<String> lines = FileUtils.readLines((new File("contacts.txt")));
+			final List<String> lines = FileUtils.readLines(contactsFile);
 			for (String line : lines) {
 				scrapedItems.add(Contact.fromString(line));
 			}
@@ -181,6 +173,16 @@ public class AprodScraperScheduler {
 	}
 
 	private void saveResults() throws FileNotFoundException, IOException {
+		ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(adPageScrapingThreadPool, 10, TimeUnit.MINUTES);
+
+		collectResults();
+
+		final List<Contact> forSorting = new ArrayList<>(scrapedItems);
+		Collections.sort(forSorting);
+		FileUtils.writeLines(contactsFile, forSorting);
+	}
+
+	private void collectResults() {
 		for (int i = 0; i < queuedLinks.size(); i++) {
 			try {
 				final Future<Contact> future = contactScrapingCompletionService.poll(10, TimeUnit.SECONDS);
@@ -194,12 +196,6 @@ public class AprodScraperScheduler {
 				e.printStackTrace();
 			}
 		}
-
-		final List<Contact> forSorting = new ArrayList<>(scrapedItems);
-		Collections.sort(forSorting);
-
-		File contactsFile = new File("contacts.txt");
-		FileUtils.writeLines(contactsFile, forSorting);
 	}
 
 	private void saveVisitedLinksToFile() {
@@ -235,11 +231,6 @@ public class AprodScraperScheduler {
 	}
 
 	private ExecutorService createDefaultThreadPool() {
-		return new ThreadPoolExecutor(AVAILABLE_PROCESSORS * 5, Integer.MAX_VALUE, 1, TimeUnit.MINUTES,
-				new LinkedBlockingQueue<Runnable>());
+		return new ThreadPoolExecutor(AVAILABLE_PROCESSORS * 5, Integer.MAX_VALUE, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>());
 	}
-
-	// private boolean isAdDescriptionPage(String href) {
-	// return href.contains("hirdetes");
-	// }
 }

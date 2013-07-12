@@ -29,16 +29,6 @@ public class ContactJsoupScraper extends AbstractAprodJsoupScraper<Contact> {
 	}
 
 	@Override
-	protected Document getPage(String scrapeUrl) throws IOException {
-		try {
-			return HttpClientParserUtil.getPageFromUrl(scrapeUrl);
-		} catch (IOException e) {
-			AbstractAprodJsoupScraper.setSessionExpired(true);
-			throw e;
-		}
-	}
-
-	@Override
 	protected Contact scrapePage(Document page) {
 		String category = scrapeCategoryFromPage(page);
 		String name = scrapeNameFromPage(page);
