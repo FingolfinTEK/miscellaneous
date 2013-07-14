@@ -1,6 +1,8 @@
 package com.fingy.scrape.jsoup;
 
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -18,7 +20,7 @@ import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -28,16 +30,29 @@ public class HttpClientParserUtil {
 
 	private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0";
 
-	private static HttpClient httpClient = getNewHttpClient();
-
-	public static void resetClient() {
-		httpClient = getNewHttpClient();
-	}
+	private static PoolingClientConnectionManager manager = createPoolingClientConnectionManager();
+	private static ThreadLocal<HttpClient> httpClient = new ThreadLocal<HttpClient>() {
+		@Override
+		protected HttpClient initialValue() {
+			return getNewHttpClient();
+		}
+	};
 
 	public static HttpClient getNewHttpClient() {
 		try {
+			return createDefaultHttpClient(manager);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return new DefaultHttpClient();
+	}
+
+	private static PoolingClientConnectionManager createPoolingClientConnectionManager() {
+		try {
 			TrustManager tm = new TrustAllCertificates();
-			SSLContext sslContext = SSLContext.getInstance("TLS");
+			SSLContext sslContext;
+			sslContext = SSLContext.getInstance("TLS");
 			sslContext.init(null, new TrustManager[] { tm }, null);
 
 			SSLSocketFactory sf = new SSLSocketFactory(sslContext, SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
@@ -46,16 +61,20 @@ public class HttpClientParserUtil {
 			registry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
 			registry.register(new Scheme("https", 443, sf));
 
-			ThreadSafeClientConnManager manager = new ThreadSafeClientConnManager(registry);
+			PoolingClientConnectionManager manager = new PoolingClientConnectionManager(registry);
 			manager.setDefaultMaxPerRoute(10);
-
-			return createDefaultHttpClient(manager);
-		} catch (Exception e) {
-			return new DefaultHttpClient();
+			return manager;
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (KeyManagementException e) {
+			e.printStackTrace();
 		}
+		
+		return new PoolingClientConnectionManager();
+
 	}
 
-	private static HttpClient createDefaultHttpClient(ThreadSafeClientConnManager manager) {
+	private static HttpClient createDefaultHttpClient(PoolingClientConnectionManager manager) {
 		DefaultHttpClient defaultHttpClient = new DefaultHttpClient(manager);
 		addProxyIfNeeded(defaultHttpClient);
 		return defaultHttpClient;
@@ -79,7 +98,7 @@ public class HttpClientParserUtil {
 	private static HttpEntity getEntityFromUrl(String scrapeUrl) throws IOException, ClientProtocolException {
 		HttpGet get = new HttpGet(scrapeUrl);
 		get.setHeader("User-Agent", USER_AGENT);
-		HttpResponse response = httpClient.execute(get);
+		HttpResponse response = httpClient.get().execute(get);
 		HttpEntity entity = response.getEntity();
 		return entity;
 	}
@@ -89,7 +108,8 @@ public class HttpClientParserUtil {
 		return IOUtils.toString(entity.getContent());
 	}
 
-	public static String delayedGetPageAsStringFromUrl(long delayMillis, String scrapeUrl) throws IOException, ClientProtocolException {
+	public static String delayedGetPageAsStringFromUrl(long delayMillis, String scrapeUrl) throws IOException,
+			ClientProtocolException {
 		delay(delayMillis);
 		HttpEntity entity = getEntityFromUrl(scrapeUrl);
 		return IOUtils.toString(entity.getContent());
@@ -99,7 +119,6 @@ public class HttpClientParserUtil {
 		try {
 			Thread.sleep(delayMillis);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

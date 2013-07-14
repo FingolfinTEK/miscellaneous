@@ -9,6 +9,7 @@
 	<modules>
 		<module>selenium</module>
 		<module>scraper</module>
+		<module>scraper-aprod.hu</module>
 	</modules>
 
 	<properties>
@@ -21,7 +22,6 @@
 		<version.maven.jar.plugin>2.4</version.maven.jar.plugin>
 
 		<version.commons-lang>3.1</version.commons-lang>
-		<version.jgoodies.forms>1.2.1</version.jgoodies.forms>
 		<version.junit>4.9</version.junit>
 		<version.logback>0.9.29</version.logback>
 		<version.slf4j>1.6.2</version.slf4j>
@@ -113,8 +113,6 @@
 					<configuration>
 						<archive>
 							<manifest>
-								<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-								<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
 								<addClasspath>true</addClasspath>
 								<classpathPrefix>lib/</classpathPrefix>
 							</manifest>

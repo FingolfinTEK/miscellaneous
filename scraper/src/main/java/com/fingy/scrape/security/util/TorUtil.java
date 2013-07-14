@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 public class TorUtil {
 
-	private static final String TOR_LOCATION = "start.exe";
+	private static final String TOR_LOCATION = "tor/start.exe";
 	private static final String AUTHENTICATE_COMMAND = "AUTHENTICATE \"aprodhu123\"\r\n";
 	private static final String NEW_IDENTITY_COMMAND = "SIGNAL NEWNYM\r\n";
 	private static final String SHUTDOWN_IDENTITY_COMMAND = "SIGNAL SHUTDOWN\r\n";
@@ -37,16 +37,16 @@ public class TorUtil {
 			Socket socket = new Socket(TOR_SOKCS_HOST, 9151);
 
 			for (String command : commands) {
-				System.out.print("Seding command to Tor: " + command);
+				logger.trace("Seding command to Tor: " + command);
 				socket.getOutputStream().write(command.getBytes());
 
 				InputStreamReader torResponseReader = new InputStreamReader(socket.getInputStream());
 				BufferedReader bufferedTorResponseReader = IOUtils.toBufferedReader(torResponseReader);
 				String response = bufferedTorResponseReader.readLine();
-				System.out.println("Received response from Tor: " + response);
+				logger.trace("Received response from Tor: " + response);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Tor not running or wrong control port");
 		}
 
 		restoreSystemProperties(backup);
@@ -94,9 +94,9 @@ public class TorUtil {
 		try {
 			if (torProcess == null || processTerminated())
 				torProcess = Runtime.getRuntime().exec(TOR_LOCATION);
-			logger.debug("Started Tor");
+			logger.trace("Started Tor");
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Exception occured", e);
 		}
 	}
 
@@ -119,7 +119,7 @@ public class TorUtil {
 			shutdownTor();
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			logger.error("Exception occured", e);
 		} finally {
 			forciblyTerminateProcesses();
 		}
@@ -129,9 +129,9 @@ public class TorUtil {
 		try {
 			Runtime.getRuntime().exec("Taskkill /IM vidalia.exe /F").waitFor();
 			Runtime.getRuntime().exec("Taskkill /IM tor.exe /F").waitFor();
-			logger.debug("Stopped Tor");
+			logger.trace("Stopped Tor");
 		} catch (InterruptedException | IOException e) {
-			e.printStackTrace();
+			logger.error("Exception occured", e);
 		}
 	}
 
