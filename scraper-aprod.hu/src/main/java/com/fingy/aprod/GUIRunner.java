@@ -79,22 +79,17 @@ public class GUIRunner extends JFrame {
 		JButton btnBrowse = new JButton("Browse");
 		btnBrowse.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				EventQueue.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						JFileChooser fileChooser = new JFileChooser();
-						fileChooser.setMultiSelectionEnabled(false);
+				JFileChooser fileChooser = new JFileChooser();
+				fileChooser.setMultiSelectionEnabled(false);
 
-						int selectedOption = fileChooser.showSaveDialog(GUIRunner.this);
-						if (selectedOption == JFileChooser.APPROVE_OPTION) {
-							File chosen = fileChooser.getSelectedFile();
-							if (chosen != null) {
-								contacts = chosen;
-								contactsFilePath.setText(chosen.getAbsolutePath());
-							}
-						}
+				int selectedOption = fileChooser.showSaveDialog(GUIRunner.this);
+				if (selectedOption == JFileChooser.APPROVE_OPTION) {
+					File chosen = fileChooser.getSelectedFile();
+					if (chosen != null) {
+						contacts = chosen;
+						contactsFilePath.setText(chosen.getAbsolutePath());
 					}
-				});
+				}
 			}
 		});
 		getContentPane().add(btnBrowse, "6, 2");
@@ -120,8 +115,7 @@ public class GUIRunner extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				btnStartScrape.setEnabled(false);
 				btnStopScrape.setEnabled(true);
-				SwingWorker<Object, Object> worker = new ScraperWorker();
-				worker.execute();
+				new ScraperWorker().execute();
 			}
 		});
 		panel.add(btnStartScrape, "1, 1");
@@ -155,17 +149,12 @@ public class GUIRunner extends JFrame {
 			}
 		});
 		panel.add(btnResetState, "5, 1");
-		
+
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
-				EventQueue.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						TorUtil.stopTor();
-						System.exit(0);
-					}
-				});
+				TorUtil.stopTor();
+				System.exit(0);
 			}
 		});
 	}
@@ -173,14 +162,18 @@ public class GUIRunner extends JFrame {
 	public static void main(String[] args) throws ExecutionException, IOException, InterruptedException {
 		try {
 			UIManager.setLookAndFeel(new NimbusLookAndFeel());
-		} catch (UnsupportedLookAndFeelException e1) {
-			e1.printStackTrace();
+		} catch (UnsupportedLookAndFeelException ignored) {
 		}
 
-		GUIRunner runner = new GUIRunner();
-		runner.pack();
-		runner.setLocationRelativeTo(null);
-		runner.setVisible(true);
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				GUIRunner runner = new GUIRunner();
+				runner.pack();
+				runner.setLocationRelativeTo(null);
+				runner.setVisible(true);
+			}
+		});
 	}
 
 	public void runScrape() {

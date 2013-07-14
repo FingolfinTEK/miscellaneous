@@ -30,10 +30,13 @@ import com.fingy.concurrent.ExecutorsUtil;
 import com.fingy.scrape.queue.ScraperLinksQueue;
 
 public class AprodScraperScheduler {
-
+	private static final int DEFAULT_TERMINATION_AWAIT_INTERVAL_MINUTES = 60;
 	private static final int CATEGORY_TIMEOUT = 20000;
 	private static final int AVAILABLE_PROCESSORS = Runtime.getRuntime().availableProcessors();
-	
+
+	private static final String SEEKS_LINK = "http://aprod.hu/budapest/?search[offer_seek]=seek";
+	private static final String OFFERS_LINK = "http://aprod.hu/budapest/";
+
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private ExecutorService adPageScrapingThreadPool;
@@ -54,9 +57,10 @@ public class AprodScraperScheduler {
 		System.exit(result.getQueueSize());
 	}
 
-	public AprodScraperScheduler(final String contactsFilePath, final String visitedFilePath, final String queuedFilePath) {
-		adPageScrapingThreadPool = createDefaultThreadPool();
-		contactScrapingThreadPool = createDefaultThreadPool();
+	public AprodScraperScheduler(final String contactsFilePath, final String visitedFilePath,
+			final String queuedFilePath) {
+		adPageScrapingThreadPool = createThreadPool(6);
+		contactScrapingThreadPool = createThreadPool(2);
 		contactScrapingCompletionService = new ExecutorCompletionService<>(contactScrapingThreadPool);
 
 		linksQueue = new ScraperLinksQueue();
@@ -75,12 +79,11 @@ public class AprodScraperScheduler {
 			loadVisitedLinksFromFile();
 			loadQueuedLinksFromFile();
 
-			adPageScrapingThreadPool.submit(new FirstAdPageJsoupScraper("http://aprod.hu/budapest/", linksQueue));
-			adPageScrapingThreadPool.submit(new FirstAdPageJsoupScraper(
-					"http://aprod.hu/budapest/?search[offer_seek]=seek", linksQueue));
+			adPageScrapingThreadPool.submit(new FirstAdPageJsoupScraper(OFFERS_LINK, linksQueue));
+			adPageScrapingThreadPool.submit(new FirstAdPageJsoupScraper(SEEKS_LINK, linksQueue));
 
-			AdultItemJsoupScraper.setSessionExpired(false);
 			submitScrapingTasksWhileThereIsEnoughWork();
+			awaitTerminationOfTheTasks();
 			saveResults();
 		} catch (Exception e) {
 			logger.error("Exception occured", e);
@@ -126,7 +129,8 @@ public class AprodScraperScheduler {
 	}
 
 	private void submitScrapingTasksWhileThereIsEnoughWork() {
-		logger.trace("submitScrapingTasksWhileThereIsEnoughWork()");
+		AdultItemJsoupScraper.setSessionExpired(false);
+
 		while (stillHaveLinksToBeScraped()) {
 			if (AbstractAdultItemJsoupScraper.isSessionExpired()) {
 				logger.trace("Session expired, breaking");
@@ -173,9 +177,18 @@ public class AprodScraperScheduler {
 		}
 	}
 
-	private void saveResults() throws FileNotFoundException, IOException {
-		ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(adPageScrapingThreadPool, 10, TimeUnit.MINUTES);
+	private void awaitTerminationOfTheTasks() {
+		ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(
+			adPageScrapingThreadPool,
+			DEFAULT_TERMINATION_AWAIT_INTERVAL_MINUTES,
+			TimeUnit.MINUTES);
+		ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(
+			contactScrapingThreadPool,
+			DEFAULT_TERMINATION_AWAIT_INTERVAL_MINUTES,
+			TimeUnit.MINUTES);
+	}
 
+	private void saveResults() throws FileNotFoundException, IOException {
 		collectResults();
 
 		final List<Contact> forSorting = new ArrayList<>(scrapedItems);
@@ -225,8 +238,8 @@ public class AprodScraperScheduler {
 		return 0;
 	}
 
-	private ExecutorService createDefaultThreadPool() {
-		return new ThreadPoolExecutor(AVAILABLE_PROCESSORS * 5, Integer.MAX_VALUE, 1, TimeUnit.MINUTES,
-				new LinkedBlockingQueue<Runnable>());
+	private ExecutorService createThreadPool(int processorMultiplier) {
+		return new ThreadPoolExecutor(AVAILABLE_PROCESSORS * processorMultiplier, Integer.MAX_VALUE, 1,
+				TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>());
 	}
 }
