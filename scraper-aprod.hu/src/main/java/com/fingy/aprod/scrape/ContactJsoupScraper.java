@@ -11,7 +11,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.fingy.aprod.Contact;
-import com.fingy.scrape.exception.ScrapeException;
+import com.fingy.aprod.scrape.exception.SessionExpiredException;
 import com.fingy.scrape.jsoup.AbstractJsoupScraper;
 import com.fingy.scrape.jsoup.HttpClientParserUtil;
 import com.fingy.scrape.queue.ScraperLinksQueue;
@@ -41,7 +41,7 @@ public class ContactJsoupScraper extends AbstractAprodJsoupScraper<Contact> {
 
 		AbstractJsoupScraper.setSessionExpired(true);
 		linksQueue.addIfNotVisited(getScrapeUrl());
-		throw new ScrapeException("Session expired!");
+		throw new SessionExpiredException(getScrapeUrl());
 	}
 
 	private String scrapeCategoryFromPage(Document page) {

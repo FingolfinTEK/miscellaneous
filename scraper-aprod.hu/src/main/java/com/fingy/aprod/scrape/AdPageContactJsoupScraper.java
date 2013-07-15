@@ -34,11 +34,6 @@ public class AdPageContactJsoupScraper extends AbstractAprodJsoupScraper<String>
 		return extractLinksByCssQuery(page, cssQuery);
 	}
 
-	private Collection<String> getAdPagesFromPage(Document page) {
-		String cssQuery = "div.pager span.item a";
-		return extractLinksByCssQuery(page, cssQuery);
-	}
-
 	private Collection<String> extractLinksByCssQuery(Document page, String cssQuery) {
 		Set<String> adLinks = new LinkedHashSet<String>();
 

@@ -60,7 +60,7 @@ public class AprodScraperScheduler {
 	public AprodScraperScheduler(final String contactsFilePath, final String visitedFilePath,
 			final String queuedFilePath) {
 		adPageScrapingThreadPool = createThreadPool(6);
-		contactScrapingThreadPool = createThreadPool(2);
+		contactScrapingThreadPool = createThreadPool(4);
 		contactScrapingCompletionService = new ExecutorCompletionService<>(contactScrapingThreadPool);
 
 		linksQueue = new ScraperLinksQueue();
@@ -84,7 +84,7 @@ public class AprodScraperScheduler {
 
 			submitScrapingTasksWhileThereIsEnoughWork();
 			awaitTerminationOfTheTasks();
-			saveResults();
+			collectAndSaveResults();
 		} catch (Exception e) {
 			logger.error("Exception occured", e);
 		} finally {
@@ -188,7 +188,7 @@ public class AprodScraperScheduler {
 			TimeUnit.MINUTES);
 	}
 
-	private void saveResults() throws FileNotFoundException, IOException {
+	private void collectAndSaveResults() throws FileNotFoundException, IOException {
 		collectResults();
 
 		final List<Contact> forSorting = new ArrayList<>(scrapedItems);

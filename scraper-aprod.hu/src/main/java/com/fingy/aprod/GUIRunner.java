@@ -54,6 +54,7 @@ public class GUIRunner extends JFrame {
 
 	private File contacts = new File(DEFAULT_CONTACTS_FILE);
 	private JLabel lblActivityLog;
+	private JButton btnClearLog;
 
 	public GUIRunner() {
 		setPreferredSize(new Dimension(600, 400));
@@ -149,6 +150,14 @@ public class GUIRunner extends JFrame {
 			}
 		});
 		panel.add(btnResetState, "5, 1");
+
+		btnClearLog = new JButton("Clear Log");
+		btnClearLog.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				infoPane.setText("");
+			}
+		});
+		panel.add(btnClearLog, "7, 1");
 
 		addWindowListener(new WindowAdapter() {
 			@Override

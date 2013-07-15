@@ -48,17 +48,12 @@ public abstract class AbstractJsoupScraper<T> extends AbstractScraper<T> {
 			final Document page = getPage(scrapeUrl);
 			return scrapePage(page);
 		} catch (Exception e) {
-			processException(e);
 			throw new ScrapeException("Exception parsing link " + getScrapeUrl(), e);
 		}
 	}
 
 	protected Document getPage(String scrapeUrl) throws IOException {
 		return Jsoup.connect(scrapeUrl).userAgent(USER_AGENT).cookies(getCookies()).timeout(0).get();
-	}
-
-	protected void processException(Exception e) {
-		logger.debug("Exception occurred", e);
 	}
 
 	protected String getTagTextFromCssQuery(Element elementToQuery, String cssQuery) {
