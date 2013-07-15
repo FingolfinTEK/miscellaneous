@@ -222,7 +222,7 @@ public class GUIRunner extends JFrame {
 			infoPane.appendLine("Starting new scrape iteration");
 			ScrapeResult result = new AprodScraperScheduler(contacts.getAbsolutePath(), VISITED_TXT_FILE_NAME,
 					QUEUED_TXT_FILE_NAME).doScrape();
-			infoPane.appendLine("Finished scrape iteration; useful scrapes: " + result.getScrapeSize());
+			infoPane.appendLine("Finished scrape iteration; total contacts scraped: " + result.getScrapeSize());
 
 			queueSize = result.getQueueSize();
 			TorUtil.requestNewIdentity();

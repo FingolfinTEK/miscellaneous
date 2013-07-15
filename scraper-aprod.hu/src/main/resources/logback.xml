@@ -22,15 +22,16 @@
 			</timeBasedFileNamingAndTriggeringPolicy>
 		</rollingPolicy>
 		<encoder>
-			<pattern>%date{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+			<pattern>%date{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+			</pattern>
 		</encoder>
 	</appender>
 
-	<logger name="org.apache" level="WARN" />
+	<logger name="com.fingy.aprod" level="TRACE" />
 
-	<root level="INFO">
+	<root level="WARN">
 		<appender-ref ref="FILE" />
-		<appender-ref ref="STDOUT" />
+		<!-- <appender-ref ref="STDOUT" /> -->
 	</root>
 
 </configuration>

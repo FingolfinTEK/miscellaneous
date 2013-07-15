@@ -18,6 +18,7 @@ import com.fingy.scrape.queue.ScraperLinksQueue;
 
 public class ContactJsoupScraper extends AbstractAprodJsoupScraper<Contact> {
 
+	private static final String PHONE_NUMBER_URL_FORMAT = "http://aprod.hu/ajax/misc/contact/phone/%s/";
 	private static final Pattern PHONE_ID_REGEX = Pattern.compile(".+'id':'(\\w+)'.+");
 
 	public ContactJsoupScraper(String scrapeUrl, ScraperLinksQueue linksQueue) {
@@ -73,11 +74,11 @@ public class ContactJsoupScraper extends AbstractAprodJsoupScraper<Contact> {
 
 	private String getPhoneNumberByAjax(String requestId) {
 		try {
-			String phoneNumberUrl = "http://aprod.hu/ajax/misc/contact/phone/" + requestId + "/";
+			String phoneNumberUrl = String.format(PHONE_NUMBER_URL_FORMAT, requestId);
 			String phoneNumberString = HttpClientParserUtil.getPageAsStringFromUrl(phoneNumberUrl);
 			return cleanPhoneNumber(phoneNumberString);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Exception scraping phone number", e);
 		}
 
 		return "N/A";
@@ -86,7 +87,7 @@ public class ContactJsoupScraper extends AbstractAprodJsoupScraper<Contact> {
 	private String cleanPhoneNumber(String phoneNumberString) {
 		String extractedPhoneNumbers = extractMultiplePhoneNumbers(phoneNumberString);
 		String cleanedPhoneNumbers = removeIllegalCharacters(extractedPhoneNumbers);
-		return separateMultiplePhoneNumbersBySpaceInsteadOfDash(cleanedPhoneNumbers);
+		return separateMultiplePhoneNumbersBySpaceInsteadOfComma(cleanedPhoneNumbers);
 	}
 
 	private String extractMultiplePhoneNumbers(String phoneNumberString) {
@@ -97,7 +98,7 @@ public class ContactJsoupScraper extends AbstractAprodJsoupScraper<Contact> {
 		return phoneNumberString.replaceAll("[ \\-\"]+", "").trim();
 	}
 
-	private String separateMultiplePhoneNumbersBySpaceInsteadOfDash(String phoneNumberString) {
+	private String separateMultiplePhoneNumbersBySpaceInsteadOfComma(String phoneNumberString) {
 		return phoneNumberString.replaceAll(",", " ");
 	}
 

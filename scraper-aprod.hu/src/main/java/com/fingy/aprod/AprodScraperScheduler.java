@@ -208,7 +208,6 @@ public class AprodScraperScheduler {
 					scrapedItems.add(contact);
 				}
 			} catch (Exception e) {
-				logger.error("Exception occured", e);
 				timeout = 0;
 			}
 		}

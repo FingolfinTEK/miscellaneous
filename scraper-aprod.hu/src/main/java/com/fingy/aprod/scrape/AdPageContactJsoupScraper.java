@@ -39,7 +39,7 @@ public class AdPageContactJsoupScraper extends AbstractAprodJsoupScraper<String>
 
 		Elements links = page.select(cssQuery);
 		for (Element element : links) {
-			adLinks.add(element.attr("href").replace("http://", "http://"));
+			adLinks.add(element.attr("href"));
 		}
 
 		return adLinks;
