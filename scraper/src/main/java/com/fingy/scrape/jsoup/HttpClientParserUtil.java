@@ -11,6 +11,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
+import org.apache.http.TruncatedChunkException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -24,11 +25,15 @@ import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import com.fingy.io.IOHelper;
 import com.fingy.scrape.security.TrustAllCertificates;
 
 public class HttpClientParserUtil {
 
 	private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0";
+
+	public static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
+	public static final int EOF = -1;
 
 	private static PoolingClientConnectionManager manager = createPoolingClientConnectionManager();
 	private static ThreadLocal<HttpClient> httpClient = new ThreadLocal<HttpClient>() {
@@ -44,7 +49,7 @@ public class HttpClientParserUtil {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		return new DefaultHttpClient();
 	}
 
@@ -64,12 +69,9 @@ public class HttpClientParserUtil {
 			PoolingClientConnectionManager manager = new PoolingClientConnectionManager(registry);
 			manager.setDefaultMaxPerRoute(10);
 			return manager;
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		} catch (KeyManagementException e) {
-			e.printStackTrace();
+		} catch (NoSuchAlgorithmException | KeyManagementException ignored) {
 		}
-		
+
 		return new PoolingClientConnectionManager();
 
 	}
@@ -92,7 +94,8 @@ public class HttpClientParserUtil {
 
 	public static Document getPageFromUrl(String scrapeUrl) throws IOException, ClientProtocolException {
 		HttpEntity entity = getEntityFromUrl(scrapeUrl);
-		return Jsoup.parse(entity.getContent(), "UTF-8", "");
+		final byte[] content = IOHelper.readContent(entity.getContent(), TruncatedChunkException.class);
+		return Jsoup.parse(new String(content, "UTF-8"), "");
 	}
 
 	private static HttpEntity getEntityFromUrl(String scrapeUrl) throws IOException, ClientProtocolException {
@@ -108,8 +111,7 @@ public class HttpClientParserUtil {
 		return IOUtils.toString(entity.getContent());
 	}
 
-	public static String delayedGetPageAsStringFromUrl(long delayMillis, String scrapeUrl) throws IOException,
-			ClientProtocolException {
+	public static String delayedGetPageAsStringFromUrl(long delayMillis, String scrapeUrl) throws IOException, ClientProtocolException {
 		delay(delayMillis);
 		HttpEntity entity = getEntityFromUrl(scrapeUrl);
 		return IOUtils.toString(entity.getContent());

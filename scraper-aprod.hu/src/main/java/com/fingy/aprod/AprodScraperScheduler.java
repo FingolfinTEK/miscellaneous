@@ -16,6 +16,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -30,12 +31,11 @@ import com.fingy.concurrent.ExecutorsUtil;
 import com.fingy.scrape.queue.ScraperLinksQueue;
 
 public class AprodScraperScheduler {
+	private static final String AD_PAGE_LINK_REGEX = ".*aprod\\.hu/.*/budapest/.*";
+
 	private static final int DEFAULT_TERMINATION_AWAIT_INTERVAL_MINUTES = 60;
 	private static final int CATEGORY_TIMEOUT = 20000;
 	private static final int AVAILABLE_PROCESSORS = Runtime.getRuntime().availableProcessors();
-
-	private static final String SEEKS_LINK = "http://aprod.hu/budapest/?search[offer_seek]=seek";
-	private static final String OFFERS_LINK = "http://aprod.hu/budapest/";
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -47,17 +47,19 @@ public class AprodScraperScheduler {
 	private Set<String> queuedLinks;
 	private Set<Contact> scrapedItems;
 
+	private String initialUrl;
+	private String initialSeeksUrl;
 	private File contactsFile;
 	private File visitedFile;
 	private File queuedFile;
 
 	public static void main(String[] args) throws FileNotFoundException, IOException, InterruptedException,
 			ExecutionException {
-		ScrapeResult result = new AprodScraperScheduler(args[0], args[1], args[2]).doScrape();
+		ScrapeResult result = new AprodScraperScheduler(args[0], args[1], args[2], args[3]).doScrape();
 		System.exit(result.getQueueSize());
 	}
 
-	public AprodScraperScheduler(final String contactsFilePath, final String visitedFilePath,
+	public AprodScraperScheduler(final String startingUrl, final String contactsFilePath, final String visitedFilePath,
 			final String queuedFilePath) {
 		adPageScrapingThreadPool = createThreadPool(6);
 		contactScrapingThreadPool = createThreadPool(4);
@@ -67,6 +69,8 @@ public class AprodScraperScheduler {
 		queuedLinks = new LinkedHashSet<>();
 		scrapedItems = new LinkedHashSet<>();
 
+		initialUrl = startingUrl;
+		initialSeeksUrl = startingUrl + "&search[offer_seek]=seek";
 		contactsFile = new File(contactsFilePath);
 		visitedFile = new File(visitedFilePath);
 		queuedFile = new File(queuedFilePath);
@@ -79,8 +83,8 @@ public class AprodScraperScheduler {
 			loadVisitedLinksFromFile();
 			loadQueuedLinksFromFile();
 
-			adPageScrapingThreadPool.submit(new FirstAdPageJsoupScraper(OFFERS_LINK, linksQueue));
-			adPageScrapingThreadPool.submit(new FirstAdPageJsoupScraper(SEEKS_LINK, linksQueue));
+			adPageScrapingThreadPool.submit(new FirstAdPageJsoupScraper(initialUrl, linksQueue));
+			adPageScrapingThreadPool.submit(new FirstAdPageJsoupScraper(initialSeeksUrl, linksQueue));
 
 			submitScrapingTasksWhileThereIsEnoughWork();
 			awaitTerminationOfTheTasks();
@@ -154,7 +158,7 @@ public class AprodScraperScheduler {
 	}
 
 	private boolean isAdPage(String link) {
-		return link.contains("aprod.hu/budapest/");
+		return Pattern.matches(AD_PAGE_LINK_REGEX, link);
 	}
 
 	private boolean stillHaveLinksToBeScraped() {

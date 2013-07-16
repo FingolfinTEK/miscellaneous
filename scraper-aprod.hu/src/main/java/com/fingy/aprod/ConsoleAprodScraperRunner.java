@@ -43,7 +43,7 @@ public class ConsoleAprodScraperRunner {
 	private static void scrapeWhileThereAreResults() throws ExecutionException, IOException, InterruptedException {
 		int queueSize = 0;
 		do {
-			ScrapeResult result = new AprodScraperScheduler("contacts.txt", "visited.txt", "queued.txt").doScrape();
+			ScrapeResult result = new AprodScraperScheduler(Category.ALL.getLink(), "contacts.txt", "visited.txt", "queued.txt").doScrape();
 			queueSize = result.getQueueSize();
 			TorUtil.requestNewIdentity();
 			sleep(30000);

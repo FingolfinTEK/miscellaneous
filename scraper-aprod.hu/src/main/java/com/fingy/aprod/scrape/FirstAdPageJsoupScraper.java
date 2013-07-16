@@ -6,6 +6,7 @@ import java.util.Map;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import com.fingy.aprod.Category;
 import com.fingy.scrape.queue.ScraperLinksQueue;
 
 public class FirstAdPageJsoupScraper extends AbstractAprodJsoupScraper<String> {
@@ -21,14 +22,14 @@ public class FirstAdPageJsoupScraper extends AbstractAprodJsoupScraper<String> {
 	@Override
 	protected String scrapePage(Document page) {
 		String scrapeUrl = getScrapeUrl();
+		Integer lastPageNumber = getLastPageNumber(page);
 
 		linksQueue.addIfNotVisited(scrapeUrl);
-		int lastPageNumber = getLastPageNumber(page);
 		for(int i = 2; i <= lastPageNumber; i++) {
 			String pageLink = scrapeUrl + (scrapeUrl.contains("?") ? "&" : "?") + "page=" + i;
 			linksQueue.addIfNotVisited(pageLink);
 		}
-		
+
 		return scrapeUrl;
 	}
 
@@ -36,6 +37,12 @@ public class FirstAdPageJsoupScraper extends AbstractAprodJsoupScraper<String> {
 		String cssQuery = "div.pager span.item a";
 		Element lastPageNumber = page.select(cssQuery).last();
 		return Integer.parseInt(lastPageNumber.text());
+	}
+
+	public static void main(String[] args) {
+		ScraperLinksQueue linksQueue = new ScraperLinksQueue();
+		new FirstAdPageJsoupScraper(Category.BOOKS_MAGAZINES.getLink(), linksQueue).call();
+		System.out.println(linksQueue.getQueuedLinks());
 	}
 
 }

@@ -47,7 +47,7 @@ public class AdPageContactJsoupScraper extends AbstractAprodJsoupScraper<String>
 
 	public static void main(String[] args) {
 		ScraperLinksQueue linksQueue = new ScraperLinksQueue();
-		new AdPageContactJsoupScraper("http://aprod.hu/budapest/", linksQueue).call();
+		new AdPageContactJsoupScraper("http://aprod.hu/konyv-ujsag/budapest/?all_categories=all&page=564", linksQueue).call();
 		System.out.println(linksQueue.getQueuedLinks());
 	}
 

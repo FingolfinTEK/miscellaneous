@@ -18,8 +18,8 @@ import com.fingy.scrape.queue.ScraperLinksQueue;
 
 public class ContactJsoupScraper extends AbstractAprodJsoupScraper<Contact> {
 
+	private static final String NOT_AVAILABLE = "N/A";
 	private static final String PHONE_NUMBER_URL_FORMAT = "http://aprod.hu/ajax/misc/contact/phone/%s/";
-	private static final String ILLEGAL_PHONE_NUMBER_REGEX = ".*[a-zA-Z]+.*";
 	private static final Pattern PHONE_ID_REGEX = Pattern.compile(".+'id':'(\\w+)'.+");
 
 	public ContactJsoupScraper(String scrapeUrl, ScraperLinksQueue linksQueue) {
@@ -36,13 +36,13 @@ public class ContactJsoupScraper extends AbstractAprodJsoupScraper<Contact> {
 		String name = scrapeNameFromPage(page);
 		String phoneNumber = scrapePhoneNumberFromPage(page);
 
-		if (isValidNumber(phoneNumber)) {
+		if (shouldNotExpireSession(phoneNumber)) {
 			linksQueue.markVisited(getScrapeUrl());
 			return new Contact(category, name, phoneNumber);
 		}
 
-		AbstractJsoupScraper.setSessionExpired(true);
 		linksQueue.addIfNotVisited(getScrapeUrl());
+		AbstractJsoupScraper.setSessionExpired(true);
 		throw new SessionExpiredException(getScrapeUrl());
 	}
 
@@ -55,8 +55,8 @@ public class ContactJsoupScraper extends AbstractAprodJsoupScraper<Contact> {
 	}
 
 	private String scrapePhoneNumberFromPage(Document page) {
-		String phoneNumber = "N/A";
-		Elements phoneLinks = page.select("#contact_methods div.overh a");
+		String phoneNumber = NOT_AVAILABLE;
+		Elements phoneLinks = page.select("#contact_methods div.overh a.link-phone");
 		if (!phoneLinks.isEmpty()) {
 			Element phoneLink = phoneLinks.first();
 			phoneNumber = processPhoneLink(phoneNumber, phoneLink);
@@ -82,7 +82,7 @@ public class ContactJsoupScraper extends AbstractAprodJsoupScraper<Contact> {
 			logger.error("Exception scraping phone number", e);
 		}
 
-		return "N/A";
+		return NOT_AVAILABLE;
 	}
 
 	private String cleanPhoneNumber(String phoneNumberString) {
@@ -103,13 +103,11 @@ public class ContactJsoupScraper extends AbstractAprodJsoupScraper<Contact> {
 		return phoneNumberString.replaceAll(",", " ");
 	}
 
-	private boolean isValidNumber(String phoneNumber) {
-		return !Pattern.matches(ILLEGAL_PHONE_NUMBER_REGEX, phoneNumber);
+	private boolean shouldNotExpireSession(String phoneNumber) {
+		return !phoneNumber.contains("limitet");
 	}
 
 	public static void main(String[] args) throws IOException {
-		System.out.println(new ContactJsoupScraper(
-				"http://aprod.hu/hirdetes/szekrenysor-ID17cmw.html#aab5e98961",
-				new ScraperLinksQueue()).call());
+		System.out.println(new ContactJsoupScraper("http://aprod.hu/hirdetes/szekrenysor-ID17cmw.html#aab5e98961", new ScraperLinksQueue()).call());
 	}
 }

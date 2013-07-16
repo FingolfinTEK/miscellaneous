@@ -3,7 +3,6 @@ package com.fingy.scrape.queue;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Set;
@@ -17,7 +16,7 @@ public class ScraperLinksQueue {
 	public ScraperLinksQueue() {
 		visitedLinks = new LinkedHashSet<String>();
 		queuedLinks = new LinkedList<String>();
-		queuedLinksSet = new HashSet<String>();
+		queuedLinksSet = new LinkedHashSet<String>();
 	}
 
 	public Collection<String> getVisitedLinks() {

@@ -10,7 +10,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -36,6 +38,7 @@ import com.jgoodies.forms.layout.RowSpec;
 
 public class GUIRunner extends JFrame {
 
+	private static final int RETRY_COUNT = 5;
 	private static final String VISITED_TXT_FILE_NAME = "visited.txt";
 	private static final String QUEUED_TXT_FILE_NAME = "queued.txt";
 	private static final String DEFAULT_CONTACTS_FILE = "contacts.txt";
@@ -49,24 +52,22 @@ public class GUIRunner extends JFrame {
 
 	private JTextField contactsFilePath;
 	private AppendableJTextArea infoPane;
+	private JComboBox<Category> categoryCombo;
 	private JButton btnStartScrape;
 	private JButton btnStopScrape;
+	private JButton btnClearLog;
 
 	private File contacts = new File(DEFAULT_CONTACTS_FILE);
-	private JLabel lblActivityLog;
-	private JButton btnClearLog;
 
 	public GUIRunner() {
 		setPreferredSize(new Dimension(600, 400));
 		setTitle("aprod.hu Scraper");
 		getContentPane().setLayout(
-			new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC,
-					FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"),
-					FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, },
-					new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
-							FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"),
-							FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("max(11dlu;default)"),
-							FormFactory.RELATED_GAP_ROWSPEC, }));
+				new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,
+						ColumnSpec.decode("default:grow"), FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, },
+						new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+								FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), FormFactory.RELATED_GAP_ROWSPEC,
+								RowSpec.decode("max(11dlu;default)"), FormFactory.RELATED_GAP_ROWSPEC, }));
 
 		JLabel lblOutputFileName = new JLabel("Output file name:");
 		getContentPane().add(lblOutputFileName, "2, 2, right, default");
@@ -95,20 +96,26 @@ public class GUIRunner extends JFrame {
 		});
 		getContentPane().add(btnBrowse, "6, 2");
 
-		lblActivityLog = new JLabel("Activity log:");
-		getContentPane().add(lblActivityLog, "2, 4, default, top");
+		JLabel lblScrapeCategory = new JLabel("Scrape category:");
+		getContentPane().add(lblScrapeCategory, "2, 4, right, default");
+
+		categoryCombo = new JComboBox<Category>();
+		categoryCombo.setModel(new DefaultComboBoxModel<Category>(Category.values()));
+		getContentPane().add(categoryCombo, "4, 4, fill, default");
+
+		JLabel lblActivityLog = new JLabel("Activity log:");
+		getContentPane().add(lblActivityLog, "2, 6, default, top");
 
 		infoPane = new AppendableJTextArea();
 		infoPane.setRows(10);
 		infoPane.setEditable(false);
 		infoPane.setWrapStyleWord(true);
-		getContentPane().add(new JScrollPane(infoPane), "4, 4, 3, 1, default, fill");
+		getContentPane().add(new JScrollPane(infoPane), "4, 6, 3, 1, default, fill");
 
 		JPanel panel = new JPanel();
-		getContentPane().add(panel, "4, 6, 3, 1, fill, fill");
-		panel.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC,
-				FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, },
+		getContentPane().add(panel, "4, 8, 3, 1, fill, fill");
+		panel.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC,
+				FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, },
 				new RowSpec[] { FormFactory.DEFAULT_ROWSPEC, }));
 
 		btnStartScrape = new JButton("Start scrape");
@@ -135,11 +142,8 @@ public class GUIRunner extends JFrame {
 		JButton btnResetState = new JButton("Reset state");
 		btnResetState.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int option = JOptionPane.showConfirmDialog(
-					GUIRunner.this,
-					"This will delete internal data. Are you sure you wish to continue?",
-					"Confirm scraper reset",
-					JOptionPane.OK_CANCEL_OPTION);
+				int option = JOptionPane.showConfirmDialog(GUIRunner.this, "This will delete internal data. Are you sure you wish to continue?",
+						"Confirm scraper reset", JOptionPane.OK_CANCEL_OPTION);
 
 				if (option == JOptionPane.OK_OPTION) {
 					FileUtils.deleteQuietly(new File(VISITED_TXT_FILE_NAME));
@@ -189,7 +193,10 @@ public class GUIRunner extends JFrame {
 		try {
 			shouldStop = false;
 			setUpTorIfNeeded();
-			scrapeWhileThereAreResults();
+
+			for (int i = 0; i < RETRY_COUNT; i++)
+				scrapeWhileThereAreResults();
+
 			stopTor();
 		} catch (Exception e) {
 			logger.error("Exception occured", e);
@@ -219,9 +226,10 @@ public class GUIRunner extends JFrame {
 	private void scrapeWhileThereAreResults() throws ExecutionException, IOException, InterruptedException {
 		int queueSize = 1;
 		while (queueSize > 0 && !shouldStop) {
-			infoPane.appendLine("Starting new scrape iteration");
-			ScrapeResult result = new AprodScraperScheduler(contacts.getAbsolutePath(), VISITED_TXT_FILE_NAME,
-					QUEUED_TXT_FILE_NAME).doScrape();
+			Category category = (Category) categoryCombo.getSelectedItem();
+			infoPane.appendLine("Starting new scrape iteration for category " + category);
+			ScrapeResult result = new AprodScraperScheduler(category.getLink(), contacts.getAbsolutePath(), VISITED_TXT_FILE_NAME, QUEUED_TXT_FILE_NAME)
+					.doScrape();
 			infoPane.appendLine("Finished scrape iteration; total contacts scraped: " + result.getScrapeSize());
 
 			queueSize = result.getQueueSize();
