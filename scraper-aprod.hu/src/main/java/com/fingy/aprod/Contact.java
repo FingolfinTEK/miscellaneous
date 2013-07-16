@@ -8,7 +8,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 public class Contact implements Comparable<Contact>{
 
 	private static final String N_A = "N/A";
-
 	private static final String FORBIDDEN_MESSAGE_FRAGMENT = "limitet";
 
 	private final String category;
