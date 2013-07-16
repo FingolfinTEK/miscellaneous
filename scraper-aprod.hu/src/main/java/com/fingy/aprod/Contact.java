@@ -1,14 +1,16 @@
 package com.fingy.aprod;
 
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class Contact implements Comparable<Contact>{
+public class Contact implements Comparable<Contact> {
 
 	private static final String N_A = "N/A";
-	private static final String FORBIDDEN_MESSAGE_FRAGMENT = "limitet";
+	private static final String ILLEGAL_PHONE_NUMBER_REGEX = ".*[a-zA-Z]+.*";
 
 	private final String category;
 	private final String name;
@@ -74,7 +76,7 @@ public class Contact implements Comparable<Contact>{
 	}
 
 	private boolean isPhoneNumberValid() {
-		return StringUtils.isNotBlank(phoneNumber) && !N_A.equals(phoneNumber) && !phoneNumber.contains(FORBIDDEN_MESSAGE_FRAGMENT);
+		return StringUtils.isNotBlank(phoneNumber) && !N_A.equals(phoneNumber) && !Pattern.matches(ILLEGAL_PHONE_NUMBER_REGEX, phoneNumber);
 	}
 
 	@Override
@@ -90,7 +92,7 @@ public class Contact implements Comparable<Contact>{
 		String[] data = contactData.split("#");
 		try {
 			return new Contact(data[0], data[1], data[2]);
-		} catch(ArrayIndexOutOfBoundsException ex) {
+		} catch (ArrayIndexOutOfBoundsException ex) {
 			System.out.println("Contact.fromString() " + contactData);
 			throw ex;
 		}
