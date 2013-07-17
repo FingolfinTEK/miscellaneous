@@ -3,6 +3,7 @@ package com.fingy.aprod;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
+import com.fingy.aprod.criteria.Category;
 import com.fingy.scrape.security.util.TorUtil;
 
 public class ConsoleAprodScraperRunner {

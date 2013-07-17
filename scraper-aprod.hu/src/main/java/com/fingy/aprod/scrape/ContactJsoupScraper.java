@@ -13,8 +13,9 @@ import org.jsoup.select.Elements;
 import com.fingy.aprod.Contact;
 import com.fingy.aprod.scrape.exception.SessionExpiredException;
 import com.fingy.scrape.jsoup.AbstractJsoupScraper;
-import com.fingy.scrape.jsoup.HttpClientParserUtil;
 import com.fingy.scrape.queue.ScraperLinksQueue;
+import com.fingy.scrape.util.HttpClientParserUtil;
+import com.fingy.scrape.util.JsoupParserUtil;
 
 public class ContactJsoupScraper extends AbstractAprodJsoupScraper<Contact> {
 
@@ -47,11 +48,11 @@ public class ContactJsoupScraper extends AbstractAprodJsoupScraper<Contact> {
 	}
 
 	private String scrapeCategoryFromPage(Document page) {
-		return getTagTextFromCssQuery(page, "div.offerhead table.breadcrumb li:last-child a").trim();
+		return JsoupParserUtil.getTagTextFromCssQuery(page, "div.offerhead table.breadcrumb li:last-child a").trim();
 	}
 
 	private String scrapeNameFromPage(Document page) {
-		return getTagTextFromCssQuery(page, "#ad_active.content div.userbox p.x-large2 span.block").trim();
+		return JsoupParserUtil.getTagTextFromCssQuery(page, "#ad_active.content div.userbox p.x-large2 span.block").trim();
 	}
 
 	private String scrapePhoneNumberFromPage(Document page) {

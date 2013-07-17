@@ -29,12 +29,14 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fingy.aprod.criteria.Category;
 import com.fingy.aprod.gui.AppendableJTextArea;
 import com.fingy.scrape.security.util.TorUtil;
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
+import com.fingy.aprod.criteria.City;
 
 public class GUIRunner extends JFrame {
 
@@ -58,16 +60,32 @@ public class GUIRunner extends JFrame {
 	private JButton btnClearLog;
 
 	private File contacts = new File(DEFAULT_CONTACTS_FILE);
+	private JComboBox<City> cityCombo;
 
 	public GUIRunner() {
 		setPreferredSize(new Dimension(600, 400));
 		setTitle("aprod.hu Scraper");
 		getContentPane().setLayout(
-				new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,
-						ColumnSpec.decode("default:grow"), FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, },
-						new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-								FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), FormFactory.RELATED_GAP_ROWSPEC,
-								RowSpec.decode("max(11dlu;default)"), FormFactory.RELATED_GAP_ROWSPEC, }));
+				new FormLayout(new ColumnSpec[] {
+				FormFactory.RELATED_GAP_COLSPEC,
+				FormFactory.DEFAULT_COLSPEC,
+				FormFactory.RELATED_GAP_COLSPEC,
+				ColumnSpec.decode("default:grow"),
+				FormFactory.RELATED_GAP_COLSPEC,
+				FormFactory.DEFAULT_COLSPEC,
+				FormFactory.RELATED_GAP_COLSPEC,},
+			new RowSpec[] {
+				FormFactory.RELATED_GAP_ROWSPEC,
+				FormFactory.DEFAULT_ROWSPEC,
+				FormFactory.RELATED_GAP_ROWSPEC,
+				FormFactory.DEFAULT_ROWSPEC,
+				FormFactory.RELATED_GAP_ROWSPEC,
+				FormFactory.DEFAULT_ROWSPEC,
+				FormFactory.RELATED_GAP_ROWSPEC,
+				RowSpec.decode("default:grow"),
+				FormFactory.RELATED_GAP_ROWSPEC,
+				RowSpec.decode("max(11dlu;default)"),
+				FormFactory.RELATED_GAP_ROWSPEC,}));
 
 		JLabel lblOutputFileName = new JLabel("Output file name:");
 		getContentPane().add(lblOutputFileName, "2, 2, right, default");
@@ -96,24 +114,33 @@ public class GUIRunner extends JFrame {
 		});
 		getContentPane().add(btnBrowse, "6, 2");
 
+		JLabel lblScrapeCity = new JLabel("Scrape city:");
+		getContentPane().add(lblScrapeCity, "2, 4, right, default");
+
+		cityCombo = new JComboBox<City>();
+		cityCombo.setModel(new DefaultComboBoxModel<>(City.values()));
+		cityCombo.setSelectedItem(City.BUDAPEST);
+		getContentPane().add(cityCombo, "4, 4, fill, default");
+
 		JLabel lblScrapeCategory = new JLabel("Scrape category:");
-		getContentPane().add(lblScrapeCategory, "2, 4, right, default");
+		getContentPane().add(lblScrapeCategory, "2, 6, right, default");
 
 		categoryCombo = new JComboBox<Category>();
 		categoryCombo.setModel(new DefaultComboBoxModel<Category>(Category.values()));
-		getContentPane().add(categoryCombo, "4, 4, fill, default");
+		categoryCombo.setSelectedItem(Category.ALL);
+		getContentPane().add(categoryCombo, "4, 6, fill, default");
 
 		JLabel lblActivityLog = new JLabel("Activity log:");
-		getContentPane().add(lblActivityLog, "2, 6, default, top");
+		getContentPane().add(lblActivityLog, "2, 8, default, top");
 
 		infoPane = new AppendableJTextArea();
 		infoPane.setRows(10);
 		infoPane.setEditable(false);
 		infoPane.setWrapStyleWord(true);
-		getContentPane().add(new JScrollPane(infoPane), "4, 6, 3, 1, default, fill");
+		getContentPane().add(new JScrollPane(infoPane), "4, 8, 3, 1, default, fill");
 
 		JPanel panel = new JPanel();
-		getContentPane().add(panel, "4, 8, 3, 1, fill, fill");
+		getContentPane().add(panel, "4, 10, 3, 1, fill, fill");
 		panel.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC,
 				FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, },
 				new RowSpec[] { FormFactory.DEFAULT_ROWSPEC, }));
@@ -226,15 +253,20 @@ public class GUIRunner extends JFrame {
 	private void scrapeWhileThereAreResults() throws ExecutionException, IOException, InterruptedException {
 		int queueSize = 1;
 		while (queueSize > 0 && !shouldStop) {
+			City city = (City) cityCombo.getSelectedItem();
 			Category category = (Category) categoryCombo.getSelectedItem();
-			infoPane.appendLine("Starting new scrape iteration for category " + category);
-			ScrapeResult result = new AprodScraperScheduler(category.getLink(), contacts.getAbsolutePath(), VISITED_TXT_FILE_NAME, QUEUED_TXT_FILE_NAME)
+
+			infoPane.appendLine("Starting new scrape iteration for city " + city + " and category " + category);
+
+			String startUrl = String.format(category.getLink(), city.getUrlName());
+			ScrapeResult result = new AprodScraperScheduler(startUrl, contacts.getAbsolutePath(), VISITED_TXT_FILE_NAME, QUEUED_TXT_FILE_NAME)
 					.doScrape();
+
 			infoPane.appendLine("Finished scrape iteration; total contacts scraped: " + result.getScrapeSize());
 
 			queueSize = result.getQueueSize();
 			TorUtil.requestNewIdentity();
-			sleep(30000);
+			sleep(10000);
 		}
 	}
 

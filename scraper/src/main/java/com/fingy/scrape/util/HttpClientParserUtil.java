@@ -1,4 +1,4 @@
-package com.fingy.scrape.jsoup;
+package com.fingy.scrape.util;
 
 import java.io.IOException;
 import java.security.KeyManagementException;

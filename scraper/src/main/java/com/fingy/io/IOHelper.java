@@ -4,7 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.fingy.scrape.jsoup.HttpClientParserUtil;
+import com.fingy.scrape.util.HttpClientParserUtil;
 
 public class IOHelper {
 

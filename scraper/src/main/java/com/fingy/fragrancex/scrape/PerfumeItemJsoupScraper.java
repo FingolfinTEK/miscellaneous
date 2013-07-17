@@ -12,6 +12,7 @@ import org.jsoup.select.Elements;
 
 import com.fingy.fragrancex.PerfumeItem;
 import com.fingy.scrape.jsoup.AbstractJsoupScraper;
+import com.fingy.scrape.util.JsoupParserUtil;
 
 public class PerfumeItemJsoupScraper extends AbstractJsoupScraper<PerfumeItem> {
 
@@ -43,11 +44,11 @@ public class PerfumeItemJsoupScraper extends AbstractJsoupScraper<PerfumeItem> {
 	}
 
 	private String scrapeNameFromPage(Document page) {
-		return getTagTextFromCssQuery(page, "div.in.product-hero-scale h1.h2");
+		return JsoupParserUtil.getTagTextFromCssQuery(page, "div.in.product-hero-scale h1.h2");
 	}
 
 	private String scrapeDescriptionFromPage(Document page) {
-		return getTagTextFromCssQuery(page, "div.in.product-hero-scale p.mtn");
+		return JsoupParserUtil.getTagTextFromCssQuery(page, "div.in.product-hero-scale p.mtn");
 	}
 
 	private String scrapePriceFromPage(Document page) {
@@ -55,7 +56,7 @@ public class PerfumeItemJsoupScraper extends AbstractJsoupScraper<PerfumeItem> {
 		for (Element product : products) {
 			String text = product.text();
 			if (text.contains(task.getSizeOrType()))
-				return getTagTextFromCssQuery(product.parent(), "p.new-price");
+				return JsoupParserUtil.getTagTextFromCssQuery(product.parent(), "p.new-price");
 		}
 		return "N/A";
 	}

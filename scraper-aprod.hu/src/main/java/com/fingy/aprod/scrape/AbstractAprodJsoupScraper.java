@@ -6,8 +6,8 @@ import java.util.Map;
 import org.jsoup.nodes.Document;
 
 import com.fingy.scrape.jsoup.AbstractJsoupScraper;
-import com.fingy.scrape.jsoup.HttpClientParserUtil;
 import com.fingy.scrape.queue.ScraperLinksQueue;
+import com.fingy.scrape.util.HttpClientParserUtil;
 
 public abstract class AbstractAprodJsoupScraper<T> extends AbstractJsoupScraper<T> {
 

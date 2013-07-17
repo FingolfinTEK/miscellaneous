@@ -6,7 +6,7 @@ import java.util.Map;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import com.fingy.aprod.Category;
+import com.fingy.aprod.criteria.Category;
 import com.fingy.scrape.queue.ScraperLinksQueue;
 
 public class FirstAdPageJsoupScraper extends AbstractAprodJsoupScraper<String> {
@@ -36,7 +36,7 @@ public class FirstAdPageJsoupScraper extends AbstractAprodJsoupScraper<String> {
 	private Integer getLastPageNumber(Document page) {
 		String cssQuery = "div.pager span.item a";
 		Element lastPageNumber = page.select(cssQuery).last();
-		return Integer.parseInt(lastPageNumber.text());
+		return lastPageNumber == null ? 0 : Integer.parseInt(lastPageNumber.text());
 	}
 
 	public static void main(String[] args) {

@@ -31,7 +31,7 @@ import com.fingy.concurrent.ExecutorsUtil;
 import com.fingy.scrape.queue.ScraperLinksQueue;
 
 public class AprodScraperScheduler {
-	private static final String AD_PAGE_LINK_REGEX = ".*aprod\\.hu/.*/budapest/.*";
+	private static final String AD_LINK_REGEX = ".*aprod\\.hu/hirdetes/.*";
 
 	private static final int DEFAULT_TERMINATION_AWAIT_INTERVAL_MINUTES = 60;
 	private static final int CATEGORY_TIMEOUT = 20000;
@@ -144,11 +144,11 @@ public class AprodScraperScheduler {
 			try {
 				String link = linksQueue.take();
 
-				if (isAdPage(link)) {
-					submitAdPageScrapingTask(link);
-				} else {
+				if (isLinkForAdPage(link)) {
 					queuedLinks.add(link);
 					submitContactScrapingTask(link);
+				} else {
+					submitAdPageScrapingTask(link);
 				}
 			} catch (InterruptedException e) {
 				logger.error("Exception occured", e);
@@ -157,8 +157,8 @@ public class AprodScraperScheduler {
 		}
 	}
 
-	private boolean isAdPage(String link) {
-		return Pattern.matches(AD_PAGE_LINK_REGEX, link);
+	private boolean isLinkForAdPage(String link) {
+		return Pattern.matches(AD_LINK_REGEX, link);
 	}
 
 	private boolean stillHaveLinksToBeScraped() {

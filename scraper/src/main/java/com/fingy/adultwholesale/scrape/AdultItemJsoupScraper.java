@@ -9,6 +9,7 @@ import org.jsoup.select.Elements;
 
 import com.fingy.adultwholesale.AdultItem;
 import com.fingy.scrape.queue.ScraperLinksQueue;
+import com.fingy.scrape.util.JsoupParserUtil;
 
 public class AdultItemJsoupScraper extends AbstractAdultItemJsoupScraper {
 
@@ -36,11 +37,11 @@ public class AdultItemJsoupScraper extends AbstractAdultItemJsoupScraper {
 	}
 
 	private String scrapeIdFromPage(Document page) {
-		return getTagTextFromCssQuery(page, "div.topTop").replace("Item #:", "").trim();
+		return JsoupParserUtil.getTagTextFromCssQuery(page, "div.topTop").replace("Item #:", "").trim();
 	}
 
 	private String scrapeTitleFromPage(Document page) {
-		return getTagTextFromCssQuery(page, "div.topname span.prodTitle");
+		return JsoupParserUtil.getTagTextFromCssQuery(page, "div.topname span.prodTitle");
 	}
 
 	private String scrapeCategoryFromPage(Document page) {
@@ -65,19 +66,19 @@ public class AdultItemJsoupScraper extends AbstractAdultItemJsoupScraper {
 	}
 
 	private String scrapePriceFromPage(Document page) {
-		return getTagTextFromCssQuery(page, "html body div div.prodInfo dl.details dd");
+		return JsoupParserUtil.getTagTextFromCssQuery(page, "html body div div.prodInfo dl.details dd");
 	}
 
 	private String scrapeUPCFromPage(Document page) {
-		return getTagTextFromCssQuery(page, "html body div div.prodInfo div.oldSku span");
+		return JsoupParserUtil.getTagTextFromCssQuery(page, "html body div div.prodInfo div.oldSku span");
 	}
 
 	private String scrapeStockStatusFromPage(Document page) {
-		return getTagTextFromCssQuery(page, "html body div div.prodInfo dl.details dd a span");
+		return JsoupParserUtil.getTagTextFromCssQuery(page, "html body div div.prodInfo dl.details dd a span");
 	}
 
 	private String scrapeDescriptionFromPage(Document page) {
-		return getTagTextFromCssQuery(page, "html body div div.descriptionBlock span.det_des");
+		return JsoupParserUtil.getTagTextFromCssQuery(page, "html body div div.descriptionBlock span.det_des");
 	}
 
 	private String determineImageUrl(String id) {

@@ -5,13 +5,11 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import com.fingy.scrape.AbstractScraper;
 import com.fingy.scrape.exception.ScrapeException;
+import com.fingy.scrape.util.JsoupParserUtil;
 
 public abstract class AbstractJsoupScraper<T> extends AbstractScraper<T> {
 
@@ -53,12 +51,7 @@ public abstract class AbstractJsoupScraper<T> extends AbstractScraper<T> {
 	}
 
 	protected Document getPage(String scrapeUrl) throws IOException {
-		return Jsoup.connect(scrapeUrl).userAgent(USER_AGENT).cookies(getCookies()).timeout(0).get();
-	}
-
-	protected String getTagTextFromCssQuery(Element elementToQuery, String cssQuery) {
-		Elements element = elementToQuery.select(cssQuery);
-		return element.isEmpty() ? "N/A" : element.first().text().trim();
+		return JsoupParserUtil.getPageFromUrl(scrapeUrl, getCookies());
 	}
 
 	public Map<String, String> getCookies() {
