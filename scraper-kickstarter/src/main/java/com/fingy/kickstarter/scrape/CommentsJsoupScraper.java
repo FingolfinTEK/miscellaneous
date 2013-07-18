@@ -31,13 +31,14 @@ public class CommentsJsoupScraper extends AbstractJsoupScraper<Collection<Commen
 		String cursor = getCursorFromPage(page);
 		while (true) {
 			try {
-				Document nextPage = getPage(getScrapeUrl() + "/?cursor=" + cursor);
+				String nextPageUrl = getScrapeUrl() + "/?cursor=" + cursor;
+				Document nextPage = getPage(nextPageUrl);
 				Collection<Comment> nextPageComments = getCommentsFromPage(nextPage);
 
 				if (nextPageComments.isEmpty())
 					break;
 				else {
-					cursor = getCursorFromPage(page);
+					cursor = getCursorFromPage(nextPage);
 					comments.addAll(nextPageComments);
 				}
 
@@ -46,10 +47,6 @@ public class CommentsJsoupScraper extends AbstractJsoupScraper<Collection<Commen
 			}
 		}
 		return new LinkedHashSet<>(comments);
-	}
-
-	private String getCursorFromPage(Document page) {
-		return extractCommentFromElement(page.select(".comments li").last()).getId();
 	}
 
 	private Collection<Comment> getCommentsFromPage(Document page) {
@@ -63,6 +60,11 @@ public class CommentsJsoupScraper extends AbstractJsoupScraper<Collection<Commen
 
 		return comments;
 	}
+
+	private String getCursorFromPage(Document page) {
+		return extractCommentFromElement(page.select(".comments li").last()).getId();
+	}
+
 
 	private Comment extractCommentFromElement(Element commentElement) {
 		String commentId = scrapeCommentIdFromElement(commentElement);
@@ -83,15 +85,12 @@ public class CommentsJsoupScraper extends AbstractJsoupScraper<Collection<Commen
 
 	private String scrapeCommenterUrlFromElement(Element commentElement) {
 		String prefix = "http://www.kickstarter.com";
-		Element authorTag = JsoupParserUtil
-				.getTagFromCssQuery(commentElement, "div.comment-inner div.main h3 a.author");
+		Element authorTag = JsoupParserUtil.getTagFromCssQuery(commentElement, "div.comment-inner div.main h3 a.author");
 		return prefix + authorTag.attr("href");
 	}
 
 	private String scrapeCommentTimestampFromElement(Element commentElement) {
-		Element dateTag = JsoupParserUtil.getTagFromCssQuery(
-			commentElement,
-			"div.comment-inner div.main h3 span.date data");
+		Element dateTag = JsoupParserUtil.getTagFromCssQuery(commentElement, "div.comment-inner div.main h3 span.date data");
 		return dateTag.val();
 	}
 
