@@ -2,3 +2,8 @@
 /.settings
 /.classpath
 /.project
+/tor
+/Data
+/scraped.txt
+/queued.txt
+/visited.txt

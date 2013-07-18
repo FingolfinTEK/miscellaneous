@@ -23,10 +23,10 @@ public class IndexPageScraper extends AbstractEHentaiJsoupScraper<Integer>{
 	}
 
 	private void enqueuePagesToScrape(Integer lastPage) {
-		getLinksQueue().add(getScrapeUrl());
+	    linksQueue.add(getScrapeUrl());
 		for (int i = 1; i < lastPage; i++) {
 			String pageUrl = getScrapeUrl() + "&page=" + i;
-			getLinksQueue().add(pageUrl);
+			linksQueue.add(pageUrl);
 		}
 	}
 

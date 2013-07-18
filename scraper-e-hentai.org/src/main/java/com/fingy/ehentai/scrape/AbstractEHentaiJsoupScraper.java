@@ -5,7 +5,7 @@ import com.fingy.scrape.queue.ScraperLinksQueue;
 
 public abstract class AbstractEHentaiJsoupScraper<T> extends AbstractJsoupScraper<T> {
 
-	private final ScraperLinksQueue linksQueue;
+	protected final ScraperLinksQueue linksQueue;
 
 	public AbstractEHentaiJsoupScraper(String scrapeUrl, ScraperLinksQueue linksQueue) {
 		super(scrapeUrl);
