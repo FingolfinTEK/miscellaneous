@@ -25,9 +25,13 @@ public class JsoupParserUtil {
 		return Jsoup.connect(url).userAgent(USER_AGENT).timeout(0).ignoreContentType(true).execute().body();
 	}
 
-	public static Document getPageFromUrl(String url, Map<String, String> cookies) throws IOException {
+	public static Document getPageFromUrlWithCookies(String url, Map<String, String> cookies) throws IOException {
 		return Jsoup.connect(url).userAgent(USER_AGENT).cookies(cookies).timeout(0).get();
 	}
+
+    public static Document getPageFromUrlWithTimeout(String url, int timeout) throws IOException {
+        return Jsoup.connect(url).userAgent(USER_AGENT).timeout(timeout).get();
+    }
 
 	public static String getTagTextFromCssQuery(Element elementToQuery, String cssQuery) {
 		Elements element = elementToQuery.select(cssQuery);

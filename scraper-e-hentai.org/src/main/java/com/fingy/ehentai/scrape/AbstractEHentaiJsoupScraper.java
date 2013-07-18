@@ -1,18 +1,42 @@
 package com.fingy.ehentai.scrape;
 
+import java.io.IOException;
+
+import org.jsoup.nodes.Document;
+
+import com.fingy.scrape.exception.ScrapeException;
 import com.fingy.scrape.jsoup.AbstractJsoupScraper;
 import com.fingy.scrape.queue.ScraperLinksQueue;
+import com.fingy.scrape.util.JsoupParserUtil;
 
 public abstract class AbstractEHentaiJsoupScraper<T> extends AbstractJsoupScraper<T> {
 
-	protected final ScraperLinksQueue linksQueue;
+    private static final String       BANNED_IP_MESSAGE_START = "Your IP address has been temporarily banned";
 
-	public AbstractEHentaiJsoupScraper(String scrapeUrl, ScraperLinksQueue linksQueue) {
-		super(scrapeUrl);
-		this.linksQueue = linksQueue;
-	}
+    protected final ScraperLinksQueue linksQueue;
 
-	public ScraperLinksQueue getLinksQueue() {
-		return linksQueue;
-	}
+    public AbstractEHentaiJsoupScraper(String scrapeUrl, ScraperLinksQueue linksQueue) {
+        super(scrapeUrl);
+        this.linksQueue = linksQueue;
+    }
+
+    @Override
+    protected Document getPage(String scrapeUrl) throws IOException {
+        try {
+            Document page = JsoupParserUtil.getPageFromUrlWithTimeout(scrapeUrl, 10000);
+
+            if (!page.text().startsWith(BANNED_IP_MESSAGE_START)) {
+                return page;
+            }
+        } catch (Exception e) {
+            logger.error("Exception while getting page", e);
+        }
+
+        setSessionExpired(true);
+        throw new ScrapeException("Session expired");
+    }
+
+    public ScraperLinksQueue getLinksQueue() {
+        return linksQueue;
+    }
 }

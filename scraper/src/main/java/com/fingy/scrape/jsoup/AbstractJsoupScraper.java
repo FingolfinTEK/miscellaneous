@@ -51,7 +51,7 @@ public abstract class AbstractJsoupScraper<T> extends AbstractScraper<T> {
 	}
 
 	protected Document getPage(String scrapeUrl) throws IOException {
-		return JsoupParserUtil.getPageFromUrl(scrapeUrl, getCookies());
+		return JsoupParserUtil.getPageFromUrlWithCookies(scrapeUrl, getCookies());
 	}
 
 	public Map<String, String> getCookies() {

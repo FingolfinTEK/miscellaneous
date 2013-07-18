@@ -11,7 +11,7 @@ import com.fingy.scrape.security.util.TorUtil;
 
 public class ConsoleAprodScrapeRunner {
 
-    private static final int    RETRY_COUNT           = 5;
+    private static final int    RETRY_COUNT           = 10;
 
     private static final String SCRAPED_TXT_FILE_NAME = "scraped.txt";
     private static final String VISITED_TXT_FILE_NAME = "visited.txt";
@@ -26,7 +26,7 @@ public class ConsoleAprodScrapeRunner {
     }
 
     public static void main(String[] args) {
-        new ConsoleAprodScrapeRunner(args[0]);
+        new ConsoleAprodScrapeRunner(args[0]).runScrape();
     }
 
     public void runScrape() {
@@ -45,7 +45,7 @@ public class ConsoleAprodScrapeRunner {
     private void setUpTor() {
         TorUtil.stopTor();
         TorUtil.startAndUseTorAsProxy();
-        sleep(45000);
+        sleep(30000);
     }
 
     private void sleep(int millis) {

@@ -14,7 +14,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -30,7 +29,6 @@ import com.fingy.scrape.ScrapeResult;
 import com.fingy.scrape.queue.ScraperLinksQueue;
 
 public class EHentaiScraperScheduler {
-    private static final String                  AD_LINK_REGEX                              = ".*aprod\\.hu/hirdetes/.*";
 
     private static final int                     DEFAULT_TERMINATION_AWAIT_INTERVAL_MINUTES = 60;
     private static final int                     CATEGORY_TIMEOUT                           = 20000;
@@ -57,8 +55,8 @@ public class EHentaiScraperScheduler {
     }
 
     public EHentaiScraperScheduler(final String startingUrl, final String mangaInfoFilePath, final String visitedFilePath, final String queuedFilePath) {
-        searchPageScrapingThreadPool = createThreadPool(6);
-        mangaInfoScrapingThreadPool = createThreadPool(4);
+        searchPageScrapingThreadPool = createThreadPool(1);
+        mangaInfoScrapingThreadPool = createThreadPool(1);
         mangaInfoScrapingCompletionService = new ExecutorCompletionService<>(mangaInfoScrapingThreadPool);
 
         linksQueue = new ScraperLinksQueue();
@@ -144,6 +142,8 @@ public class EHentaiScraperScheduler {
                 } else {
                     submitSearchPageScrapingTask(link);
                 }
+
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 logger.error("Exception occured", e);
                 break;
@@ -152,7 +152,7 @@ public class EHentaiScraperScheduler {
     }
 
     private boolean isLinkForMangaPage(String link) {
-        return Pattern.matches(AD_LINK_REGEX, link);
+        return link.startsWith("http://g.e-hentai.org/g/");
     }
 
     private boolean stillHaveLinksToBeScraped() {
