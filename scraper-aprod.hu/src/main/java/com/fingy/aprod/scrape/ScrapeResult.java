@@ -1,4 +1,4 @@
-package com.fingy.aprod;
+package com.fingy.aprod.scrape;
 
 public class ScrapeResult {
 

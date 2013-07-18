@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fingy.aprod.criteria.Category;
 import com.fingy.aprod.gui.AppendableJTextArea;
+import com.fingy.aprod.scrape.ScrapeResult;
 import com.fingy.scrape.security.util.TorUtil;
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;

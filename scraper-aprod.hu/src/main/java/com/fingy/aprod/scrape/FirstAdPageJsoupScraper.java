@@ -9,7 +9,7 @@ import org.jsoup.nodes.Element;
 import com.fingy.aprod.criteria.Category;
 import com.fingy.scrape.queue.ScraperLinksQueue;
 
-public class FirstAdPageJsoupScraper extends AbstractAprodJsoupScraper<String> {
+public class FirstAdPageJsoupScraper extends AbstractAprodHttpClientJsoupScraper<String> {
 
 	public FirstAdPageJsoupScraper(String scrapeUrl, ScraperLinksQueue linksQueue) {
 		super(Collections.<String, String> emptyMap(), scrapeUrl, linksQueue);

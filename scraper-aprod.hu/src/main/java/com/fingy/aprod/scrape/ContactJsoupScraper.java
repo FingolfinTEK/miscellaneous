@@ -17,7 +17,7 @@ import com.fingy.scrape.queue.ScraperLinksQueue;
 import com.fingy.scrape.util.HttpClientParserUtil;
 import com.fingy.scrape.util.JsoupParserUtil;
 
-public class ContactJsoupScraper extends AbstractAprodJsoupScraper<Contact> {
+public class ContactJsoupScraper extends AbstractAprodHttpClientJsoupScraper<Contact> {
 
 	private static final String NOT_AVAILABLE = "N/A";
 	private static final String PHONE_NUMBER_URL_FORMAT = "http://aprod.hu/ajax/misc/contact/phone/%s/";

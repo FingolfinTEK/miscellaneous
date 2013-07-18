@@ -9,11 +9,11 @@ import com.fingy.scrape.jsoup.AbstractJsoupScraper;
 import com.fingy.scrape.queue.ScraperLinksQueue;
 import com.fingy.scrape.util.HttpClientParserUtil;
 
-public abstract class AbstractAprodJsoupScraper<T> extends AbstractJsoupScraper<T> {
+public abstract class AbstractAprodHttpClientJsoupScraper<T> extends AbstractJsoupScraper<T> {
 
 	protected ScraperLinksQueue linksQueue;
 
-	public AbstractAprodJsoupScraper(Map<String, String> cookies, String scrapeUrl, ScraperLinksQueue linksQueue) {
+	public AbstractAprodHttpClientJsoupScraper(Map<String, String> cookies, String scrapeUrl, ScraperLinksQueue linksQueue) {
 		super(cookies, scrapeUrl);
 		this.linksQueue = linksQueue;
 	}
@@ -23,7 +23,7 @@ public abstract class AbstractAprodJsoupScraper<T> extends AbstractJsoupScraper<
 		try {
 			return HttpClientParserUtil.getPageFromUrl(scrapeUrl);
 		} catch (IOException e) {
-			AbstractAprodJsoupScraper.setSessionExpired(true);
+			AbstractAprodHttpClientJsoupScraper.setSessionExpired(true);
 			throw e;
 		}
 	}
