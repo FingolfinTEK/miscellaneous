@@ -23,7 +23,7 @@ public abstract class AbstractEHentaiJsoupScraper<T> extends AbstractJsoupScrape
     @Override
     protected Document getPage(String scrapeUrl) throws IOException {
         try {
-            Document page = JsoupParserUtil.getPageFromUrlWithTimeout(scrapeUrl, 10000);
+            Document page = JsoupParserUtil.smartGetPageFromUrlWithTimeout(scrapeUrl, 10000);
 
             if (!page.text().startsWith(BANNED_IP_MESSAGE_START)) {
                 return page;

@@ -17,7 +17,7 @@ public class StatePageScraper extends AbstractCityDataPageScraper<Integer> {
         Elements cityLinks = page.select("#main_body div.style1 table tbody tr td div.style1 table a");
 
         for (Element cityLink : cityLinks) {
-            linksQueue.addIfNotVisited("http://www.city-data.com" + cityLink.attr("href"));
+            linksQueue.addIfNotVisited(cityLink.attr("abs:href"));
         }
 
         linksQueue.markVisited(getScrapeUrl());

@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.openxml4j.opc.PackageAccess;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -16,22 +17,21 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class MangaInfoToExcelBuilder {
 
-    private int                   currentRowNumber;
+    private int currentRowNumber;
 
-    private OPCPackage            xlsxPackage;
-    private Workbook              workbook;
-    private Sheet                 sheet;
+    private OPCPackage xlsxPackage;
+    private Workbook workbook;
+    private Sheet sheet;
 
     private Collection<MangaInfo> mangaInfos;
+
+    public void close() throws IOException {
+        xlsxPackage.close();
+    }
 
     public MangaInfoToExcelBuilder writeToFile(String fileName) throws FileNotFoundException, IOException {
         FileOutputStream fileStream = new FileOutputStream(fileName);
         workbook.write(fileStream);
-        return this;
-    }
-
-    public MangaInfoToExcelBuilder writeToCurrentFile() throws IOException {
-        xlsxPackage.close();
         return this;
     }
 
@@ -55,7 +55,7 @@ public class MangaInfoToExcelBuilder {
                 writeToFile(fileName);
             }
 
-            xlsxPackage = OPCPackage.open(excelFile);
+            xlsxPackage = OPCPackage.open(excelFile, PackageAccess.READ_WRITE);
             workbook = new XSSFWorkbook(xlsxPackage);
         } catch (Exception e) {
             e.printStackTrace();
@@ -108,9 +108,9 @@ public class MangaInfoToExcelBuilder {
         return this;
     }
 
-
     private void appendItemRowToSheet(MangaInfo mangaInfo) {
-        createAndFillRowAt(sheet.getLastRowNum() + 1, mangaInfo.getTitle(), mangaInfo.getUrl(), mangaInfo.getImages(), mangaInfo.getCoverImageUrl(), mangaInfo.getTags());
+        createAndFillRowAt(sheet.getLastRowNum() + 1, mangaInfo.getTitle(), mangaInfo.getUrl(), mangaInfo.getImages(),
+                           mangaInfo.getCoverImageUrl(), mangaInfo.getTags());
     }
 
     private void autoSizeColumns() {

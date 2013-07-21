@@ -10,7 +10,6 @@ import org.jsoup.select.Elements;
 
 import com.fingy.ehentai.MangaInfo;
 import com.fingy.scrape.queue.ScraperLinksQueue;
-import com.fingy.scrape.util.JsoupParserUtil;
 
 public class MangaInfoScraper extends AbstractEHentaiJsoupScraper<MangaInfo> {
 
@@ -52,11 +51,12 @@ public class MangaInfoScraper extends AbstractEHentaiJsoupScraper<MangaInfo> {
     }
 
     private String scrapeCoverImageUrlFromPage(Document page) {
+        String imagePageUrl = page.select("div#gdt div.gdtm div a").first().attr("href");
         try {
-            String imagePageUrl = page.select("div#gdt div.gdtm div a").first().attr("href");
-            Document imagePage = JsoupParserUtil.getPageFromUrl(imagePageUrl);
+            Document imagePage = getPage(imagePageUrl);
             return imagePage.getElementById("img").attr("src");
         } catch (IOException e) {
+            logger.error("Error fetching image from page " + imagePageUrl, e);
         }
 
         return null;

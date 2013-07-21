@@ -17,7 +17,7 @@ public class USPageScraper extends AbstractCityDataPageScraper<Integer> {
         Elements links = page.select("#main_body div.style1 table tbody tr td table a");
 
         for (Element link : links) {
-            linksQueue.addIfNotVisited("http://www.city-data.com/aircraft/" + link.attr("href"));
+            linksQueue.addIfNotVisited(link.attr("abs:href"));
         }
 
         return links.size();
