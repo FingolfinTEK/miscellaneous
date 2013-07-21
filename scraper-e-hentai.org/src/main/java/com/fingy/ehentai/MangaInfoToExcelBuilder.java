@@ -8,24 +8,30 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class MangaInfoToExcelBuilder {
 
     private int                   currentRowNumber;
 
+    private OPCPackage            xlsxPackage;
     private Workbook              workbook;
     private Sheet                 sheet;
 
-    private Collection<MangaInfo> MangaInfos;
+    private Collection<MangaInfo> mangaInfos;
 
     public MangaInfoToExcelBuilder writeToFile(String fileName) throws FileNotFoundException, IOException {
         FileOutputStream fileStream = new FileOutputStream(fileName);
         workbook.write(fileStream);
+        return this;
+    }
+
+    public MangaInfoToExcelBuilder writeToCurrentFile() throws IOException {
+        xlsxPackage.close();
         return this;
     }
 
@@ -37,7 +43,7 @@ public class MangaInfoToExcelBuilder {
 
     private void resetBuilder() {
         currentRowNumber = 0;
-        MangaInfos = new ArrayList<MangaInfo>();
+        mangaInfos = new ArrayList<MangaInfo>();
     }
 
     private void loadExcel(String fileName) {
@@ -49,19 +55,17 @@ public class MangaInfoToExcelBuilder {
                 writeToFile(fileName);
             }
 
-            workbook = WorkbookFactory.create(excelFile);
+            xlsxPackage = OPCPackage.open(excelFile);
+            workbook = new XSSFWorkbook(xlsxPackage);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-
     public MangaInfoToExcelBuilder buildExcel(Collection<MangaInfo> items) {
         initBuilder(items);
 
-        addHeaderRow();
-
-        for (MangaInfo item : MangaInfos) {
+        for (MangaInfo item : mangaInfos) {
             addItemRowToSheet(item);
         }
 
@@ -81,11 +85,7 @@ public class MangaInfoToExcelBuilder {
         currentRowNumber = 0;
         workbook = new XSSFWorkbook();
         sheet = workbook.createSheet("Items");
-        MangaInfos = new ArrayList<MangaInfo>(items);
-    }
-
-    private void addHeaderRow() {
-        createAndFillRow("Name", "Phone number");
+        mangaInfos = new ArrayList<MangaInfo>(items);
     }
 
     private void createAndFillRow(String... data) {
@@ -94,6 +94,29 @@ public class MangaInfoToExcelBuilder {
 
     private void addItemRowToSheet(MangaInfo mangaInfo) {
         createAndFillRow(mangaInfo.getTitle(), mangaInfo.getUrl(), mangaInfo.getImages(), mangaInfo.getCoverImageUrl(), mangaInfo.getTags());
+    }
+
+    public MangaInfoToExcelBuilder appendToExcel(Collection<MangaInfo> items) {
+        mangaInfos = items;
+        sheet = workbook.getSheetAt(0);
+
+        for (MangaInfo item : mangaInfos) {
+            appendItemRowToSheet(item);
+        }
+
+        autoSizeColumns();
+        return this;
+    }
+
+
+    private void appendItemRowToSheet(MangaInfo mangaInfo) {
+        createAndFillRowAt(sheet.getLastRowNum() + 1, mangaInfo.getTitle(), mangaInfo.getUrl(), mangaInfo.getImages(), mangaInfo.getCoverImageUrl(), mangaInfo.getTags());
+    }
+
+    private void autoSizeColumns() {
+        for (int i = 0; i < 6; i++) {
+            sheet.autoSizeColumn(i);
+        }
     }
 
 }

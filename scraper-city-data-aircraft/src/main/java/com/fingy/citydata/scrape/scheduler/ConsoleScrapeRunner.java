@@ -1,4 +1,4 @@
-package com.fingy.ehentai;
+package com.fingy.citydata.scrape.scheduler;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -9,24 +9,18 @@ import org.slf4j.LoggerFactory;
 import com.fingy.scrape.ScrapeResult;
 import com.fingy.scrape.security.util.TorUtil;
 
-public class ConsoleAprodScrapeRunner {
+public class ConsoleScrapeRunner {
 
-    private static final int    RETRY_COUNT           = 10;
+    private static final int RETRY_COUNT = 20;
 
-    private static final String SCRAPED_TXT_FILE_NAME = "scraped.txt";
+    private static final String SCRAPED_TXT_FILE_NAME = "scraped.xlsx";
     private static final String VISITED_TXT_FILE_NAME = "visited.txt";
-    private static final String QUEUED_TXT_FILE_NAME  = "queued.txt";
+    private static final String QUEUED_TXT_FILE_NAME = "queued.txt";
 
-    private final Logger        logger                = LoggerFactory.getLogger(getClass());
-
-    private final String        startUrl;
-
-    private ConsoleAprodScrapeRunner(String startUrl) {
-        this.startUrl = startUrl;
-    }
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public static void main(String[] args) {
-        new ConsoleAprodScrapeRunner(args[0]).runScrape();
+        new ConsoleScrapeRunner().runScrape();
     }
 
     public void runScrape() {
@@ -61,7 +55,8 @@ public class ConsoleAprodScrapeRunner {
     private void scrapeWhileThereAreResults() throws ExecutionException, IOException, InterruptedException {
         int queueSize = 1;
         while (queueSize > 0) {
-            ScrapeResult result = new EHentaiScraperScheduler(startUrl, SCRAPED_TXT_FILE_NAME, VISITED_TXT_FILE_NAME, QUEUED_TXT_FILE_NAME).doScrape();
+            ScrapeResult result = new AircraftInfoScraperScheduler(SCRAPED_TXT_FILE_NAME, VISITED_TXT_FILE_NAME, QUEUED_TXT_FILE_NAME)
+                    .doScrape();
             queueSize = result.getQueueSize();
             TorUtil.requestNewIdentity();
             sleep(10000);

@@ -1,10 +1,12 @@
-package com.fingy.ehentai;
+package com.fingy.citydata.scrape.scheduler;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -19,50 +21,49 @@ import org.slf4j.LoggerFactory;
 
 import com.fingy.adultwholesale.scrape.AbstractAdultItemJsoupScraper;
 import com.fingy.adultwholesale.scrape.AdultItemJsoupScraper;
+import com.fingy.citydata.model.AircraftRegistrationInfo;
+import com.fingy.citydata.scrape.CityPageScraper;
+import com.fingy.citydata.scrape.StatePageScraper;
+import com.fingy.citydata.scrape.USPageScraper;
 import com.fingy.concurrent.ExecutorsUtil;
-import com.fingy.ehentai.scrape.IndexPageScraper;
-import com.fingy.ehentai.scrape.MangaInfoScraper;
-import com.fingy.ehentai.scrape.SearchPageMangaLinksScraper;
 import com.fingy.scrape.ScrapeResult;
 import com.fingy.scrape.queue.ScraperLinksQueue;
 
-public class EHentaiScraperScheduler {
+public class AircraftInfoScraperScheduler {
 
-    private static final int                     DEFAULT_TERMINATION_AWAIT_INTERVAL_MINUTES = 60;
-    private static final int                     CATEGORY_TIMEOUT                           = 20000;
-    private static final int                     AVAILABLE_PROCESSORS                       = Runtime.getRuntime().availableProcessors();
+    private static final int DEFAULT_TERMINATION_AWAIT_INTERVAL_MINUTES = 30;
+    private static final int CATEGORY_TIMEOUT = 20000;
+    private static final int AVAILABLE_PROCESSORS = Runtime.getRuntime().availableProcessors();
 
-    private final Logger                         logger                                     = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private ExecutorService                      searchPageScrapingThreadPool;
-    private ExecutorService                      mangaInfoScrapingThreadPool;
-    private ExecutorCompletionService<MangaInfo> mangaInfoScrapingCompletionService;
+    private ExecutorService stateScrapingThreadPool;
+    private ExecutorService infoScrapingThreadPool;
+    private ExecutorCompletionService<Collection<AircraftRegistrationInfo>> infoScrapingCompletionService;
 
-    private ScraperLinksQueue                    linksQueue;
-    private Set<String>                          queuedLinks;
-    private Set<MangaInfo>                       scrapedItems;
+    private ScraperLinksQueue linksQueue;
+    private Set<String> queuedLinks;
+    private Set<AircraftRegistrationInfo> scrapedItems;
 
-    private String                               initialUrl;
-    private File                                 mangaInfoFile;
-    private File                                 visitedFile;
-    private File                                 queuedFile;
+    private File infoFile;
+    private File visitedFile;
+    private File queuedFile;
 
     public static void main(String[] args) throws FileNotFoundException, IOException, InterruptedException, ExecutionException {
-        ScrapeResult result = new EHentaiScraperScheduler(args[0], args[1], args[2], args[3]).doScrape();
+        ScrapeResult result = new AircraftInfoScraperScheduler(args[0], args[1], args[2]).doScrape();
         System.exit(result.getQueueSize());
     }
 
-    public EHentaiScraperScheduler(final String startingUrl, final String mangaInfoFilePath, final String visitedFilePath, final String queuedFilePath) {
-        searchPageScrapingThreadPool = createThreadPool(1);
-        mangaInfoScrapingThreadPool = searchPageScrapingThreadPool; // createThreadPool(1);
-        mangaInfoScrapingCompletionService = new ExecutorCompletionService<>(mangaInfoScrapingThreadPool);
+    public AircraftInfoScraperScheduler(final String scrapedFilePath, final String visitedFilePath, final String queuedFilePath) {
+        stateScrapingThreadPool = createThreadPool(6);
+        infoScrapingThreadPool = createThreadPool(6);
+        infoScrapingCompletionService = new ExecutorCompletionService<>(infoScrapingThreadPool);
 
         linksQueue = new ScraperLinksQueue();
         queuedLinks = new LinkedHashSet<>();
         scrapedItems = new LinkedHashSet<>();
 
-        initialUrl = startingUrl;
-        mangaInfoFile = new File(mangaInfoFilePath);
+        infoFile = new File(scrapedFilePath);
         visitedFile = new File(visitedFilePath);
         queuedFile = new File(queuedFilePath);
     }
@@ -73,7 +74,7 @@ public class EHentaiScraperScheduler {
             loadVisitedLinksFromFile();
             loadQueuedLinksFromFile();
 
-            searchPageScrapingThreadPool.submit(new IndexPageScraper(initialUrl, linksQueue));
+            stateScrapingThreadPool.submit(new USPageScraper("http://www.city-data.com/aircraft/", linksQueue));
 
             submitScrapingTasksWhileThereIsEnoughWork();
             awaitTerminationOfTheTasks();
@@ -121,14 +122,12 @@ public class EHentaiScraperScheduler {
             try {
                 String link = linksQueue.take();
 
-                if (isLinkForMangaPage(link)) {
+                if (isLinkForCityPage(link)) {
                     queuedLinks.add(link);
-                    submitMangaInfoScrapingTask(link);
+                    submitInfoScrapingTask(link);
                 } else {
                     submitSearchPageScrapingTask(link);
                 }
-
-                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 logger.error("Exception occured", e);
                 break;
@@ -136,8 +135,8 @@ public class EHentaiScraperScheduler {
         }
     }
 
-    private boolean isLinkForMangaPage(String link) {
-        return link.startsWith("http://g.e-hentai.org/g/");
+    private boolean isLinkForCityPage(String link) {
+        return link.startsWith("http://www.city-data.com/aircraft/air-");
     }
 
     private boolean stillHaveLinksToBeScraped() {
@@ -146,37 +145,39 @@ public class EHentaiScraperScheduler {
 
     private void submitSearchPageScrapingTask(final String link) {
         try {
-            searchPageScrapingThreadPool.submit(new SearchPageMangaLinksScraper(link, linksQueue));
+            stateScrapingThreadPool.submit(new StatePageScraper(link, linksQueue));
         } catch (Exception e) {
             logger.error("Exception occured", e);
         }
     }
 
-    private void submitMangaInfoScrapingTask(final String link) {
+    private void submitInfoScrapingTask(final String link) {
         try {
-            mangaInfoScrapingCompletionService.submit(new MangaInfoScraper(link, linksQueue));
+            infoScrapingCompletionService.submit(new CityPageScraper(link, linksQueue));
         } catch (Exception e) {
             logger.error("Exception occured", e);
         }
     }
 
     private void awaitTerminationOfTheTasks() {
-        ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(searchPageScrapingThreadPool, DEFAULT_TERMINATION_AWAIT_INTERVAL_MINUTES, TimeUnit.MINUTES);
-        ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(mangaInfoScrapingThreadPool, DEFAULT_TERMINATION_AWAIT_INTERVAL_MINUTES, TimeUnit.MINUTES);
+        ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(stateScrapingThreadPool, DEFAULT_TERMINATION_AWAIT_INTERVAL_MINUTES,
+                                                                 TimeUnit.MINUTES);
+        ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(infoScrapingThreadPool, DEFAULT_TERMINATION_AWAIT_INTERVAL_MINUTES,
+                                                                 TimeUnit.MINUTES);
     }
 
     private void collectAndSaveResults() throws FileNotFoundException, IOException {
         collectResults();
-        new MangaInfoToExcelBuilder().openExcel(mangaInfoFile.getPath()).appendToExcel(scrapedItems).writeToCurrentFile();
+        FileUtils.writeLines(infoFile, scrapedItems);
     }
 
     private void collectResults() {
         long timeout = 10;
         for (int i = 0; i < queuedLinks.size(); i++) {
             try {
-                final Future<MangaInfo> future = mangaInfoScrapingCompletionService.poll(timeout, TimeUnit.SECONDS);
-                MangaInfo mangaInfo = future.get();
-                scrapedItems.add(mangaInfo);
+                final Future<Collection<AircraftRegistrationInfo>> future = infoScrapingCompletionService.poll(timeout, TimeUnit.SECONDS);
+                Collection<AircraftRegistrationInfo> registrationInfos = future.get();
+                scrapedItems.addAll(registrationInfos);
             } catch (Exception e) {
                 timeout = 0;
             }
@@ -208,6 +209,7 @@ public class EHentaiScraperScheduler {
     }
 
     private ExecutorService createThreadPool(int processorMultiplier) {
-        return new ThreadPoolExecutor(AVAILABLE_PROCESSORS * processorMultiplier, Integer.MAX_VALUE, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>());
+        return new ThreadPoolExecutor(AVAILABLE_PROCESSORS * processorMultiplier, Integer.MAX_VALUE, 1, TimeUnit.MINUTES,
+                new LinkedBlockingQueue<Runnable>());
     }
 }

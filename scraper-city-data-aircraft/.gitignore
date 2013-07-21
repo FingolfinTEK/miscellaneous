@@ -1,0 +1,7 @@
+/target
+/visited.txt
+/scraped.txt
+/queued.txt
+/.settings
+/.project
+/.classpath

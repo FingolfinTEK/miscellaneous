@@ -12,6 +12,7 @@
 		<module>scraper-aprod.hu</module>
 		<module>scraper-kickstarter</module>
 		<module>scraper-e-hentai.org</module>
+		<module>scraper-city-data-aircraft</module>
 	</modules>
 
 	<properties>
