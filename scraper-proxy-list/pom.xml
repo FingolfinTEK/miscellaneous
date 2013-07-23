@@ -2,26 +2,17 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>com.fingy</groupId>
 		<artifactId>miscellaneous</artifactId>
+		<groupId>com.fingy</groupId>
 		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>..</relativePath>
 	</parent>
-	<artifactId>scraper-e-hentai.org</artifactId>
-
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>xml-apis</groupId>
-				<artifactId>xml-apis</artifactId>
-				<version>1.4.01</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+	<artifactId>scraper-proxy-list</artifactId>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.fingy</groupId>
-			<artifactId>scraper-proxy-list</artifactId>
+			<artifactId>scraper</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>

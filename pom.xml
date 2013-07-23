@@ -13,6 +13,7 @@
 		<module>scraper-kickstarter</module>
 		<module>scraper-e-hentai.org</module>
 		<module>scraper-city-data-aircraft</module>
+		<module>scraper-proxy-list</module>
 	</modules>
 
 	<properties>

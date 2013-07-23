@@ -8,7 +8,7 @@
 		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>scraper</artifactId>
-	
+
 	<properties>
 		<version.jgoodies.forms>1.2.1</version.jgoodies.forms>
 		<version.jgoodies.looks>2.2.2</version.jgoodies.looks>
@@ -21,11 +21,17 @@
 				<artifactId>forms</artifactId>
 				<version>${version.jgoodies.forms}</version>
 			</dependency>
-			
+
 			<dependency>
 				<groupId>com.jgoodies</groupId>
 				<artifactId>looks</artifactId>
 				<version>${version.jgoodies.looks}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>xml-apis</groupId>
+				<artifactId>xml-apis</artifactId>
+				<version>1.4.01</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -40,7 +46,7 @@
 			<groupId>com.jgoodies</groupId>
 			<artifactId>looks</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
@@ -65,23 +71,16 @@
 			<version>3.9</version>
 		</dependency>
 
-		<!-- Silvertunnel dependencies -->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
-			<version>4.2.5</version>
+			<version>4.2.3</version>
 		</dependency>
 
 		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcprov-jdk15</artifactId>
-			<version>1.45</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.jdom</groupId>
-			<artifactId>jdom</artifactId>
-			<version>1.1</version>
+			<groupId>net.sourceforge.htmlunit</groupId>
+			<artifactId>htmlunit</artifactId>
+			<version>2.12</version>
 		</dependency>
 	</dependencies>
 
