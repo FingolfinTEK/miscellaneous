@@ -55,8 +55,8 @@ public class EHentaiScraperScheduler {
 
     public EHentaiScraperScheduler(final String startingUrl, final String mangaInfoFilePath, final String visitedFilePath,
             final String queuedFilePath) {
-        searchPageScrapingThreadPool = createThreadPool(6);
-        mangaInfoScrapingThreadPool = createThreadPool(4);
+        searchPageScrapingThreadPool = createThreadPool(1);
+        mangaInfoScrapingThreadPool = searchPageScrapingThreadPool; //createThreadPool(1);
         mangaInfoScrapingCompletionService = new ExecutorCompletionService<>(mangaInfoScrapingThreadPool);
 
         linksQueue = new ScraperLinksQueue();
@@ -130,7 +130,7 @@ public class EHentaiScraperScheduler {
                     submitSearchPageScrapingTask(link);
                 }
 
-                // Thread.sleep(1000);
+                Thread.sleep(1500);
             } catch (InterruptedException e) {
                 logger.error("Exception occured", e);
                 break;

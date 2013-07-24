@@ -21,6 +21,11 @@ public class MangaInfoScraper extends AbstractEHentaiJsoupScraper<MangaInfo> {
 
     @Override
     protected MangaInfo scrapePage(Document page) {
+        if (page.text().contains("Content Warning")) {
+            String viewGalleryUrl = page.select("html body div:eq(2) a").attr("href");
+            return scrapeLink(viewGalleryUrl);
+        }
+
         String title = page.title();
         String url = getScrapeUrl();
         String images = scrapeImageInfoFromPage(page);
