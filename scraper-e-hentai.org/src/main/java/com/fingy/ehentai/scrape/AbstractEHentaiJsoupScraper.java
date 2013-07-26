@@ -7,7 +7,6 @@ import org.jsoup.nodes.Document;
 import com.fingy.scrape.exception.ScrapeException;
 import com.fingy.scrape.jsoup.AbstractJsoupScraper;
 import com.fingy.scrape.queue.ScraperLinksQueue;
-import com.fingy.scrape.util.HtmlUnitParserUtil;
 import com.fingy.scrape.util.JsoupParserUtil;
 
 public abstract class AbstractEHentaiJsoupScraper<T> extends AbstractJsoupScraper<T> {
@@ -24,8 +23,8 @@ public abstract class AbstractEHentaiJsoupScraper<T> extends AbstractJsoupScrape
     @Override
     protected Document getPage(String scrapeUrl) throws IOException {
         try {
-            // Document page = JsoupParserUtil.getPageFromUrl(scrapeUrl);
-            Document page = HtmlUnitParserUtil.getPageFromUrl(scrapeUrl);
+            Document page = JsoupParserUtil.getPageFromUrl(scrapeUrl);
+            // Document page = HtmlUnitParserUtil.getPageFromUrl(scrapeUrl);
 
             if (!page.text().startsWith(BANNED_IP_MESSAGE_START)) {
                 return page;

@@ -13,7 +13,7 @@ public class ConsoleScrapeRunner {
 
     private static final int RETRY_COUNT = 20;
 
-    private static final String SCRAPED_TXT_FILE_NAME = "scraped.xlsx";
+    private static final String SCRAPED_DIRECTORY_NAME = "scraped";
     private static final String VISITED_TXT_FILE_NAME = "visited.txt";
     private static final String QUEUED_TXT_FILE_NAME = "queued.txt";
 
@@ -55,7 +55,7 @@ public class ConsoleScrapeRunner {
     private void scrapeWhileThereAreResults() throws ExecutionException, IOException, InterruptedException {
         int queueSize = 1;
         while (queueSize > 0) {
-            ScrapeResult result = new AircraftInfoScraperScheduler(SCRAPED_TXT_FILE_NAME, VISITED_TXT_FILE_NAME, QUEUED_TXT_FILE_NAME)
+            ScrapeResult result = new AircraftInfoScraperScheduler(SCRAPED_DIRECTORY_NAME, VISITED_TXT_FILE_NAME, QUEUED_TXT_FILE_NAME)
                     .doScrape();
             queueSize = result.getQueueSize();
             TorUtil.requestNewIdentity();

@@ -6,3 +6,7 @@
 /.project
 /.classpath
 /logs
+/Data
+/tor
+/scraped
+/not-found.txt

@@ -38,9 +38,9 @@ public class ConsoleEHentaiScrapeRunner {
 
     public void runScrape() {
         try {
-            loadProxies();
-            // TorUtil.stopTor();
-            // TorUtil.startAndUseTorAsProxy();
+            // loadProxies();
+            TorUtil.stopTor();
+            TorUtil.startAndUseTorAsProxy();
 
             for (int i = 0; i < RETRY_COUNT; i++) {
                 scrapeWhileThereAreResults();
@@ -48,7 +48,7 @@ public class ConsoleEHentaiScrapeRunner {
         } catch (Exception e) {
             logger.error("Exception occured", e);
         } finally {
-            // TorUtil.stopTor();
+            TorUtil.stopTor();
         }
     }
 

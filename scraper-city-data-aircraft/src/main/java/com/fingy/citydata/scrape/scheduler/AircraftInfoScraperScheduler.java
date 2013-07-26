@@ -5,7 +5,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
@@ -31,7 +34,7 @@ import com.fingy.scrape.queue.ScraperLinksQueue;
 
 public class AircraftInfoScraperScheduler {
 
-    private static final int DEFAULT_TERMINATION_AWAIT_INTERVAL_MINUTES = 30;
+    private static final int DEFAULT_TERMINATION_AWAIT_INTERVAL_MINUTES = 5;
     private static final int CATEGORY_TIMEOUT = 20000;
     private static final int AVAILABLE_PROCESSORS = Runtime.getRuntime().availableProcessors();
 
@@ -45,7 +48,7 @@ public class AircraftInfoScraperScheduler {
     private Set<String> queuedLinks;
     private Set<AircraftRegistrationInfo> scrapedItems;
 
-    private File infoFile;
+    private String infoDirPath;
     private File visitedFile;
     private File queuedFile;
 
@@ -54,16 +57,16 @@ public class AircraftInfoScraperScheduler {
         System.exit(result.getQueueSize());
     }
 
-    public AircraftInfoScraperScheduler(final String scrapedFilePath, final String visitedFilePath, final String queuedFilePath) {
-        stateScrapingThreadPool = createThreadPool(6);
-        infoScrapingThreadPool = createThreadPool(6);
+    public AircraftInfoScraperScheduler(final String scrapedDirPath, final String visitedFilePath, final String queuedFilePath) {
+        stateScrapingThreadPool = createThreadPool(3);
+        infoScrapingThreadPool = createThreadPool(3);
         infoScrapingCompletionService = new ExecutorCompletionService<>(infoScrapingThreadPool);
 
         linksQueue = new ScraperLinksQueue();
         queuedLinks = new LinkedHashSet<>();
         scrapedItems = new LinkedHashSet<>();
 
-        infoFile = new File(scrapedFilePath);
+        infoDirPath = scrapedDirPath;
         visitedFile = new File(visitedFilePath);
         queuedFile = new File(queuedFilePath);
     }
@@ -168,7 +171,23 @@ public class AircraftInfoScraperScheduler {
 
     private void collectAndSaveResults() throws FileNotFoundException, IOException {
         collectResults();
-        FileUtils.writeLines(infoFile, scrapedItems);
+        Map<String, Set<AircraftRegistrationInfo>> registrationsByState = new LinkedHashMap<>();
+        for (AircraftRegistrationInfo info : scrapedItems) {
+            String state = info.getRegistrantInfo().getState();
+            if (registrationsByState.containsKey(state)) {
+                registrationsByState.get(state).add(info);
+            } else {
+                Set<AircraftRegistrationInfo> registrations = new LinkedHashSet<>();
+                registrations.add(info);
+                registrationsByState.put(state, registrations);
+            }
+        }
+
+        for(Entry<String, Set<AircraftRegistrationInfo>> entry : registrationsByState.entrySet()) {
+            String stateFilePath = infoDirPath + "/" + entry.getKey() + ".txt";
+            FileUtils.writeLines(new File(stateFilePath), entry.getValue(), true);
+        }
+        // FileUtils.writeLines(infoFile, scrapedItems);
     }
 
     private void collectResults() {

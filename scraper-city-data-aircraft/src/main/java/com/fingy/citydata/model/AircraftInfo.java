@@ -2,7 +2,8 @@ package com.fingy.citydata.model;
 
 public class AircraftInfo {
 
-    private final String makeAndModel;
+    private final String make;
+    private final String model;
     private final String category;
     private final String numberOfEngines;
     private final String numberOfSeats;
@@ -13,9 +14,10 @@ public class AircraftInfo {
     private final String turboFanPower;
     private final String typeOfEngine;
 
-    public AircraftInfo(String makeAndModel, String category, String numberOfEngines, String numberOfSeats, String weight, String speed,
-            String engineManufacturerAndModel, String reciprocatingPower, String turboFanPower, String typeOfEngine) {
-        this.makeAndModel = makeAndModel;
+    public AircraftInfo(String make, String model, String category, String numberOfEngines, String numberOfSeats, String weight,
+            String speed, String engineManufacturerAndModel, String reciprocatingPower, String turboFanPower, String typeOfEngine) {
+        this.make = make;
+        this.model = model;
         this.category = category;
         this.numberOfEngines = numberOfEngines;
         this.numberOfSeats = numberOfSeats;
@@ -28,11 +30,15 @@ public class AircraftInfo {
     }
 
     public AircraftInfo() {
-        this("", "", "", "", "", "", "", "", "", "");
+        this("", "", "", "", "", "", "", "", "", "", "");
     }
 
-    public String getMakeAndModel() {
-        return makeAndModel;
+    public String getMake() {
+        return make;
+    }
+
+    public String getModel() {
+        return model;
     }
 
     public String getCategory() {
@@ -71,13 +77,16 @@ public class AircraftInfo {
         return typeOfEngine;
     }
 
+
+
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((category == null) ? 0 : category.hashCode());
         result = prime * result + ((engineManufacturerAndModel == null) ? 0 : engineManufacturerAndModel.hashCode());
-        result = prime * result + ((makeAndModel == null) ? 0 : makeAndModel.hashCode());
+        result = prime * result + ((make == null) ? 0 : make.hashCode());
+        result = prime * result + ((model == null) ? 0 : model.hashCode());
         result = prime * result + ((numberOfEngines == null) ? 0 : numberOfEngines.hashCode());
         result = prime * result + ((numberOfSeats == null) ? 0 : numberOfSeats.hashCode());
         result = prime * result + ((reciprocatingPower == null) ? 0 : reciprocatingPower.hashCode());
@@ -107,10 +116,15 @@ public class AircraftInfo {
                 return false;
         } else if (!engineManufacturerAndModel.equals(other.engineManufacturerAndModel))
             return false;
-        if (makeAndModel == null) {
-            if (other.makeAndModel != null)
+        if (make == null) {
+            if (other.make != null)
                 return false;
-        } else if (!makeAndModel.equals(other.makeAndModel))
+        } else if (!make.equals(other.make))
+            return false;
+        if (model == null) {
+            if (other.model != null)
+                return false;
+        } else if (!model.equals(other.model))
             return false;
         if (numberOfEngines == null) {
             if (other.numberOfEngines != null)
@@ -153,7 +167,9 @@ public class AircraftInfo {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(makeAndModel);
+        builder.append(make);
+        builder.append("§");
+        builder.append(model);
         builder.append("§");
         builder.append(category);
         builder.append("§");
