@@ -9,13 +9,14 @@ public class AircraftInfo {
     private final String numberOfSeats;
     private final String weight;
     private final String speed;
-    private final String engineManufacturerAndModel;
+    private final String engineMake;
+    private final String engineModel;
     private final String reciprocatingPower;
     private final String turboFanPower;
     private final String typeOfEngine;
 
     public AircraftInfo(String make, String model, String category, String numberOfEngines, String numberOfSeats, String weight,
-            String speed, String engineManufacturerAndModel, String reciprocatingPower, String turboFanPower, String typeOfEngine) {
+            String speed, String engineMake, String engineModel, String reciprocatingPower, String turboFanPower, String typeOfEngine) {
         this.make = make;
         this.model = model;
         this.category = category;
@@ -23,14 +24,15 @@ public class AircraftInfo {
         this.numberOfSeats = numberOfSeats;
         this.weight = weight;
         this.speed = speed;
-        this.engineManufacturerAndModel = engineManufacturerAndModel;
+        this.engineMake = engineMake;
+        this.engineModel = engineModel;
         this.reciprocatingPower = reciprocatingPower;
         this.turboFanPower = turboFanPower;
         this.typeOfEngine = typeOfEngine;
     }
 
     public AircraftInfo() {
-        this("", "", "", "", "", "", "", "", "", "", "");
+        this("", "", "", "", "", "", "", "", "", "", "", "");
     }
 
     public String getMake() {
@@ -61,8 +63,12 @@ public class AircraftInfo {
         return speed;
     }
 
-    public String getEngineManufacturerAndModel() {
-        return engineManufacturerAndModel;
+    public String getEngineMake() {
+        return engineMake;
+    }
+
+    public String getEngineModel() {
+        return engineModel;
     }
 
     public String getReciprocatingPower() {
@@ -84,7 +90,8 @@ public class AircraftInfo {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((category == null) ? 0 : category.hashCode());
-        result = prime * result + ((engineManufacturerAndModel == null) ? 0 : engineManufacturerAndModel.hashCode());
+        result = prime * result + ((engineMake == null) ? 0 : engineMake.hashCode());
+        result = prime * result + ((engineModel == null) ? 0 : engineModel.hashCode());
         result = prime * result + ((make == null) ? 0 : make.hashCode());
         result = prime * result + ((model == null) ? 0 : model.hashCode());
         result = prime * result + ((numberOfEngines == null) ? 0 : numberOfEngines.hashCode());
@@ -111,10 +118,15 @@ public class AircraftInfo {
                 return false;
         } else if (!category.equals(other.category))
             return false;
-        if (engineManufacturerAndModel == null) {
-            if (other.engineManufacturerAndModel != null)
+        if (engineMake == null) {
+            if (other.engineMake != null)
                 return false;
-        } else if (!engineManufacturerAndModel.equals(other.engineManufacturerAndModel))
+        } else if (!engineMake.equals(other.engineMake))
+            return false;
+        if (engineModel == null) {
+            if (other.engineModel != null)
+                return false;
+        } else if (!engineModel.equals(other.engineModel))
             return false;
         if (make == null) {
             if (other.make != null)
@@ -181,7 +193,9 @@ public class AircraftInfo {
         builder.append("§");
         builder.append(speed);
         builder.append("§");
-        builder.append(engineManufacturerAndModel);
+        builder.append(engineMake);
+        builder.append("§");
+        builder.append(engineModel);
         builder.append("§");
         builder.append(reciprocatingPower);
         builder.append("§");

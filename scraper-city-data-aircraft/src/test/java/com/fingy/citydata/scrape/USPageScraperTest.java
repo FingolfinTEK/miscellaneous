@@ -22,6 +22,7 @@ public class USPageScraperTest {
     public void testScrapePage() throws Exception {
         String pageToScrape = FileUtils.readFileToString(getPageFile());
         Document page = Jsoup.parse(pageToScrape);
+        page.setBaseUri("http://www.city-data.com/aircraft");
 
         assertThat(usPageScraper.scrapePage(page)).isEqualTo(70);
         assertThat(linksQueue.getSize()).isEqualTo(70);

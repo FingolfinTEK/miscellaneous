@@ -34,13 +34,16 @@ import com.fingy.scrape.queue.ScraperLinksQueue;
 
 public class AircraftInfoScraperScheduler {
 
-    private static final int DEFAULT_TERMINATION_AWAIT_INTERVAL_MINUTES = 5;
-    private static final int CATEGORY_TIMEOUT = 20000;
+    private static final String MAIN_PAGE_URL = "http://www.city-data.com/aircraft/";
+    private static final String CITY_LINK_URL_PREFIX = "http://www.city-data.com/aircraft/air-";
+
+    private static final int DEFAULT_TIMEOUT = 30000;
+    private static final int DEFAULT_TERMINATION_AWAIT_INTERVAL_MINUTES = 2;
     private static final int AVAILABLE_PROCESSORS = Runtime.getRuntime().availableProcessors();
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private ExecutorService stateScrapingThreadPool;
+    private ThreadPoolExecutor stateScrapingThreadPool;
     private ExecutorService infoScrapingThreadPool;
     private ExecutorCompletionService<Collection<AircraftRegistrationInfo>> infoScrapingCompletionService;
 
@@ -58,8 +61,8 @@ public class AircraftInfoScraperScheduler {
     }
 
     public AircraftInfoScraperScheduler(final String scrapedDirPath, final String visitedFilePath, final String queuedFilePath) {
-        stateScrapingThreadPool = createThreadPool(3);
-        infoScrapingThreadPool = createThreadPool(3);
+        stateScrapingThreadPool = createThreadPool(2);
+        infoScrapingThreadPool = createThreadPool(2);
         infoScrapingCompletionService = new ExecutorCompletionService<>(infoScrapingThreadPool);
 
         linksQueue = new ScraperLinksQueue();
@@ -77,7 +80,7 @@ public class AircraftInfoScraperScheduler {
             loadVisitedLinksFromFile();
             loadQueuedLinksFromFile();
 
-            stateScrapingThreadPool.submit(new USPageScraper("http://www.city-data.com/aircraft/", linksQueue));
+            stateScrapingThreadPool.submit(new USPageScraper(MAIN_PAGE_URL, linksQueue));
 
             submitScrapingTasksWhileThereIsEnoughWork();
             awaitTerminationOfTheTasks();
@@ -139,11 +142,11 @@ public class AircraftInfoScraperScheduler {
     }
 
     private boolean isLinkForCityPage(String link) {
-        return link.startsWith("http://www.city-data.com/aircraft/air-");
+        return link.startsWith(CITY_LINK_URL_PREFIX);
     }
 
     private boolean stillHaveLinksToBeScraped() {
-        return !linksQueue.delayedIsEmpty(CATEGORY_TIMEOUT);
+        return !linksQueue.delayedIsEmpty(DEFAULT_TIMEOUT);
     }
 
     private void submitSearchPageScrapingTask(final String link) {
@@ -183,11 +186,12 @@ public class AircraftInfoScraperScheduler {
             }
         }
 
-        for(Entry<String, Set<AircraftRegistrationInfo>> entry : registrationsByState.entrySet()) {
+        FileUtils.writeLines(new File(infoDirPath + "/all.txt"), scrapedItems, true);
+        for (Entry<String, Set<AircraftRegistrationInfo>> entry : registrationsByState.entrySet()) {
             String stateFilePath = infoDirPath + "/" + entry.getKey() + ".txt";
             FileUtils.writeLines(new File(stateFilePath), entry.getValue(), true);
         }
-        // FileUtils.writeLines(infoFile, scrapedItems);
+
     }
 
     private void collectResults() {
@@ -198,6 +202,7 @@ public class AircraftInfoScraperScheduler {
                 Collection<AircraftRegistrationInfo> registrationInfos = future.get();
                 scrapedItems.addAll(registrationInfos);
             } catch (Exception e) {
+                logger.error("Exception occured", e);
                 timeout = 0;
             }
         }
@@ -227,8 +232,11 @@ public class AircraftInfoScraperScheduler {
         return 0;
     }
 
-    private ExecutorService createThreadPool(int processorMultiplier) {
-        return new ThreadPoolExecutor(AVAILABLE_PROCESSORS * processorMultiplier, Integer.MAX_VALUE, 1, TimeUnit.MINUTES,
-                new LinkedBlockingQueue<Runnable>());
+    private ThreadPoolExecutor createThreadPool(int processorMultiplier) {
+        int corePoolSize = AVAILABLE_PROCESSORS * processorMultiplier;
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(corePoolSize, corePoolSize * 2, 1, TimeUnit.MINUTES,
+                new LinkedBlockingQueue<Runnable>(100));
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        return executor;
     }
 }

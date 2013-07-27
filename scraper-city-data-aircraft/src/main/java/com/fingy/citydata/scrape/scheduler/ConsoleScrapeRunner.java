@@ -11,7 +11,7 @@ import com.fingy.scrape.security.util.TorUtil;
 
 public class ConsoleScrapeRunner {
 
-    private static final int RETRY_COUNT = 20;
+    private static final int RETRY_COUNT = 3;
 
     private static final String SCRAPED_DIRECTORY_NAME = "scraped";
     private static final String VISITED_TXT_FILE_NAME = "visited.txt";

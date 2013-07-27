@@ -1,5 +1,9 @@
 package com.fingy.citydata.scrape;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -14,12 +18,16 @@ public class StatePageScraper extends AbstractCityDataPageScraper<Integer> {
 
     @Override
     protected Integer scrapePage(Document page) {
-        Elements cityLinks = page.select("#main_body div.style1 table tbody tr td div.style1 table a");
+        List<String> citiesToScrape = new ArrayList<>();
 
+
+        Elements cityLinks = page.select("#main_body div.style1 table tbody tr td div.style1 table a");
         for (Element cityLink : cityLinks) {
-            linksQueue.addIfNotVisited(cityLink.attr("abs:href"));
+            citiesToScrape.add(cityLink.attr("abs:href"));
         }
 
+        Collections.sort(citiesToScrape);
+        linksQueue.addAllIfNotVisited(citiesToScrape);
         linksQueue.markVisited(getScrapeUrl());
         return cityLinks.size();
     }
