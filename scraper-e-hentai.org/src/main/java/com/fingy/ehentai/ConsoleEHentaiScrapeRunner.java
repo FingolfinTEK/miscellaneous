@@ -24,15 +24,15 @@ public class ConsoleEHentaiScrapeRunner {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private String startUrl;
+    private final String startUrl;
     private Integer currentIndex;
     private List<ProxyInfo> proxies;
 
-    private ConsoleEHentaiScrapeRunner(String startUrl) {
+    private ConsoleEHentaiScrapeRunner(final String startUrl) {
         this.startUrl = startUrl;
     }
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         new ConsoleEHentaiScrapeRunner(args[0]).runScrape();
     }
 
@@ -61,8 +61,8 @@ public class ConsoleEHentaiScrapeRunner {
     private void scrapeWhileThereAreResults() throws ExecutionException, IOException, InterruptedException {
         int queueSize = 1;
         while (queueSize > 0) {
-            setUpProxy();
-            // TorUtil.requestNewIdentity();
+            // setUpProxy();
+            TorUtil.requestNewIdentity();
 
             ScrapeResult result = new EHentaiScraperScheduler(startUrl, SCRAPED_TXT_FILE_NAME, VISITED_TXT_FILE_NAME, QUEUED_TXT_FILE_NAME)
                     .doScrape();

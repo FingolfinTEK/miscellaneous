@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -35,28 +36,28 @@ public class EHentaiScraperScheduler {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private ExecutorService searchPageScrapingThreadPool;
-    private ExecutorService mangaInfoScrapingThreadPool;
-    private ExecutorCompletionService<MangaInfo> mangaInfoScrapingCompletionService;
+    private final ExecutorService searchPageScrapingThreadPool;
+    private final ExecutorService mangaInfoScrapingThreadPool;
+    private final ExecutorCompletionService<MangaInfo> mangaInfoScrapingCompletionService;
 
-    private ScraperLinksQueue linksQueue;
-    private Set<String> queuedLinks;
-    private Set<MangaInfo> scrapedItems;
+    private final ScraperLinksQueue linksQueue;
+    private final Set<String> queuedLinks;
+    private final Set<MangaInfo> scrapedItems;
 
-    private String initialUrl;
-    private File mangaInfoFile;
-    private File visitedFile;
-    private File queuedFile;
+    private final String initialUrl;
+    private final File mangaInfoFile;
+    private final File visitedFile;
+    private final File queuedFile;
 
-    public static void main(String[] args) throws FileNotFoundException, IOException, InterruptedException, ExecutionException {
+    public static void main(final String[] args) throws FileNotFoundException, IOException, InterruptedException, ExecutionException {
         ScrapeResult result = new EHentaiScraperScheduler(args[0], args[1], args[2], args[3]).doScrape();
         System.exit(result.getQueueSize());
     }
 
     public EHentaiScraperScheduler(final String startingUrl, final String mangaInfoFilePath, final String visitedFilePath,
             final String queuedFilePath) {
-        searchPageScrapingThreadPool = createThreadPool(1);
-        mangaInfoScrapingThreadPool = searchPageScrapingThreadPool; //createThreadPool(1);
+        searchPageScrapingThreadPool = Executors.newSingleThreadExecutor();
+        mangaInfoScrapingThreadPool = searchPageScrapingThreadPool; // createThreadPool(1);
         mangaInfoScrapingCompletionService = new ExecutorCompletionService<>(mangaInfoScrapingThreadPool);
 
         linksQueue = new ScraperLinksQueue();
@@ -138,7 +139,7 @@ public class EHentaiScraperScheduler {
         }
     }
 
-    private boolean isLinkForMangaPage(String link) {
+    private boolean isLinkForMangaPage(final String link) {
         return link.contains("g.e-hentai.org/g/");
     }
 
@@ -218,7 +219,7 @@ public class EHentaiScraperScheduler {
         return 0;
     }
 
-    private ExecutorService createThreadPool(int processorMultiplier) {
+    private ExecutorService createThreadPool(final int processorMultiplier) {
         return new ThreadPoolExecutor(AVAILABLE_PROCESSORS * processorMultiplier, Integer.MAX_VALUE, 1, TimeUnit.MINUTES,
                 new LinkedBlockingQueue<Runnable>());
     }

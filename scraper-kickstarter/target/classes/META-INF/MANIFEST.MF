@@ -13,7 +13,7 @@ Class-Path: lib/scraper-0.0.1-SNAPSHOT.jar lib/forms-1.2.1.jar lib/loo
  .v20130131.jar lib/commons-lang3-3.1.jar lib/logback-classic-0.9.29.j
  ar lib/logback-core-0.9.29.jar lib/slf4j-api-1.6.2.jar lib/jcl-over-s
  lf4j-1.6.2.jar lib/jul-to-slf4j-1.6.2.jar
-Build-Jdk: 1.7.0_03
+Build-Jdk: 1.7.0_21
 Built-By: Fingy
 Created-By: Maven Integration for Eclipse
 
