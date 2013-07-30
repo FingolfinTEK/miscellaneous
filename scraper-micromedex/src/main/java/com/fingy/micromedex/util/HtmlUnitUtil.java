@@ -29,8 +29,7 @@ public class HtmlUnitUtil {
 	}
 
 	public static void doLogin(final WebClient webClient) throws FailingHttpStatusCodeException, MalformedURLException, IOException {
-		boolean javaScriptEnabled = webClient.getOptions().isJavaScriptEnabled();
-		webClient.getOptions().setJavaScriptEnabled(false);
+		boolean javaScriptEnabled = disableJavaScriptAndGetPreviousValue(webClient);
 
 		HtmlPage page = webClient.getPage(START_URL);
 
@@ -45,4 +44,11 @@ public class HtmlUnitUtil {
 
 		webClient.getOptions().setJavaScriptEnabled(javaScriptEnabled);
 	}
+
+	private static boolean disableJavaScriptAndGetPreviousValue(final WebClient webClient) {
+		boolean javaScriptEnabled = webClient.getOptions().isJavaScriptEnabled();
+		webClient.getOptions().setJavaScriptEnabled(false);
+		return javaScriptEnabled;
+	}
+	
 }

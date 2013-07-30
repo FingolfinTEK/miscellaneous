@@ -5,7 +5,6 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -14,11 +13,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.fingy.micromedex.util.HtmlUnitUtil;
 import com.fingy.micromedex.web.dto.DrugResult;
 import com.fingy.micromedex.web.dto.SearchResults;
+import com.fingy.scrape.util.JsoupParserUtil;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 @Controller
 public class MethodThreeController extends AbstractMicromedexController {
@@ -37,9 +37,7 @@ public class MethodThreeController extends AbstractMicromedexController {
 
 	private Document getParsedPage(String parseUrl) throws IOException, MalformedURLException {
 		WebClient webClient = getWebClientHolder().get();
-		webClient.getOptions().setJavaScriptEnabled(false);
-		HtmlPage html = webClient.getPage(parseUrl);
-		return Jsoup.parse(html.asXml());
+		return JsoupParserUtil.getPageFromUrlWithCookies(parseUrl, HtmlUnitUtil.getCookiesAsMap(webClient));
 	}
 
 	private SearchResults<DrugResult> extractDrugResultsFromPage(Document parsedPage) {

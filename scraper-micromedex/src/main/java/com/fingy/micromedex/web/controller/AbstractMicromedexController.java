@@ -41,6 +41,7 @@ public class AbstractMicromedexController {
 			JsonMappingException {
 		WebClient webClient = getWebClientHolder().get();
 		TextPage response = webClient.getPage(String.format(queryUrlFormat, name, getRandomInteger()));
+		webClient.closeAllWindows();
 		return parseJson(response);
 	}
 
@@ -71,6 +72,7 @@ public class AbstractMicromedexController {
 			WebClient webClient = new WebClient(BrowserVersion.FIREFOX_17);
 			try {
 				HtmlUnitUtil.doLogin(webClient);
+				webClient.closeAllWindows();
 			} catch (FailingHttpStatusCodeException | IOException e) {
 				logger.error("Error during logging", e);
 			}
