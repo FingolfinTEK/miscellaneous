@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.apache.commons.lang3.StringUtils;
+import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -69,22 +70,29 @@ public class MethodTwoController extends AbstractMicromedexController {
 			}
 		}.doSearch(allergiesToSearch);
 
-		ObjectMapper mapper = new ObjectMapper();
+		addDrugsParameters(params, drugs);
+		addAllergiesParameters(params, allergies);
 
+		return doSearch(webClient, params);
+	}
+
+	private void addDrugsParameters(Map<String, String> params, List<String[]> drugs) throws IOException, JsonGenerationException, JsonMappingException {
 		if (!drugs.isEmpty()) {
+			ObjectMapper mapper = new ObjectMapper();
 			params.put("selectedDrugs", mapper.writeValueAsString(drugs).replace("\"", "\'"));
+
 			String[] lastDrug = drugs.get(drugs.size() - 1);
 			params.put("WordWheel_ContentSetId_index_0", lastDrug[3]);
 			params.put("WordWheel_ItemId_index_0", lastDrug[0]);
 			params.put("WordWheel_MainSelected_index_0", lastDrug[1]);
 		}
+	}
 
+	private void addAllergiesParameters(Map<String, String> params, List<String[]> allergies) throws IOException, JsonGenerationException, JsonMappingException {
+		ObjectMapper mapper = new ObjectMapper();
 		if (!allergies.isEmpty()) {
 			params.put("selectedAllergies_index_0", mapper.writeValueAsString(allergies).replace("\"", "\'"));
 		}
-
-		return doSearch(webClient, params);
-
 	}
 
 	private String doSearch(WebClient webClient, Map<String, String> params) throws IOException {
