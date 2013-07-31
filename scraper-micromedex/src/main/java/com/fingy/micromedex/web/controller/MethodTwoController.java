@@ -3,7 +3,9 @@ package com.fingy.micromedex.web.controller;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -23,11 +25,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fingy.micromedex.util.HtmlUnitUtil;
+import com.fingy.micromedex.web.dto.InteractionResult;
 import com.fingy.scrape.util.JsoupParserUtil;
 import com.gargoylesoftware.htmlunit.WebClient;
 
 @Controller
 public class MethodTwoController extends AbstractMicromedexController {
+
+	private static final List<String> CATEGORIES = Arrays.asList("Drug-Drug Interactions", "Ingredient Duplication", "Drug-ALLERGY Interactions",
+			"Drug-FOOD Interactions", "Drug-ETHANOL Interactions", "Drug-LAB Interactions", "Drug-TOBACCO Interactions", "Drug-PREGNANCY Interactions",
+			"Drug-LACTATION Interactions");
 
 	private static final String INTERACTIONS_SEARCH_URL = "http://www.micromedexsolutions.com/micromedex2/librarian/PFDefaultActionId/evidencexpert.ShowDrugInteractionsResults";
 	private static final String INTERACTIONS_QUERY_PAGE_URL = "http://www.micromedexsolutions.com/micromedex2/librarian/ND_T/evidencexpert/ND_PR/"
@@ -95,8 +102,66 @@ public class MethodTwoController extends AbstractMicromedexController {
 		}
 	}
 
-	private String doSearch(WebClient webClient, Map<String, String> params) throws IOException {
-		return JsoupParserUtil.postDataToUrlWithCookies(INTERACTIONS_SEARCH_URL, HtmlUnitUtil.getCookiesAsMap(webClient), params).getElementById("resultsTable").html();
+	private Map<String, List<InteractionResult>> doSearch(WebClient webClient, Map<String, String> params) throws IOException {
+		Map<String, List<InteractionResult>> results = getEmptyResultsModelMap();
+		Document resultsPage = JsoupParserUtil.postDataToUrlWithCookies(INTERACTIONS_SEARCH_URL, HtmlUnitUtil.getCookiesAsMap(webClient), params);
+
+		List<InteractionResult> currentCategory = null;
+
+		Elements resultsTableRows = resultsPage.select("#resultsTable tr");
+		for (Element tableRow : resultsTableRows) {
+			Elements columns = tableRow.select("td");
+			if (columns.size() == 1) {
+				List<InteractionResult> category = getCategory(columns, results);
+				currentCategory = category == null ? currentCategory : category;
+			} else if (columns.size() == 4) {
+				currentCategory.add(extractInteractionFromColumns(columns));
+			}
+		}
+
+		return results;
+	}
+
+	private Map<String, List<InteractionResult>> getEmptyResultsModelMap() {
+		Map<String, List<InteractionResult>> results = new LinkedHashMap<String, List<InteractionResult>>();
+
+		for (String category : CATEGORIES) {
+			results.put(category, new ArrayList<InteractionResult>());
+		}
+
+		return results;
+	}
+
+	private List<InteractionResult> getCategory(Elements columns, Map<String, List<InteractionResult>> results) {
+		Element firstColumn = columns.get(0);
+		for (String category : CATEGORIES) {
+			if (firstColumn.text().startsWith(category)) {
+				return results.get(category);
+			}
+		}
+
+		return null;
+	}
+
+	private InteractionResult extractInteractionFromColumns(Elements columns) {
+		final String drugs = getTextFromColumn(columns, 0);
+		final String severity = getTextFromColumn(columns, 1);
+		final String documentation = getTextFromColumn(columns, 2);
+		final String summary = getTextFromColumn(columns, 3);
+		final String url = extractUrlFromColumnns(columns);
+
+		return new InteractionResult(drugs, severity, documentation, summary, url);
+	}
+
+	private String getTextFromColumn(Elements columns, int columnIndex) {
+		String text = columns.get(columnIndex).text();
+		return text.replaceAll("   ", "").replaceAll("\n", "");
+	}
+
+	private String extractUrlFromColumnns(Elements columns) {
+		Element firstColumn = columns.get(0);
+		Element dialogContent = firstColumn.getElementsByClass("dialogContent").first();
+		return dialogContent.attr("href");
 	}
 
 	private abstract class AbstractDataSearcher {

@@ -32,15 +32,19 @@ public class HtmlUnitUtil {
 		boolean javaScriptEnabled = disableJavaScriptAndGetPreviousValue(webClient);
 
 		HtmlPage page = webClient.getPage(START_URL);
+		boolean shouldLogIn = page.getFirstByXPath("/html/body/table[2]/tbody/tr/td[2]/font/a") == null;
 
-		HtmlTextInput usernameField = (HtmlTextInput) page.getElementById("login.username_index_0");
-		usernameField.setText(USERNAME);
+		if (shouldLogIn) {
+			HtmlTextInput usernameField = (HtmlTextInput) page.getElementById("login.username_index_0");
+			usernameField.setText(USERNAME);
 
-		HtmlPasswordInput passwordField = (HtmlPasswordInput) page.getElementById("login.password_index_0");
-		passwordField.setText(PASSWORD);
+			HtmlPasswordInput passwordField = (HtmlPasswordInput) page.getElementById("login.password_index_0");
+			passwordField.setText(PASSWORD);
 
-		HtmlImageInput loginButton = (HtmlImageInput) page.getElementById("Submit");
-		loginButton.click();
+			HtmlImageInput loginButton = (HtmlImageInput) page.getElementById("Submit");
+			loginButton.click();
+
+		}
 
 		webClient.getOptions().setJavaScriptEnabled(javaScriptEnabled);
 	}
@@ -50,5 +54,5 @@ public class HtmlUnitUtil {
 		webClient.getOptions().setJavaScriptEnabled(false);
 		return javaScriptEnabled;
 	}
-	
+
 }
