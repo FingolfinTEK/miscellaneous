@@ -12,9 +12,9 @@ import org.slf4j.LoggerFactory;
 
 import com.fingy.micromedex.util.HtmlUnitUtil;
 import com.fingy.micromedex.util.JsonUtil;
+import com.fingy.scrape.util.JsoupParserUtil;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
-import com.gargoylesoftware.htmlunit.TextPage;
 import com.gargoylesoftware.htmlunit.WebClient;
 
 public class AbstractMicromedexController {
@@ -40,8 +40,8 @@ public class AbstractMicromedexController {
 	protected String[][] getFromUrlQueryForName(String queryUrlFormat, final String name) throws IOException, MalformedURLException, JsonParseException,
 			JsonMappingException {
 		WebClient webClient = getWebClientHolder().get();
-		TextPage response = webClient.getPage(String.format(queryUrlFormat, name, getRandomInteger()));
-		webClient.closeAllWindows();
+		String queryUrl = String.format(queryUrlFormat, name, getRandomInteger());
+		String response = JsoupParserUtil.getResponseBodyAsTextFromUrlWithCookies(queryUrl, HtmlUnitUtil.getCookiesAsMap(webClient));
 		return parseJson(response);
 	}
 
@@ -49,15 +49,14 @@ public class AbstractMicromedexController {
 		return new Random().nextInt(10000);
 	}
 
-	private String[][] parseJson(final TextPage data) throws IOException, JsonParseException, JsonMappingException {
+	private String[][] parseJson(final String data) throws IOException, JsonParseException, JsonMappingException {
 		String unescapedContent = getHtmlUnescapedContent(data);
 		Class<String[][]> valueType = String[][].class;
 		return JsonUtil.readStringValueAsType(unescapedContent, valueType);
 	}
 
-	private String getHtmlUnescapedContent(final TextPage data) {
-		String escapedJsonContent = data.getContent();
-		return StringEscapeUtils.unescapeHtml4(escapedJsonContent);
+	private String getHtmlUnescapedContent(final String data) {
+		return StringEscapeUtils.unescapeHtml4(data);
 	}
 
 	protected String[][] getAllergiesWithNameLike(final String name) throws IOException, MalformedURLException, JsonParseException, JsonMappingException {

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonParseException;
@@ -32,9 +33,11 @@ import com.gargoylesoftware.htmlunit.WebClient;
 @Controller
 public class MethodTwoController extends AbstractMicromedexController {
 
-	private static final List<String> CATEGORIES = Arrays.asList("Drug-Drug Interactions", "Ingredient Duplication", "Drug-ALLERGY Interactions",
-			"Drug-FOOD Interactions", "Drug-ETHANOL Interactions", "Drug-LAB Interactions", "Drug-TOBACCO Interactions", "Drug-PREGNANCY Interactions",
-			"Drug-LACTATION Interactions");
+	private static final String SEARCH_FORM_ID = "ivCompatibilityLookUp";
+
+	private static final List<String> CATEGORIES = Arrays.asList("Drug-Drug", "Ingredient", "Drug-ALLERGY",
+			"Drug-FOOD Interactions", "Drug-ETHANOL", "Drug-LAB", "Drug-TOBACCO", "Drug-PREGNANCY",
+			"Drug-LACTATION");
 
 	private static final String INTERACTIONS_SEARCH_URL = "http://www.micromedexsolutions.com/micromedex2/librarian/PFDefaultActionId/evidencexpert.ShowDrugInteractionsResults";
 	private static final String INTERACTIONS_QUERY_PAGE_URL = "http://www.micromedexsolutions.com/micromedex2/librarian/ND_T/evidencexpert/ND_PR/"
@@ -51,7 +54,7 @@ public class MethodTwoController extends AbstractMicromedexController {
 		Document page = Jsoup.connect(INTERACTIONS_QUERY_PAGE_URL).cookies(HtmlUnitUtil.getCookiesAsMap(webClient)).timeout(0).get();
 
 		Map<String, String> params = new HashMap<>();
-		Element form = page.getElementById("ivCompatibilityLookUp");
+		Element form = page.getElementById(SEARCH_FORM_ID);
 		Elements formParams = form.getElementsByTag("input");
 
 		for (Element formParam : formParams) {
@@ -105,10 +108,11 @@ public class MethodTwoController extends AbstractMicromedexController {
 	private Map<String, List<InteractionResult>> doSearch(WebClient webClient, Map<String, String> params) throws IOException {
 		Map<String, List<InteractionResult>> results = getEmptyResultsModelMap();
 		Document resultsPage = JsoupParserUtil.postDataToUrlWithCookies(INTERACTIONS_SEARCH_URL, HtmlUnitUtil.getCookiesAsMap(webClient), params);
+		System.out.println(resultsPage.html());
 
 		List<InteractionResult> currentCategory = null;
 
-		Elements resultsTableRows = resultsPage.select("#resultsTable tr");
+		Elements resultsTableRows = resultsPage.select("table[id^=resultsTable] tr");
 		for (Element tableRow : resultsTableRows) {
 			Elements columns = tableRow.select("td");
 			if (columns.size() == 1) {
@@ -133,9 +137,9 @@ public class MethodTwoController extends AbstractMicromedexController {
 	}
 
 	private List<InteractionResult> getCategory(Elements columns, Map<String, List<InteractionResult>> results) {
-		Element firstColumn = columns.get(0);
+		String firstColumn = StringEscapeUtils.unescapeHtml4(columns.get(0).text()).trim();
 		for (String category : CATEGORIES) {
-			if (firstColumn.text().startsWith(category)) {
+			if (firstColumn.startsWith(category)) {
 				return results.get(category);
 			}
 		}
@@ -168,25 +172,38 @@ public class MethodTwoController extends AbstractMicromedexController {
 		public List<String[]> doSearch(final String commaSeparatedTermsToSearch) throws IOException {
 			List<String[]> searchResults = new ArrayList<>();
 
-			StringTokenizer searchTermTokenizer = new StringTokenizer(commaSeparatedTermsToSearch, ",");
-			while (searchTermTokenizer.hasMoreTokens()) {
-				String term = searchTermTokenizer.nextToken();
-				String[][] foundData = getData(term);
-
-				for (String[] datum : foundData) {
-					if (datum[NAME_INDEX].equalsIgnoreCase(term)) {
-						reorderDataInExpectedFormat(searchResults, datum);
-					}
-				}
-			}
+			if (commaSeparatedTermsToSearch.contains(","))
+				getDataFromMultipleCommaSeparatedTerms(commaSeparatedTermsToSearch, searchResults);
+			else if (StringUtils.isNotBlank(commaSeparatedTermsToSearch))
+				getDataForTerm(commaSeparatedTermsToSearch, searchResults);
 
 			return searchResults;
 		}
+
+		private void getDataFromMultipleCommaSeparatedTerms(final String commaSeparatedTermsToSearch, List<String[]> searchResults) throws JsonParseException,
+				JsonMappingException, MalformedURLException, IOException {
+			StringTokenizer searchTermTokenizer = new StringTokenizer(commaSeparatedTermsToSearch, ",");
+			while (searchTermTokenizer.hasMoreTokens()) {
+				getDataForTerm(searchTermTokenizer.nextToken(), searchResults);
+			}
+		}
+
+		private void getDataForTerm(String term, List<String[]> searchResults) throws JsonParseException, JsonMappingException, MalformedURLException,
+				IOException {
+			String[][] foundData = getData(term);
+
+			for (String[] datum : foundData) {
+				if (datum[NAME_INDEX].equalsIgnoreCase(term)) {
+					reorderDataInExpectedFormat(searchResults, datum);
+				}
+			}
+		}
+
+		public abstract String[][] getData(String searchTerm) throws JsonParseException, JsonMappingException, MalformedURLException, IOException;
 
 		private void reorderDataInExpectedFormat(List<String[]> searchResults, String[] datum) {
 			searchResults.add(new String[] { datum[1], datum[0], datum[2], datum[3] });
 		}
 
-		public abstract String[][] getData(String searchTerm) throws JsonParseException, JsonMappingException, MalformedURLException, IOException;
 	}
 }
