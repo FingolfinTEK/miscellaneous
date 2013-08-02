@@ -12,6 +12,7 @@
 	<properties>
 		<version.jgoodies.forms>1.2.1</version.jgoodies.forms>
 		<version.jgoodies.looks>2.2.2</version.jgoodies.looks>
+		<version.xml-apis>1.4.01</version.xml-apis>
 	</properties>
 
 	<dependencyManagement>
@@ -31,7 +32,7 @@
 			<dependency>
 				<groupId>xml-apis</groupId>
 				<artifactId>xml-apis</artifactId>
-				<version>1.4.01</version>
+				<version>${version.xml-apis}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -81,6 +82,11 @@
 			<groupId>net.sourceforge.htmlunit</groupId>
 			<artifactId>htmlunit</artifactId>
 			<version>2.12</version>
+		</dependency>
+
+		<dependency>
+			<groupId>xml-apis</groupId>
+			<artifactId>xml-apis</artifactId>
 		</dependency>
 	</dependencies>
 
