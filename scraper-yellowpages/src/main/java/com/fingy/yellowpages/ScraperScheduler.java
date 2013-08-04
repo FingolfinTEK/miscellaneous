@@ -1,19 +1,17 @@
-package com.fingy.ehentai;
+package com.fingy.yellowpages;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
@@ -23,50 +21,50 @@ import org.slf4j.LoggerFactory;
 import com.fingy.adultwholesale.scrape.AbstractAdultItemJsoupScraper;
 import com.fingy.adultwholesale.scrape.AdultItemJsoupScraper;
 import com.fingy.concurrent.ExecutorsUtil;
-import com.fingy.ehentai.scrape.IndexPageScraper;
-import com.fingy.ehentai.scrape.MangaInfoScraper;
-import com.fingy.ehentai.scrape.SearchPageMangaLinksScraper;
 import com.fingy.scrape.ScrapeResult;
-import com.fingy.scrape.jsoup.AbstractJsoupScraper;
 import com.fingy.scrape.queue.ScraperLinksQueue;
+import com.fingy.scrape.util.HtmlUnitParserUtil;
+import com.fingy.yellowpages.scrape.CompanyDetailsScraper;
+import com.fingy.yellowpages.scrape.CustomSearchScraper;
 
-public class EHentaiScraperScheduler {
+public class ScraperScheduler {
+    private static final String SEARCH_FORMAT = "http://www.yellowpages.com/search?tracks=true&search_terms=%s&geo_location_terms=%s";
 
-    private static final int CATEGORY_TIMEOUT = 20000;
+    private static final int DEFAULT_TERMINATION_AWAIT_INTERVAL_MINUTES = 15;
+    private static final int CATEGORY_TIMEOUT = 180000;
     private static final int AVAILABLE_PROCESSORS = Runtime.getRuntime().availableProcessors();
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final ExecutorService searchPageScrapingThreadPool;
-    private final ExecutorService mangaInfoScrapingThreadPool;
-    private final ExecutorCompletionService<MangaInfo> mangaInfoScrapingCompletionService;
+    private final ExecutorService adPageScrapingThreadPool;
+    private final ExecutorService contactScrapingThreadPool;
+    private final ExecutorCompletionService<CompanyDetails> contactScrapingCompletionService;
 
     private final ScraperLinksQueue linksQueue;
     private final Set<String> queuedLinks;
-    private final Set<MangaInfo> scrapedItems;
+    private final Set<CompanyDetails> scrapedItems;
 
-    private final String initialUrl;
-    private final File mangaInfoFile;
+    private final String searchTerm;
+    private final String searchLocation;
+
+    private final File contactsFile;
     private final File visitedFile;
     private final File queuedFile;
 
-    public static void main(final String[] args) throws FileNotFoundException, IOException, InterruptedException, ExecutionException {
-        ScrapeResult result = new EHentaiScraperScheduler(args[0], args[1], args[2], args[3]).doScrape();
-        System.exit(result.getQueueSize());
-    }
-
-    public EHentaiScraperScheduler(final String startingUrl, final String mangaInfoFilePath, final String visitedFilePath,
+    public ScraperScheduler(final String term, final String location, final String contactsFilePath, final String visitedFilePath,
             final String queuedFilePath) {
-        searchPageScrapingThreadPool = Executors.newSingleThreadExecutor();
-        mangaInfoScrapingThreadPool = searchPageScrapingThreadPool; // createThreadPool(1);
-        mangaInfoScrapingCompletionService = new ExecutorCompletionService<>(mangaInfoScrapingThreadPool);
+        adPageScrapingThreadPool = Executors.newSingleThreadExecutor();
+        contactScrapingThreadPool = Executors.newSingleThreadExecutor();
+        contactScrapingCompletionService = new ExecutorCompletionService<>(contactScrapingThreadPool);
 
         linksQueue = new ScraperLinksQueue();
         queuedLinks = new LinkedHashSet<>();
         scrapedItems = new LinkedHashSet<>();
 
-        initialUrl = startingUrl;
-        mangaInfoFile = new File(mangaInfoFilePath);
+        searchTerm = term.replaceAll(" +", "+");
+        searchLocation = location.replaceAll(" +", "+");
+
+        contactsFile = new File(contactsFilePath);
         visitedFile = new File(visitedFilePath);
         queuedFile = new File(queuedFilePath);
     }
@@ -74,10 +72,12 @@ public class EHentaiScraperScheduler {
     public ScrapeResult doScrape() {
         int queuedSize = 0;
         try {
+            loadDetailsFromFile();
             loadVisitedLinksFromFile();
             loadQueuedLinksFromFile();
 
-            searchPageScrapingThreadPool.submit(new IndexPageScraper(initialUrl, linksQueue));
+            HtmlUnitParserUtil.getPageFromUrlWithoutJavaScriptSupport(CustomSearchScraper.WWW_YELLOWPAGES_COM);
+            submitSearchPageScrapingTask(String.format(SEARCH_FORMAT, searchTerm, searchLocation));
 
             submitScrapingTasksWhileThereIsEnoughWork();
             awaitTerminationOfTheTasks();
@@ -91,6 +91,18 @@ public class EHentaiScraperScheduler {
 
         logger.trace("Scraped items: " + scrapedItems.size());
         return new ScrapeResult(queuedSize, scrapedItems.size());
+    }
+
+    private void loadDetailsFromFile() {
+        try {
+            final List<String> lines = FileUtils.readLines(contactsFile);
+            for (String line : lines) {
+                scrapedItems.add(CompanyDetails.fromString(line));
+            }
+            logger.trace("Loaded " + lines.size() + " contacts");
+        } catch (IOException e) {
+            logger.error("Exception occured", e);
+        }
     }
 
     private void loadVisitedLinksFromFile() {
@@ -125,15 +137,15 @@ public class EHentaiScraperScheduler {
             try {
                 String link = linksQueue.take();
 
-                if (isLinkForMangaPage(link)) {
-                    queuedLinks.add(link);
-                    submitMangaInfoScrapingTask(link);
-                    Thread.sleep(2000 + new Random().nextInt(3000));
-                } else {
+                if (isLinkForSearchPage(link)) {
                     submitSearchPageScrapingTask(link);
+                } else {
+                    queuedLinks.add(link);
+                    submitContactScrapingTask(link);
+                    Thread.sleep(2000 + new Random().nextInt(4000));
                 }
 
-                Thread.sleep(1500);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 logger.error("Exception occured", e);
                 break;
@@ -141,8 +153,8 @@ public class EHentaiScraperScheduler {
         }
     }
 
-    private boolean isLinkForMangaPage(final String link) {
-        return link.contains("g.e-hentai.org/g/");
+    private boolean isLinkForSearchPage(final String link) {
+        return !link.contains("lid=");
     }
 
     private boolean stillHaveLinksToBeScraped() {
@@ -151,46 +163,43 @@ public class EHentaiScraperScheduler {
 
     private void submitSearchPageScrapingTask(final String link) {
         try {
-            searchPageScrapingThreadPool.submit(new SearchPageMangaLinksScraper(link, linksQueue));
+            adPageScrapingThreadPool.submit(new CustomSearchScraper(link, linksQueue));
         } catch (Exception e) {
             logger.error("Exception occured", e);
         }
     }
 
-    private void submitMangaInfoScrapingTask(final String link) {
+    private void submitContactScrapingTask(final String link) {
         try {
-            mangaInfoScrapingCompletionService.submit(new MangaInfoScraper(link, linksQueue));
+            contactScrapingCompletionService.submit(new CompanyDetailsScraper(link, linksQueue));
         } catch (Exception e) {
             logger.error("Exception occured", e);
         }
     }
 
     private void awaitTerminationOfTheTasks() {
-        int timeout = AbstractJsoupScraper.isScrapeCompromised() ? 0 : queuedLinks.size();
-        ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(searchPageScrapingThreadPool, timeout, TimeUnit.SECONDS);
-        ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(mangaInfoScrapingThreadPool, timeout, TimeUnit.SECONDS);
+        ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(adPageScrapingThreadPool, DEFAULT_TERMINATION_AWAIT_INTERVAL_MINUTES,
+                                                                 TimeUnit.MINUTES);
+        ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(contactScrapingThreadPool, DEFAULT_TERMINATION_AWAIT_INTERVAL_MINUTES,
+                                                                 TimeUnit.MINUTES);
     }
 
     private void collectAndSaveResults() throws FileNotFoundException, IOException {
         collectResults();
-        File tempFile = new File("temp.xsls");
-
-        new MangaInfoToExcelBuilder().openExcel(mangaInfoFile.getPath()).appendToExcel(scrapedItems).writeToFile(tempFile.getPath())
-                .close();
-
-        FileUtils.forceDelete(mangaInfoFile);
-        FileUtils.copyFile(tempFile, mangaInfoFile);
-        FileUtils.forceDelete(tempFile);
+        FileUtils.writeLines(contactsFile, scrapedItems);
     }
 
     private void collectResults() {
         long timeout = 10;
         for (int i = 0; i < queuedLinks.size(); i++) {
             try {
-                final Future<MangaInfo> future = mangaInfoScrapingCompletionService.poll(timeout, TimeUnit.SECONDS);
-                MangaInfo mangaInfo = future.get();
-                scrapedItems.add(mangaInfo);
-                logger.trace("Scraped item " + mangaInfo);
+                final Future<CompanyDetails> future = contactScrapingCompletionService.poll(timeout, TimeUnit.SECONDS);
+                CompanyDetails contact = future.get();
+
+                if (contact.isValid()) {
+                    logger.trace("Added details " + contact);
+                    scrapedItems.add(contact);
+                }
             } catch (Exception e) {
                 timeout = 0;
             }
@@ -219,10 +228,5 @@ public class EHentaiScraperScheduler {
         }
 
         return 0;
-    }
-
-    private ExecutorService createThreadPool(final int processorMultiplier) {
-        return new ThreadPoolExecutor(AVAILABLE_PROCESSORS * processorMultiplier, Integer.MAX_VALUE, 1, TimeUnit.MINUTES,
-                new LinkedBlockingQueue<Runnable>());
     }
 }

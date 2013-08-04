@@ -23,7 +23,7 @@ public abstract class AbstractAprodHttpClientJsoupScraper<T> extends AbstractJso
 		try {
 			return HttpClientParserUtil.getPageFromUrl(scrapeUrl);
 		} catch (IOException e) {
-			AbstractAprodHttpClientJsoupScraper.setSessionExpired(true);
+			AbstractAprodHttpClientJsoupScraper.setScrapeCompromised(true);
 			throw e;
 		}
 	}

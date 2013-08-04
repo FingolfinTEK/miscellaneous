@@ -1,7 +1,6 @@
 package com.fingy.ehentai;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -12,7 +11,6 @@ import com.fingy.proxylist.ProxyInfo;
 import com.fingy.proxylist.ProxyListScraperScheduler;
 import com.fingy.proxylist.ProxyType;
 import com.fingy.scrape.ScrapeResult;
-import com.fingy.scrape.security.util.TorUtil;
 
 public class ConsoleEHentaiScrapeRunner {
 
@@ -38,9 +36,9 @@ public class ConsoleEHentaiScrapeRunner {
 
     public void runScrape() {
         try {
-            // loadProxies();
-            TorUtil.stopTor();
-            TorUtil.startAndUseTorAsProxy();
+            loadProxies();
+            // TorUtil.stopTor();
+            // TorUtil.startAndUseTorAsProxy();
 
             for (int i = 0; i < RETRY_COUNT; i++) {
                 scrapeWhileThereAreResults();
@@ -48,21 +46,21 @@ public class ConsoleEHentaiScrapeRunner {
         } catch (Exception e) {
             logger.error("Exception occured", e);
         } finally {
-            TorUtil.stopTor();
+            // TorUtil.stopTor();
         }
     }
 
     private void loadProxies() throws InterruptedException, ExecutionException {
         currentIndex = 0;
         proxies = new ProxyListScraperScheduler().getProxies();
-        Collections.shuffle(proxies);
+        // Collections.shuffle(proxies);
     }
 
     private void scrapeWhileThereAreResults() throws ExecutionException, IOException, InterruptedException {
         int queueSize = 1;
         while (queueSize > 0) {
-            // setUpProxy();
-            TorUtil.requestNewIdentity();
+            setUpProxy();
+            // TorUtil.requestNewIdentity();
 
             ScrapeResult result = new EHentaiScraperScheduler(startUrl, SCRAPED_TXT_FILE_NAME, VISITED_TXT_FILE_NAME, QUEUED_TXT_FILE_NAME)
                     .doScrape();

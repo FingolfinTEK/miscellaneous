@@ -43,7 +43,7 @@ public class ContactJsoupScraper extends AbstractAprodHttpClientJsoupScraper<Con
 		}
 
 		linksQueue.addIfNotVisited(getScrapeUrl());
-		AbstractJsoupScraper.setSessionExpired(true);
+		AbstractJsoupScraper.setScrapeCompromised(true);
 		throw new SessionExpiredException(getScrapeUrl());
 	}
 

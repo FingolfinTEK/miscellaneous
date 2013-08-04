@@ -1,4 +1,4 @@
-package com.fingy.aprod;
+package com.fingy.yellowpages;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -10,9 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -29,8 +27,6 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fingy.aprod.criteria.Category;
-import com.fingy.aprod.criteria.City;
 import com.fingy.gui.AppendableJTextArea;
 import com.fingy.scrape.ScrapeResult;
 import com.fingy.scrape.security.util.TorUtil;
@@ -44,7 +40,7 @@ public class GUIRunner extends JFrame {
     private static final int RETRY_COUNT = 5;
     private static final String VISITED_TXT_FILE_NAME = "visited.txt";
     private static final String QUEUED_TXT_FILE_NAME = "queued.txt";
-    private static final String DEFAULT_CONTACTS_FILE = "contacts.txt";
+    private static final String DEFAULT_COMPANIES_FILE = "companies.txt";
 
     private static final long serialVersionUID = 1L;
 
@@ -53,15 +49,15 @@ public class GUIRunner extends JFrame {
     private final boolean shouldUseTor = true;
     private boolean shouldStop;
 
-    private final JTextField contactsFilePath;
     private final AppendableJTextArea infoPane;
-    private final JComboBox<Category> categoryCombo;
+    private final JTextField contactsFilePath;
+    private final JTextField searchLocation;
+    private final JTextField searchTerm;
     private final JButton btnStartScrape;
     private final JButton btnStopScrape;
     private final JButton btnClearLog;
 
-    private File contacts = new File(DEFAULT_CONTACTS_FILE);
-    private final JComboBox<City> cityCombo;
+    private File contacts = new File(DEFAULT_COMPANIES_FILE);
 
     public GUIRunner() {
         setPreferredSize(new Dimension(600, 400));
@@ -82,7 +78,7 @@ public class GUIRunner extends JFrame {
 
         contactsFilePath = new JTextField();
         contactsFilePath.setEditable(false);
-        contactsFilePath.setText(DEFAULT_CONTACTS_FILE);
+        contactsFilePath.setText(DEFAULT_COMPANIES_FILE);
         getContentPane().add(contactsFilePath, "4, 2, fill, default");
         contactsFilePath.setColumns(10);
 
@@ -105,21 +101,17 @@ public class GUIRunner extends JFrame {
         });
         getContentPane().add(btnBrowse, "6, 2");
 
-        JLabel lblScrapeCity = new JLabel("Scrape city:");
-        getContentPane().add(lblScrapeCity, "2, 4, right, default");
+        JLabel lblSearchTerm = new JLabel("Search term:");
+        getContentPane().add(lblSearchTerm, "2, 4, right, default");
 
-        cityCombo = new JComboBox<City>();
-        cityCombo.setModel(new DefaultComboBoxModel<>(City.values()));
-        cityCombo.setSelectedItem(City.BUDAPEST);
-        getContentPane().add(cityCombo, "4, 4, fill, default");
+        searchTerm = new JTextField();
+        getContentPane().add(searchTerm, "4, 4, fill, default");
 
-        JLabel lblScrapeCategory = new JLabel("Scrape category:");
-        getContentPane().add(lblScrapeCategory, "2, 6, right, default");
+        JLabel lblSearchLocation = new JLabel("Search location:");
+        getContentPane().add(lblSearchLocation, "2, 6, right, default");
 
-        categoryCombo = new JComboBox<Category>();
-        categoryCombo.setModel(new DefaultComboBoxModel<Category>(Category.values()));
-        categoryCombo.setSelectedItem(Category.ALL);
-        getContentPane().add(categoryCombo, "4, 6, fill, default");
+        searchLocation = new JTextField();
+        getContentPane().add(searchLocation, "4, 6, fill, default");
 
         JLabel lblActivityLog = new JLabel("Activity log:");
         getContentPane().add(lblActivityLog, "2, 8, default, top");
@@ -250,13 +242,12 @@ public class GUIRunner extends JFrame {
     private void scrapeWhileThereAreResults() throws ExecutionException, IOException, InterruptedException {
         int queueSize = 1;
         while (queueSize > 0 && !shouldStop) {
-            City city = (City) cityCombo.getSelectedItem();
-            Category category = (Category) categoryCombo.getSelectedItem();
+            String term = searchTerm.getText();
+            String location = searchLocation.getText();
 
-            infoPane.appendLine("Starting new scrape iteration for city " + city + " and category " + category);
+            infoPane.appendLine("Starting new scrape iteration for term " + term + " and location " + location);
 
-            String startUrl = String.format(category.getLink(), city.getUrlName());
-            ScrapeResult result = new AprodScraperScheduler(startUrl, contacts.getAbsolutePath(), VISITED_TXT_FILE_NAME,
+            ScrapeResult result = new ScraperScheduler(term, location, contacts.getAbsolutePath(), VISITED_TXT_FILE_NAME,
                     QUEUED_TXT_FILE_NAME).doScrape();
 
             infoPane.appendLine("Finished scrape iteration; total contacts scraped: " + result.getScrapeSize());

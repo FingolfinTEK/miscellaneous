@@ -94,7 +94,7 @@ public class AdultWholesaleScraperScheduler {
 		System.getProperties().setProperty("socksProxyHost", "127.0.0.1");
 		System.getProperties().setProperty("socksProxyPort", "9150");
 
-		AdultItemJsoupScraper.setSessionExpired(false);
+		AdultItemJsoupScraper.setScrapeCompromised(false);
 		doLogin();
 
 		loadVisitedLinksFromFile();
@@ -150,7 +150,7 @@ public class AdultWholesaleScraperScheduler {
 	private void submitScrapingTasksWhileThereIsEnoughWork() {
 		System.out.println("AdultWholesaleScraperScheduler.submitScrapingTasksWhileThereIsEnoughWork()");
 		while (stillHaveLinksToBeScraped()) {
-			if (AbstractAdultItemJsoupScraper.isSessionExpired()) {
+			if (AbstractAdultItemJsoupScraper.isScrapeCompromised()) {
 				System.out.println("Session expired, breaking");
 				break;
 			}
