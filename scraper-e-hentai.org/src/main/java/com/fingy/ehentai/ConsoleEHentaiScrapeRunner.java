@@ -1,6 +1,7 @@
 package com.fingy.ehentai;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -53,7 +54,7 @@ public class ConsoleEHentaiScrapeRunner {
     private void loadProxies() throws InterruptedException, ExecutionException {
         currentIndex = 0;
         proxies = new ProxyListScraperScheduler().getProxies();
-        // Collections.shuffle(proxies);
+        Collections.shuffle(proxies);
     }
 
     private void scrapeWhileThereAreResults() throws ExecutionException, IOException, InterruptedException {
