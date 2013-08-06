@@ -12,6 +12,7 @@
 	<bean class="com.fingy.micromedex.web.controller.MethodOneController"/>
 	<bean class="com.fingy.micromedex.web.controller.MethodTwoController"/>
 	<bean class="com.fingy.micromedex.web.controller.MethodThreeController"/>
+	<bean class="com.fingy.micromedex.web.controller.MethodFourController"/>
 
 	<mvc:annotation-driven />
 
