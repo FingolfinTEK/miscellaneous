@@ -9,13 +9,16 @@
           http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
 		http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd">
 
-	<context:component-scan base-package="com.fingy.micromedex.web.controller" />
+	<bean class="com.fingy.micromedex.web.controller.MethodOneController"/>
+	<bean class="com.fingy.micromedex.web.controller.MethodTwoController"/>
+	<bean class="com.fingy.micromedex.web.controller.MethodThreeController"/>
 
 	<mvc:annotation-driven />
 
 	<bean id="ehcacheManager"
 		class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"
 		p:configLocation="classpath:META-INF/ehcache-config.xml" />
+
 	<bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager"
 		p:cache-manager-ref="ehcacheManager" />
 
