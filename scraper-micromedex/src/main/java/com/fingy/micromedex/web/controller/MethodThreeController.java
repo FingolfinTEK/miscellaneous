@@ -8,6 +8,7 @@ import java.util.List;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,9 +30,10 @@ public class MethodThreeController extends AbstractMicromedexController {
 
 	@ResponseBody
 	@RequestMapping("/check-disease")
-	public SearchResults<DrugResult> checkDisease(@RequestParam(value = "disease", required = true) final String disease)
+	@Cacheable(value = "methodThreeCache", key = "#name")
+	public SearchResults<DrugResult> checkDisease(@RequestParam(value = "name", required = true) final String name)
 			throws FailingHttpStatusCodeException, IOException {
-		Document parsedPage = getParsedPage(DISEASE_CHECK_URL_FORMAT + disease);
+		Document parsedPage = getParsedPage(DISEASE_CHECK_URL_FORMAT + name);
 		return extractDrugResultsFromPage(parsedPage);
 	}
 

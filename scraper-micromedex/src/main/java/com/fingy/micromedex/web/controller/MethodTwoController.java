@@ -20,6 +20,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -46,6 +47,7 @@ public class MethodTwoController extends AbstractMicromedexController {
 
 	@ResponseBody
 	@RequestMapping("/interactions")
+	@Cacheable(value = "methodTwoCache", key = "#drugsToSearch.concat(#allergiesToSearch)")
 	public Object interactions(@RequestParam(value = "drugs", required = true) final String drugsToSearch,
 			@RequestParam(value = "allergies", required = true) final String allergiesToSearch) throws IOException {
 
@@ -108,7 +110,6 @@ public class MethodTwoController extends AbstractMicromedexController {
 	private Map<String, List<InteractionResult>> doSearch(WebClient webClient, Map<String, String> params) throws IOException {
 		Map<String, List<InteractionResult>> results = getEmptyResultsModelMap();
 		Document resultsPage = JsoupParserUtil.postDataToUrlWithCookies(INTERACTIONS_SEARCH_URL, HtmlUnitUtil.getCookiesAsMap(webClient), params);
-		System.out.println(resultsPage.html());
 
 		List<InteractionResult> currentCategory = null;
 

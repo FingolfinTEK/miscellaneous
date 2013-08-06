@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,6 +19,7 @@ public class MethodOneController extends AbstractMicromedexController {
 
 	@ResponseBody
 	@RequestMapping("/drugs")
+	@Cacheable(value = "methodOneCache", key = "'drugs'.concat(#name)")
 	public SearchResults<String> drugs(@RequestParam(value = "name", required = true) final String name) throws FailingHttpStatusCodeException,
 			MalformedURLException, IOException {
 		String[][] searchResults = getDrugsWithNameLike(name);
@@ -34,6 +36,7 @@ public class MethodOneController extends AbstractMicromedexController {
 
 	@ResponseBody
 	@RequestMapping("/allergies")
+	@Cacheable(value = "methodOneCache", key = "'allergies'.concat(#name)")
 	public SearchResults<String> allergies(@RequestParam(value = "name", required = true) final String name) throws FailingHttpStatusCodeException,
 			MalformedURLException, IOException {
 		String[][] searchResults = getAllergiesWithNameLike(name);
