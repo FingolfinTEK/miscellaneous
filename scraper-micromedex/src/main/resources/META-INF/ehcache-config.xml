@@ -1,0 +1,11 @@
+<ehcache updateCheck="false">
+
+	<!-- Mandatory Default Cache configuration. These settings will be applied to caches created programmtically using CacheManager.add(String cacheName) -->
+	<defaultCache maxElementsInMemory="10000" eternal="false" timeToIdleSeconds="120" timeToLiveSeconds="120" overflowToDisk="true" maxElementsOnDisk="10000000"
+		diskPersistent="false" diskExpiryThreadIntervalSeconds="120" memoryStoreEvictionPolicy="LRU" />
+
+	<cache name="methodOneCache" maxElementsInMemory="10000" eternal="false" timeToIdleSeconds="14400" timeToLiveSeconds="14400" memoryStoreEvictionPolicy="LRU" />
+	<cache name="methodTwoCache" maxElementsInMemory="5000" eternal="false" timeToIdleSeconds="14400" timeToLiveSeconds="14400" memoryStoreEvictionPolicy="LRU" />
+	<cache name="methodThreeCache" maxElementsInMemory="5000" eternal="false" timeToIdleSeconds="14400" timeToLiveSeconds="14400" memoryStoreEvictionPolicy="LRU" />
+
+</ehcache>
