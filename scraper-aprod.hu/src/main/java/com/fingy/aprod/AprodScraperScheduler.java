@@ -134,10 +134,10 @@ public class AprodScraperScheduler {
 	}
 
 	private void submitScrapingTasksWhileThereIsEnoughWork() {
-		AdultItemJsoupScraper.setSessionExpired(false);
+		AdultItemJsoupScraper.setScrapeCompromised(false);
 
 		while (stillHaveLinksToBeScraped()) {
-			if (AbstractAdultItemJsoupScraper.isSessionExpired()) {
+			if (AbstractAdultItemJsoupScraper.isScrapeCompromised()) {
 				logger.trace("Session expired, breaking");
 				break;
 			}

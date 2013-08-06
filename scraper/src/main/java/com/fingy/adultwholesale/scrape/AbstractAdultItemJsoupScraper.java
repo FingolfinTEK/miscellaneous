@@ -23,7 +23,7 @@ public abstract class AbstractAdultItemJsoupScraper extends AbstractJsoupScraper
 		if (page.getElementsContainingText("sessionexpired").isEmpty())
 			return doScrapePage(page);
 		else {
-			setSessionExpired(true);
+			setScrapeCompromised(true);
 			throw new ScrapeException("Session expred");
 		}
 	}

@@ -7,7 +7,7 @@ import org.jsoup.nodes.Document;
 import com.fingy.scrape.exception.ScrapeException;
 import com.fingy.scrape.jsoup.AbstractJsoupScraper;
 import com.fingy.scrape.queue.ScraperLinksQueue;
-import com.fingy.scrape.util.JsoupParserUtil;
+import com.fingy.scrape.util.HtmlUnitParserUtil;
 
 public abstract class AbstractEHentaiJsoupScraper<T> extends AbstractJsoupScraper<T> {
 
@@ -15,16 +15,15 @@ public abstract class AbstractEHentaiJsoupScraper<T> extends AbstractJsoupScrape
 
     protected final ScraperLinksQueue linksQueue;
 
-    public AbstractEHentaiJsoupScraper(String scrapeUrl, ScraperLinksQueue linksQueue) {
+    public AbstractEHentaiJsoupScraper(final String scrapeUrl, final ScraperLinksQueue linksQueue) {
         super(scrapeUrl);
         this.linksQueue = linksQueue;
     }
 
     @Override
-    protected Document getPage(String scrapeUrl) throws IOException {
+    protected Document getPage(final String scrapeUrl) throws IOException {
         try {
-            Document page = JsoupParserUtil.getPageFromUrl(scrapeUrl);
-            // Document page = HtmlUnitParserUtil.getPageFromUrl(scrapeUrl);
+            Document page = HtmlUnitParserUtil.getPageFromUrlWithoutJavaScriptSupport(scrapeUrl);
 
             if (!page.text().startsWith(BANNED_IP_MESSAGE_START)) {
                 return page;
@@ -33,7 +32,7 @@ public abstract class AbstractEHentaiJsoupScraper<T> extends AbstractJsoupScrape
             logger.error("Exception while getting page", e);
         }
 
-        setSessionExpired(true);
+        setScrapeCompromised(true);
         throw new ScrapeException("Session expired");
     }
 
