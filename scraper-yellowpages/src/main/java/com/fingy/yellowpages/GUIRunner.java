@@ -57,9 +57,9 @@ public class GUIRunner extends JFrame {
     private final JButton btnStopScrape;
     private final JButton btnClearLog;
 
-    private File contacts = new File(DEFAULT_COMPANIES_FILE);
     private String term;
     private String location;
+    private String contactsFile;
 
     public GUIRunner() {
         setPreferredSize(new Dimension(600, 400));
@@ -95,7 +95,6 @@ public class GUIRunner extends JFrame {
                 if (selectedOption == JFileChooser.APPROVE_OPTION) {
                     File chosen = fileChooser.getSelectedFile();
                     if (chosen != null) {
-                        contacts = chosen;
                         contactsFilePath.setText(chosen.getAbsolutePath());
                     }
                 }
@@ -141,6 +140,7 @@ public class GUIRunner extends JFrame {
 
                 term = searchTerm.getText();
                 location = searchLocation.getText();
+                contactsFile = contactsFilePath.getText();
                 new ScraperWorker().execute();
             }
         });
@@ -252,8 +252,8 @@ public class GUIRunner extends JFrame {
 
             infoPane.appendLine("Starting new scrape iteration for term " + term + " and location " + location);
 
-            ScrapeResult result = new ScraperScheduler(term, location, contacts.getAbsolutePath(), VISITED_TXT_FILE_NAME,
-                    QUEUED_TXT_FILE_NAME).doScrape();
+            ScrapeResult result = new ScraperScheduler(term, location, contactsFile, VISITED_TXT_FILE_NAME, QUEUED_TXT_FILE_NAME)
+                    .doScrape();
 
             infoPane.appendLine("Finished scrape iteration; total contacts scraped: " + result.getScrapeSize());
 
