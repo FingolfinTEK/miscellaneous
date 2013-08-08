@@ -32,7 +32,6 @@ public class ScraperScheduler {
 
     private static final int DEFAULT_TERMINATION_AWAIT_INTERVAL_MINUTES = 15;
     private static final int CATEGORY_TIMEOUT = 180000;
-    private static final int AVAILABLE_PROCESSORS = Runtime.getRuntime().availableProcessors();
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -162,19 +161,11 @@ public class ScraperScheduler {
     }
 
     private void submitSearchPageScrapingTask(final String link) {
-        try {
-            adPageScrapingThreadPool.submit(new CustomSearchScraper(link, linksQueue));
-        } catch (Exception e) {
-            logger.error("Exception occured", e);
-        }
+        adPageScrapingThreadPool.submit(new CustomSearchScraper(link, linksQueue));
     }
 
     private void submitContactScrapingTask(final String link) {
-        try {
-            contactScrapingCompletionService.submit(new CompanyDetailsScraper(link, linksQueue));
-        } catch (Exception e) {
-            logger.error("Exception occured", e);
-        }
+        contactScrapingCompletionService.submit(new CompanyDetailsScraper(link, linksQueue));
     }
 
     private void awaitTerminationOfTheTasks() {
@@ -197,7 +188,6 @@ public class ScraperScheduler {
                 CompanyDetails contact = future.get();
 
                 if (contact.isValid()) {
-                    logger.trace("Added details " + contact);
                     scrapedItems.add(contact);
                 }
             } catch (Exception e) {

@@ -58,10 +58,12 @@ public class GUIRunner extends JFrame {
     private final JButton btnClearLog;
 
     private File contacts = new File(DEFAULT_COMPANIES_FILE);
+    private String term;
+    private String location;
 
     public GUIRunner() {
         setPreferredSize(new Dimension(600, 400));
-        setTitle("aprod.hu Scraper");
+        setTitle("YellowPages Scraper");
         getContentPane().setLayout(new FormLayout(
                                            new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC,
                                                    FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"),
@@ -132,8 +134,13 @@ public class GUIRunner extends JFrame {
         btnStartScrape.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
+                searchTerm.setEnabled(false);
+                searchLocation.setEnabled(false);
                 btnStartScrape.setEnabled(false);
                 btnStopScrape.setEnabled(true);
+
+                term = searchTerm.getText();
+                location = searchLocation.getText();
                 new ScraperWorker().execute();
             }
         });
@@ -242,8 +249,6 @@ public class GUIRunner extends JFrame {
     private void scrapeWhileThereAreResults() throws ExecutionException, IOException, InterruptedException {
         int queueSize = 1;
         while (queueSize > 0 && !shouldStop) {
-            String term = searchTerm.getText();
-            String location = searchLocation.getText();
 
             infoPane.appendLine("Starting new scrape iteration for term " + term + " and location " + location);
 
@@ -273,6 +278,8 @@ public class GUIRunner extends JFrame {
 
         @Override
         protected void done() {
+            searchTerm.setEnabled(true);
+            searchLocation.setEnabled(true);
             btnStartScrape.setEnabled(true);
             btnStopScrape.setEnabled(false);
             infoPane.appendLine("Finished scraping.");
