@@ -27,9 +27,12 @@ public class CustomSearchScraper extends AbstractYellowPagesScraper<Integer> {
     }
 
     private void addOtherPages(final Document page) {
-        Elements pageLinks = page.select("div#results div.pagination div.page-navigation ol.track-pagination li a");
-        for (Element pageLink : pageLinks) {
-            getLinksQueue().addIfNotVisited(WWW_YELLOWPAGES_COM + pageLink.attr("href"));
+        Element totalResultsElement = page.select("div#results div.pagination div.result-totals strong").last();
+        Integer totalResults = Integer.parseInt(totalResultsElement.text());
+        Integer totalPages = totalResults / 30 + Math.min(1, totalResults % 30);
+
+        for (int i = 2; i < totalPages; i++) {
+            getLinksQueue().addIfNotVisited(page.baseUri() + "&page=" + i);
         }
     }
 }
