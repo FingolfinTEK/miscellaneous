@@ -32,7 +32,14 @@ public class CustomSearchScraper extends AbstractYellowPagesScraper<Integer> {
         Integer totalPages = totalResults / 30 + Math.min(1, totalResults % 30);
 
         for (int i = 2; i < totalPages; i++) {
-            getLinksQueue().addIfNotVisited(page.baseUri() + "&page=" + i);
+            getLinksQueue().addIfNotVisited(generatePageUrl(page, i));
         }
     }
+
+	private String generatePageUrl(Document page, int i) {
+		Element pageLinks = page.select("div#results div.pagination div.page-navigation ol.track-pagination li a").first();
+		String url = pageLinks.attr("href");
+		String replaceAll = url.replaceAll("page=(\\d+)", "page=" + i);
+		return WWW_YELLOWPAGES_COM + replaceAll;
+	}
 }

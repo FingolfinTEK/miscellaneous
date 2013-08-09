@@ -7,11 +7,13 @@ import java.io.File;
 import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.fingy.ehentai.MangaInfo;
 import com.fingy.scrape.queue.ScraperLinksQueue;
 
+@Ignore
 public class MangaInfoScraperTest {
 	private static final String MANGA_PAGE_HTM_LOCATION = "test_pages/manga-page.htm";
 
