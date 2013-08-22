@@ -12,14 +12,12 @@ public class TorNetworkProxyBasedScrapeDetectionOverride implements ProxyBasedSc
 
     @Override
     public void setUpProxy() {
-        // TODO Auto-generated method stub
-
+        TorUtil.requestNewIdentity();
     }
 
     @Override
-    public void tearDownProxy() {
+    public void destroyContext() {
         TorUtil.stopTor();
-
     }
 
 }

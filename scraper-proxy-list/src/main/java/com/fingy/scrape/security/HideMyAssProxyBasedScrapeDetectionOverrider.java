@@ -42,7 +42,7 @@ public class HideMyAssProxyBasedScrapeDetectionOverrider implements ProxyBasedSc
     }
 
     @Override
-    public void tearDownProxy() {
+    public void destroyContext() {
     }
 
 }

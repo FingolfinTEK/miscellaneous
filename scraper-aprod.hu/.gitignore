@@ -2,3 +2,7 @@
 /logs
 /tor
 /Data
+/bin
+/.settings
+.project
+.classpath

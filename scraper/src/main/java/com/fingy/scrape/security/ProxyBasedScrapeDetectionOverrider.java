@@ -6,6 +6,6 @@ public interface ProxyBasedScrapeDetectionOverrider {
 
     void setUpProxy();
 
-    void tearDownProxy();
+    void destroyContext();
 
 }

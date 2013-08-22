@@ -1,0 +1,10 @@
+/target
+/tor
+/.settings
+/logs
+/Data
+/.classpath
+/.project
+/details.txt
+/queued.txt
+/visited.txt
