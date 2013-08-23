@@ -32,13 +32,13 @@ import com.fingy.gui.AppendableJTextArea;
 import com.fingy.scrape.ScrapeResult;
 import com.fingy.scrape.jsoup.AbstractJsoupScraper;
 import com.fingy.scrape.security.ProxyBasedScrapeDetectionOverrider;
-import com.fingy.scrape.security.TorNetworkProxyBasedScrapeDetectionOverride;
+import com.fingy.scrape.security.TorNetworkProxyBasedRefreshingScrapeDetectionOverride;
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
-public class GUIRunner extends JFrame {
+public class MousePriceGUIRunner extends JFrame {
 
 	private static final int RETRY_COUNT = 5;
 	private static final String VISITED_TXT_FILE_NAME = "visited.txt";
@@ -49,7 +49,7 @@ public class GUIRunner extends JFrame {
 	private static final long serialVersionUID = 1L;
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
-	private final ProxyBasedScrapeDetectionOverrider scrapeDetectionOverrider = new TorNetworkProxyBasedScrapeDetectionOverride();
+	private final ProxyBasedScrapeDetectionOverrider scrapeDetectionOverrider = new TorNetworkProxyBasedRefreshingScrapeDetectionOverride();
 
 	private boolean shouldStop;
 
@@ -63,7 +63,7 @@ public class GUIRunner extends JFrame {
 	private String detailsFile;
 	private String zipsFile;
 
-	public GUIRunner() {
+	public MousePriceGUIRunner() {
 		setPreferredSize(new Dimension(600, 400));
 		setTitle("MousePrice Scraper");
 		getContentPane().setLayout(
@@ -88,7 +88,7 @@ public class GUIRunner extends JFrame {
 				JFileChooser fileChooser = new JFileChooser();
 				fileChooser.setMultiSelectionEnabled(false);
 
-				int selectedOption = fileChooser.showSaveDialog(GUIRunner.this);
+				int selectedOption = fileChooser.showSaveDialog(MousePriceGUIRunner.this);
 				if (selectedOption == JFileChooser.APPROVE_OPTION) {
 					File chosen = fileChooser.getSelectedFile();
 					if (chosen != null) {
@@ -112,7 +112,7 @@ public class GUIRunner extends JFrame {
 				JFileChooser fileChooser = new JFileChooser();
 				fileChooser.setMultiSelectionEnabled(false);
 
-				int selectedOption = fileChooser.showSaveDialog(GUIRunner.this);
+				int selectedOption = fileChooser.showSaveDialog(MousePriceGUIRunner.this);
 				if (selectedOption == JFileChooser.APPROVE_OPTION) {
 					File chosen = fileChooser.getSelectedFile();
 					if (chosen != null) {
@@ -171,7 +171,7 @@ public class GUIRunner extends JFrame {
 		btnResetState.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				int option = JOptionPane.showConfirmDialog(GUIRunner.this, "This will delete internal data. Are you sure you wish to continue?",
+				int option = JOptionPane.showConfirmDialog(MousePriceGUIRunner.this, "This will delete internal data. Are you sure you wish to continue?",
 						"Confirm scraper reset", JOptionPane.OK_CANCEL_OPTION);
 
 				if (option == JOptionPane.OK_OPTION) {
@@ -196,7 +196,7 @@ public class GUIRunner extends JFrame {
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(final WindowEvent e) {
-				int option = JOptionPane.showConfirmDialog(GUIRunner.this, "This will exit without saving the current state and data. Are you sure?",
+				int option = JOptionPane.showConfirmDialog(MousePriceGUIRunner.this, "This will exit without saving the current state and data. Are you sure?",
 						"Confirm exit", JOptionPane.OK_CANCEL_OPTION);
 
 				if (option == JOptionPane.OK_OPTION) {
@@ -216,7 +216,7 @@ public class GUIRunner extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				GUIRunner runner = new GUIRunner();
+				MousePriceGUIRunner runner = new MousePriceGUIRunner();
 				runner.pack();
 				runner.setLocationRelativeTo(null);
 				runner.setVisible(true);
