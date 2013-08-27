@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 import com.fingy.gui.AppendableJTextArea;
 import com.fingy.scrape.ScrapeResult;
 import com.fingy.scrape.jsoup.AbstractJsoupScraper;
-import com.fingy.scrape.security.HideMyAssProxyBasedScrapeDetectionOverrider;
+import com.fingy.scrape.security.AutoRefreshingHideMyAssProxyBasedScrapeDetectionOverrider;
 import com.fingy.scrape.security.ProxyBasedScrapeDetectionOverrider;
 import com.fingy.scrape.security.TorNetworkProxyBasedScrapeDetectionOverride;
 import com.jgoodies.forms.factories.FormFactory;
@@ -272,7 +272,7 @@ public class MousePriceGUIRunner extends JFrame {
             if (shouldUseTor()) {
                 scrapeDetectionOverrider = new TorNetworkProxyBasedScrapeDetectionOverride();
             } else {
-                scrapeDetectionOverrider = new HideMyAssProxyBasedScrapeDetectionOverrider();
+                scrapeDetectionOverrider = new AutoRefreshingHideMyAssProxyBasedScrapeDetectionOverrider();
             }
         }
 
