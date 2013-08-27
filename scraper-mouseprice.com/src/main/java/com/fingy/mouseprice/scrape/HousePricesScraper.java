@@ -1,7 +1,9 @@
 package com.fingy.mouseprice.scrape;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -14,93 +16,98 @@ import com.fingy.scrape.util.JsoupParserUtil;
 
 public class HousePricesScraper extends AbstractMousePriceScraper<List<RealEstateInfo>> {
 
-	private static final String START_URL = "http://www.mouseprice.com/house-prices/";
+    private static final String START_URL = "http://www.mouseprice.com/house-prices/";
 
-	private final String zip;
+    private final String zip;
 
-	public HousePricesScraper(String scrapeUrl, ScraperLinksQueue linksQueue) {
-		super(scrapeUrl, linksQueue);
-		zip = extractZipFromScrapeUrl(scrapeUrl);
-	}
+    public HousePricesScraper(final String scrapeUrl, final ScraperLinksQueue linksQueue) {
+        this(scrapeUrl, Collections.<String, String> emptyMap(), linksQueue);
+    }
 
-	private String extractZipFromScrapeUrl(String scrapeUrl) {
-		String relativeZipUrl = scrapeUrl.replace(START_URL, "");
-		if (isFirstPageUrl(relativeZipUrl))
-			return convertToHumanReadableForm(relativeZipUrl);
-		String relativeZipUrlWithoutPageNumber = relativeZipUrl.substring(0, relativeZipUrl.indexOf("/"));
-		return convertToHumanReadableForm(relativeZipUrlWithoutPageNumber);
-	}
+    public HousePricesScraper(final String scrapeUrl, final Map<String, String> cookies, final ScraperLinksQueue linksQueue) {
+        super(scrapeUrl, cookies, linksQueue);
+        zip = extractZipFromScrapeUrl(scrapeUrl);
+    }
 
-	public String convertToHumanReadableForm(String relativeZipUrl) {
-		return relativeZipUrl.replace("+", " ").toUpperCase();
-	}
+    private String extractZipFromScrapeUrl(final String scrapeUrl) {
+        String relativeZipUrl = scrapeUrl.replace(START_URL, "");
+        if (isFirstPageUrl(relativeZipUrl)) {
+            return convertToHumanReadableForm(relativeZipUrl);
+        }
+        String relativeZipUrlWithoutPageNumber = relativeZipUrl.substring(0, relativeZipUrl.indexOf("/"));
+        return convertToHumanReadableForm(relativeZipUrlWithoutPageNumber);
+    }
 
-	public boolean isFirstPageUrl(String searchTerms) {
-		return !searchTerms.contains("/");
-	}
+    public String convertToHumanReadableForm(final String relativeZipUrl) {
+        return relativeZipUrl.replace("+", " ").toUpperCase();
+    }
 
-	@Override
-	protected List<RealEstateInfo> scrapePage(Document page) {
-		if (JsoupParserUtil.getTagTextFromCssQuery(page, "div.errorSec_404 div.gm_header").equals("IP address blocked")) {
-			setScrapeCompromised(true);
-			throw new ScrapeException("Scrape detected");
-		}
+    public boolean isFirstPageUrl(final String searchTerms) {
+        return !searchTerms.contains("/");
+    }
 
-		List<RealEstateInfo> realEstateInfos = new ArrayList<>();
+    @Override
+    protected List<RealEstateInfo> scrapePage(final Document page) {
+        if (JsoupParserUtil.getTagTextFromCssQuery(page, "div.errorSec_404 div.gm_header").equals("IP address blocked")) {
+            setScrapeCompromised(true);
+            throw new ScrapeException("Scrape detected");
+        }
 
-		Elements realEstates = page.select("div#LV_BASearch.lv_search div.lv_pricedetails");
-		for (Element realEstate : realEstates) {
-			String address = scrapeAddressFromSearcResultRow(realEstate);
-			String type = scrapeTypeFromSearchResultRow(realEstate);
-			String pricePaid = scrapePricePaidFromSearchResultRow(realEstate);
-			String date = scrapeDateFromSearchResultRow(realEstate);
-			String beds = scrapeBedsFromSearchResultRow(realEstate);
-			String worth = scrapeWorthFromSearchResultRow(realEstate);
-			realEstateInfos.add(new RealEstateInfo(worth, address, type, pricePaid, date, beds, worth));
-		}
+        List<RealEstateInfo> realEstateInfos = new ArrayList<>();
 
-		getLinksQueue().markVisited(getScrapeUrl());
-		scheduleOtherPagesForScrape(page);
-		return realEstateInfos;
-	}
+        Elements realEstates = page.select("div#LV_BASearch.lv_search div.lv_pricedetails");
+        for (Element realEstate : realEstates) {
+            String address = scrapeAddressFromSearcResultRow(realEstate);
+            String type = scrapeTypeFromSearchResultRow(realEstate);
+            String pricePaid = scrapePricePaidFromSearchResultRow(realEstate);
+            String date = scrapeDateFromSearchResultRow(realEstate);
+            String beds = scrapeBedsFromSearchResultRow(realEstate);
+            String worth = scrapeWorthFromSearchResultRow(realEstate);
+            realEstateInfos.add(new RealEstateInfo(zip, address, type, pricePaid, date, beds, worth));
+        }
 
-	private String scrapeAddressFromSearcResultRow(Element realEstate) {
-		return JsoupParserUtil.getTagTextFromCssQuery(realEstate, ".lv_address_basic");
-	}
+        getLinksQueue().markVisited(getScrapeUrl());
+        scheduleOtherPagesForScrape(page);
+        return realEstateInfos;
+    }
 
-	private String scrapeTypeFromSearchResultRow(Element realEstate) {
-		return JsoupParserUtil.getTagTextFromCssQuery(realEstate, ".lv_proptype");
-	}
+    private String scrapeAddressFromSearcResultRow(final Element realEstate) {
+        return JsoupParserUtil.getTagTextFromCssQuery(realEstate, ".lv_address_basic");
+    }
 
-	private String scrapePricePaidFromSearchResultRow(Element realEstate) {
-		return JsoupParserUtil.getTagTextFromCssQuery(realEstate, ".lv_price");
-	}
+    private String scrapeTypeFromSearchResultRow(final Element realEstate) {
+        return JsoupParserUtil.getTagTextFromCssQuery(realEstate, ".lv_proptype");
+    }
 
-	private String scrapeDateFromSearchResultRow(Element realEstate) {
-		return JsoupParserUtil.getTagTextFromCssQuery(realEstate, ".lv_date");
-	}
+    private String scrapePricePaidFromSearchResultRow(final Element realEstate) {
+        return JsoupParserUtil.getTagTextFromCssQuery(realEstate, ".lv_price");
+    }
 
-	private String scrapeBedsFromSearchResultRow(Element realEstate) {
-		return JsoupParserUtil.getTagTextFromCssQuery(realEstate, ".lv_beds");
-	}
+    private String scrapeDateFromSearchResultRow(final Element realEstate) {
+        return JsoupParserUtil.getTagTextFromCssQuery(realEstate, ".lv_date_basic_nl");
+    }
 
-	private String scrapeWorthFromSearchResultRow(Element realEstate) {
-		return JsoupParserUtil.getTagTextFromCssQuery(realEstate, ".lv_worth");
-	}
+    private String scrapeBedsFromSearchResultRow(final Element realEstate) {
+        return JsoupParserUtil.getTagTextFromCssQuery(realEstate, ".lv_beds");
+    }
 
-	private void scheduleOtherPagesForScrape(Document page) {
-		Element lastPageLink = page.select("#dtPager a").last();
+    private String scrapeWorthFromSearchResultRow(final Element realEstate) {
+        return JsoupParserUtil.getTagTextFromCssQuery(realEstate, ".lv_worth");
+    }
 
-		if (lastPageLink != null) {
-			int lastPage = Integer.parseInt(lastPageLink.text());
-			for (int pageNumber = 2; pageNumber <= lastPage; pageNumber++) {
-				String pageUrl = START_URL + getZipAsSearchQuery() + "/" + pageNumber;
-				getLinksQueue().addIfNotVisited(pageUrl);
-			}
-		}
-	}
+    private void scheduleOtherPagesForScrape(final Document page) {
+        Element lastPageLink = page.select("#dtPager a").last();
 
-	public String getZipAsSearchQuery() {
-		return zip.replace(" ", "+");
-	}
+        if (lastPageLink != null) {
+            int lastPage = Integer.parseInt(lastPageLink.text());
+            for (int pageNumber = 2; pageNumber <= lastPage; pageNumber++) {
+                String pageUrl = START_URL + getZipAsSearchQuery() + "/" + pageNumber;
+                getLinksQueue().addIfNotVisited(pageUrl);
+            }
+        }
+    }
+
+    public String getZipAsSearchQuery() {
+        return zip.replace(" ", "+");
+    }
 }

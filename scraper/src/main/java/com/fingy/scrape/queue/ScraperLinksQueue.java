@@ -2,20 +2,17 @@ package com.fingy.scrape.queue;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Deque;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.Set;
 
 public class ScraperLinksQueue {
 
     private final Set<String> visitedLinks;
-    private final Deque<String> queuedLinks;
     private final Set<String> queuedLinksSet;
 
     public ScraperLinksQueue() {
         visitedLinks = new LinkedHashSet<String>();
-        queuedLinks = new LinkedList<String>();
         queuedLinksSet = new LinkedHashSet<String>();
     }
 
@@ -28,18 +25,18 @@ public class ScraperLinksQueue {
     }
 
     public synchronized int getSize() {
-        return queuedLinks.size();
+        return queuedLinksSet.size();
     }
 
     public synchronized boolean isEmpty() {
-        return queuedLinks.isEmpty();
+        return queuedLinksSet.isEmpty();
     }
 
     public synchronized boolean delayedIsEmpty(final long timeoutMillis) {
-        if (queuedLinks.isEmpty()) {
+        if (queuedLinksSet.isEmpty()) {
             waitWithTimeout(timeoutMillis);
         }
-        return queuedLinks.isEmpty();
+        return queuedLinksSet.isEmpty();
     }
 
     private void waitWithTimeout(final long timeoutMillis) {
@@ -55,7 +52,6 @@ public class ScraperLinksQueue {
 
     public synchronized void add(final String linkToEnqueue) {
         if (!queuedLinksSet.contains(linkToEnqueue)) {
-            queuedLinks.add(linkToEnqueue);
             queuedLinksSet.add(linkToEnqueue);
             notifyAll();
         }
@@ -67,7 +63,6 @@ public class ScraperLinksQueue {
         for (String linkToEnqueue : linksToAdd) {
             if (isNotAlreadyQueuedAndNotVisited(linkToEnqueue)) {
                 numberAdded++;
-                queuedLinks.add(linkToEnqueue);
                 queuedLinksSet.add(linkToEnqueue);
             }
         }
@@ -89,28 +84,28 @@ public class ScraperLinksQueue {
     }
 
     public synchronized String take() throws InterruptedException {
-        while (queuedLinks.isEmpty()) {
+        while (queuedLinksSet.isEmpty()) {
             wait();
         }
 
-        String taken = queuedLinks.poll();
-        if (taken != null) {
-            queuedLinksSet.remove(taken);
-        }
+        return takeFromQueuedLinksSet();
+    }
+
+    private String takeFromQueuedLinksSet() {
+        Iterator<String> iterator = queuedLinksSet.iterator();
+        String taken = iterator.next();
+        iterator.remove();
 
         return taken;
     }
 
     public synchronized String take(final long timeout) throws InterruptedException {
         wait(timeout);
-
-        String taken = queuedLinks.poll();
-        queuedLinksSet.remove(taken);
-        return taken;
+        return takeFromQueuedLinksSet();
     }
 
     public String peek() {
-        return queuedLinks.peek();
+        return queuedLinksSet.iterator().next();
     }
 
     public synchronized void addIfNotVisited(final String linkToEnqueue) {

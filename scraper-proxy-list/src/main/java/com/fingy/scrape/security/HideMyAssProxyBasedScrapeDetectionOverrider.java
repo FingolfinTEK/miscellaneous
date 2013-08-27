@@ -2,6 +2,7 @@ package com.fingy.scrape.security;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
@@ -18,16 +19,23 @@ public class HideMyAssProxyBasedScrapeDetectionOverrider implements ProxyBasedSc
     private Integer currentIndex;
     private List<ProxyInfo> proxies;
 
+    public List<ProxyInfo> getProxies() {
+        return proxies;
+    }
+
     @Override
     public void initializeContext() {
         try {
             currentIndex = 0;
-            proxies = new ProxyListScraperScheduler().getProxies();
+            proxies = Collections.synchronizedList(scrapeProxies());
             Collections.shuffle(proxies);
         } catch (InterruptedException | ExecutionException e) {
             logger.error("Error loading proxies");
         }
+    }
 
+    protected List<ProxyInfo> scrapeProxies() throws InterruptedException, ExecutionException {
+        return new ProxyListScraperScheduler().getProxies();
     }
 
     @Override
@@ -43,6 +51,13 @@ public class HideMyAssProxyBasedScrapeDetectionOverrider implements ProxyBasedSc
 
     @Override
     public void destroyContext() {
+    }
+
+    protected void setProxies(final Set<ProxyInfo> uniqueProxies) {
+        synchronized (proxies) {
+            proxies.clear();
+            proxies.addAll(uniqueProxies);
+        }
     }
 
 }
