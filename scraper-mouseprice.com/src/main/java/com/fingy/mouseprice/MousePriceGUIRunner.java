@@ -314,7 +314,7 @@ public class MousePriceGUIRunner extends JFrame {
         private void setUpProxy() {
             scrapeDetectionOverrider.setUpProxy();
             if (shouldUseTor()) {
-                sleep(10000);
+                sleep(2000);
             }
         }
 

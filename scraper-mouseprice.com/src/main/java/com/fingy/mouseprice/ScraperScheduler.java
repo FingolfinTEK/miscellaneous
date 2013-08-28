@@ -40,9 +40,10 @@ public class ScraperScheduler {
     private final ExecutorService detailsScrapingThreadPool;
     private final ExecutorCompletionService<List<RealEstateInfo>> detailsScrapingCompletionService;
 
+    private final ScraperLinksQueue linksQueue;
     private final List<String> zipsToScrape;
 
-    private static ScraperLinksQueue linksQueue;
+    private static Set<String> visitedLinks;
     private static Set<String> queuedLinks;
     private static Set<RealEstateInfo> scrapedItems;
 
@@ -54,6 +55,7 @@ public class ScraperScheduler {
         detailsScrapingThreadPool = createThreadPool();
         detailsScrapingCompletionService = new ExecutorCompletionService<>(detailsScrapingThreadPool);
 
+        linksQueue = new ScraperLinksQueue();
         zipsToScrape = zips;
     }
 
@@ -62,7 +64,6 @@ public class ScraperScheduler {
         visitedFile = new File(visitedFilePath);
         queuedFile = new File(queuedFilePath);
 
-        linksQueue = new ScraperLinksQueue();
         queuedLinks = new LinkedHashSet<>();
         scrapedItems = new LinkedHashSet<>();
 
@@ -81,10 +82,8 @@ public class ScraperScheduler {
     public ScrapeResult doScrape() {
         int queuedSize = 0;
         try {
-            createInitialScrapingTasks();
+            initializeScraper();
             submitScrapingTasksWhileThereIsEnoughWork();
-
-            awaitTerminationOfTheTasks();
             collectResults();
         } catch (Exception e) {
             logger.error("Exception occured", e);
@@ -96,16 +95,27 @@ public class ScraperScheduler {
         return new ScrapeResult(queuedSize, scrapedItems.size());
     }
 
+    private void initializeScraper() {
+        linksQueue.markAllVisited(visitedLinks);
+        linksQueue.addAllIfNotVisited(queuedLinks);
+
+        for (String zip : zipsToScrape) {
+            linksQueue.addIfNotVisited(START_URL + zip.replace(" ", "+"));
+        }
+    }
+
+    private Set<String> determineQueuedLinks() {
+        Set<String> temp = new HashSet<String>();
+        temp.addAll(linksQueue.getQueuedLinks());
+        temp.addAll(queuedLinks);
+        temp.removeAll(linksQueue.getVisitedLinks());
+        return temp;
+    }
+
     public static void saveScrapeContext() {
         saveResultsToFile();
         saveVisitedLinksToFile();
         saveQueuedLinksToFile();
-    }
-
-    private void createInitialScrapingTasks() {
-        for (String zip : zipsToScrape) {
-            linksQueue.addIfNotVisited(START_URL + zip.replace(" ", "+"));
-        }
     }
 
     private static void loadDetailsFromFile() {
@@ -122,9 +132,8 @@ public class ScraperScheduler {
 
     private static void loadVisitedLinksFromFile() {
         try {
-            final Set<String> visited = new HashSet<String>(FileUtils.readLines(visitedFile, ENCODING));
-            linksQueue.markAllVisited(visited);
-            logger.trace("Found " + visited.size() + " visited links");
+            visitedLinks = new HashSet<String>(FileUtils.readLines(visitedFile, ENCODING));
+            logger.trace("Found " + visitedLinks.size() + " visited links");
         } catch (IOException e) {
             logger.error("Exception occured", e);
         }
@@ -132,9 +141,8 @@ public class ScraperScheduler {
 
     private static void loadQueuedLinksFromFile() {
         try {
-            final Set<String> queued = new HashSet<String>(FileUtils.readLines(queuedFile, ENCODING));
-            linksQueue.addAllIfNotVisited(queued);
-            logger.trace("Found " + queued.size() + " queued links; queue size: " + linksQueue.getSize());
+            queuedLinks = new HashSet<String>(FileUtils.readLines(queuedFile, ENCODING));
+            logger.trace("Found " + queuedLinks.size() + " queued links");
         } catch (IOException e) {
             logger.error("Exception occured", e);
         }
@@ -181,6 +189,8 @@ public class ScraperScheduler {
     }
 
     private void collectResults() {
+        awaitTerminationOfTheTasks();
+
         long timeout = 10;
         for (int i = 0; i < queuedLinks.size(); i++) {
             try {
@@ -191,6 +201,9 @@ public class ScraperScheduler {
                 timeout = 0;
             }
         }
+
+        queuedLinks.clear();
+        queuedLinks.addAll(determineQueuedLinks());
     }
 
     private static void saveResultsToFile() {
@@ -203,7 +216,7 @@ public class ScraperScheduler {
 
     private static void saveVisitedLinksToFile() {
         try {
-            FileUtils.writeLines(visitedFile, ENCODING, linksQueue.getVisitedLinks());
+            FileUtils.writeLines(visitedFile, ENCODING, visitedLinks);
         } catch (IOException e) {
             logger.error("Exception occured", e);
         }
@@ -211,21 +224,12 @@ public class ScraperScheduler {
 
     private static int saveQueuedLinksToFile() {
         try {
-            Set<String> temp = determineQueuedLinks();
-            FileUtils.writeLines(queuedFile, ENCODING, temp);
-            return temp.size();
+            FileUtils.writeLines(queuedFile, ENCODING, queuedLinks);
+            return queuedLinks.size();
         } catch (IOException e) {
             logger.error("Exception occured", e);
         }
 
         return 0;
-    }
-
-    private static Set<String> determineQueuedLinks() {
-        Set<String> temp = new HashSet<String>();
-        temp.addAll(linksQueue.getQueuedLinks());
-        temp.addAll(queuedLinks);
-        temp.removeAll(linksQueue.getVisitedLinks());
-        return temp;
     }
 }
