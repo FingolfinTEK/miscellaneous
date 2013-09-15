@@ -255,7 +255,6 @@ public class MousePriceGUIRunner extends JFrame {
         public void runScrape() {
             try {
                 shouldStop = false;
-                createScrapeDetectionOverrider();
                 initContext();
 
                 for (int i = 0; i < RETRY_COUNT; i++) {
@@ -277,6 +276,7 @@ public class MousePriceGUIRunner extends JFrame {
         }
 
         private void initContext() {
+            createScrapeDetectionOverrider();
             scrapeDetectionOverrider.initializeContext();
             ScraperScheduler.loadScrapeContext(detailsFile, VISITED_TXT_FILE_NAME, QUEUED_TXT_FILE_NAME);
             if (shouldUseTor()) {

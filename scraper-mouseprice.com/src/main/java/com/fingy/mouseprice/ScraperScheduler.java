@@ -59,26 +59,6 @@ public class ScraperScheduler {
         zipsToScrape = zips;
     }
 
-    public static void loadScrapeContext(final String detailsFilePath, final String visitedFilePath, final String queuedFilePath) {
-        detailsFile = new File(detailsFilePath);
-        visitedFile = new File(visitedFilePath);
-        queuedFile = new File(queuedFilePath);
-
-        queuedLinks = new LinkedHashSet<>();
-        scrapedItems = new LinkedHashSet<>();
-
-        loadDetailsFromFile();
-        loadVisitedLinksFromFile();
-        loadQueuedLinksFromFile();
-    }
-
-    public static ThreadPoolExecutor createThreadPool() {
-        LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>(5000);
-        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(5, 10, 1, TimeUnit.HOURS, workQueue);
-        threadPoolExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-        return threadPoolExecutor;
-    }
-
     public ScrapeResult doScrape() {
         int queuedSize = 0;
         try {
@@ -110,42 +90,6 @@ public class ScraperScheduler {
         temp.addAll(queuedLinks);
         temp.removeAll(linksQueue.getVisitedLinks());
         return temp;
-    }
-
-    public static void saveScrapeContext() {
-        saveResultsToFile();
-        saveVisitedLinksToFile();
-        saveQueuedLinksToFile();
-    }
-
-    private static void loadDetailsFromFile() {
-        try {
-            final List<String> lines = FileUtils.readLines(detailsFile, ENCODING);
-            for (String line : lines) {
-                scrapedItems.add(RealEstateInfo.fromString(line));
-            }
-            logger.trace("Loaded " + lines.size() + " contacts");
-        } catch (IOException e) {
-            logger.error("Exception occured", e);
-        }
-    }
-
-    private static void loadVisitedLinksFromFile() {
-        try {
-            visitedLinks = new HashSet<String>(FileUtils.readLines(visitedFile, ENCODING));
-            logger.trace("Found " + visitedLinks.size() + " visited links");
-        } catch (IOException e) {
-            logger.error("Exception occured", e);
-        }
-    }
-
-    private static void loadQueuedLinksFromFile() {
-        try {
-            queuedLinks = new HashSet<String>(FileUtils.readLines(queuedFile, ENCODING));
-            logger.trace("Found " + queuedLinks.size() + " queued links");
-        } catch (IOException e) {
-            logger.error("Exception occured", e);
-        }
     }
 
     private void submitScrapingTasksWhileThereIsEnoughWork() {
@@ -202,8 +146,57 @@ public class ScraperScheduler {
             }
         }
 
-        queuedLinks.clear();
-        queuedLinks.addAll(determineQueuedLinks());
+        queuedLinks = determineQueuedLinks();
+        visitedLinks.addAll(linksQueue.getVisitedLinks());
+    }
+
+    public static void loadScrapeContext(final String detailsFilePath, final String visitedFilePath, final String queuedFilePath) {
+        detailsFile = new File(detailsFilePath);
+        visitedFile = new File(visitedFilePath);
+        queuedFile = new File(queuedFilePath);
+
+        queuedLinks = new LinkedHashSet<>();
+        scrapedItems = new LinkedHashSet<>();
+
+        loadDetailsFromFile();
+        loadVisitedLinksFromFile();
+        loadQueuedLinksFromFile();
+    }
+
+    public static void saveScrapeContext() {
+        saveResultsToFile();
+        saveVisitedLinksToFile();
+        saveQueuedLinksToFile();
+    }
+
+    private static void loadDetailsFromFile() {
+        try {
+            final List<String> lines = FileUtils.readLines(detailsFile, ENCODING);
+            for (String line : lines) {
+                scrapedItems.add(RealEstateInfo.fromString(line));
+            }
+            logger.trace("Loaded " + lines.size() + " contacts");
+        } catch (IOException e) {
+            logger.error("Exception occured", e);
+        }
+    }
+
+    private static void loadVisitedLinksFromFile() {
+        try {
+            visitedLinks = new HashSet<String>(FileUtils.readLines(visitedFile, ENCODING));
+            logger.trace("Found " + visitedLinks.size() + " visited links");
+        } catch (IOException e) {
+            logger.error("Exception occured", e);
+        }
+    }
+
+    private static void loadQueuedLinksFromFile() {
+        try {
+            queuedLinks = new HashSet<String>(FileUtils.readLines(queuedFile, ENCODING));
+            logger.trace("Found " + queuedLinks.size() + " queued links");
+        } catch (IOException e) {
+            logger.error("Exception occured", e);
+        }
     }
 
     private static void saveResultsToFile() {
@@ -231,5 +224,12 @@ public class ScraperScheduler {
         }
 
         return 0;
+    }
+
+    public static ThreadPoolExecutor createThreadPool() {
+        LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>(5000);
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(5, 10, 1, TimeUnit.HOURS, workQueue);
+        threadPoolExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        return threadPoolExecutor;
     }
 }

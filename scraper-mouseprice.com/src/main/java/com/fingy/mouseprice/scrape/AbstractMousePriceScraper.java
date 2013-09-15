@@ -1,9 +1,13 @@
 package com.fingy.mouseprice.scrape;
 
+import java.io.IOException;
 import java.util.Map;
+
+import org.jsoup.nodes.Document;
 
 import com.fingy.scrape.jsoup.AbstractJsoupScraper;
 import com.fingy.scrape.queue.ScraperLinksQueue;
+import com.fingy.scrape.util.JsoupParserUtil;
 
 public abstract class AbstractMousePriceScraper<T> extends AbstractJsoupScraper<T> {
 
@@ -23,8 +27,8 @@ public abstract class AbstractMousePriceScraper<T> extends AbstractJsoupScraper<
         return linksQueue;
     }
 
-    // @Override
-    // protected Document getPage(String scrapeUrl) throws IOException {
-    // return HtmlUnitParserUtil.getPageFromUrlWithoutJavaScriptSupport(scrapeUrl);
-    // }
+    @Override
+    protected Document getPage(final String scrapeUrl) throws IOException {
+        return JsoupParserUtil.getPageFromUrlWithTimeout(scrapeUrl, 30000);
+    }
 }
