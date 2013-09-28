@@ -13,6 +13,9 @@ public class TorNetworkProxyBasedScrapeDetectionOverride implements ProxyBasedSc
     @Override
     public void setUpProxy() {
         TorUtil.requestNewIdentity();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {}
     }
 
     @Override

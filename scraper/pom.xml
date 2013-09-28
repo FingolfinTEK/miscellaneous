@@ -12,6 +12,9 @@
 	<properties>
 		<version.jgoodies.forms>1.2.1</version.jgoodies.forms>
 		<version.jgoodies.looks>2.2.2</version.jgoodies.looks>
+		<version.jsoup>1.7.2</version.jsoup>
+		<version.lombok>0.12.0</version.lombok>
+		<version.poi>3.9</version.poi>
 		<version.xml-apis>1.4.01</version.xml-apis>
 	</properties>
 
@@ -27,6 +30,30 @@
 				<groupId>com.jgoodies</groupId>
 				<artifactId>looks</artifactId>
 				<version>${version.jgoodies.looks}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.jsoup</groupId>
+				<artifactId>jsoup</artifactId>
+				<version>${version.jsoup}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok</artifactId>
+				<version>${version.lombok}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.poi</groupId>
+				<artifactId>poi</artifactId>
+				<version>${version.poi}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.poi</groupId>
+				<artifactId>poi-ooxml</artifactId>
+				<version>${version.poi}</version>
 			</dependency>
 
 			<dependency>
@@ -57,19 +84,21 @@
 		<dependency>
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>
-			<version>1.7.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
-			<version>3.9</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
-			<version>3.9</version>
 		</dependency>
 
 		<dependency>

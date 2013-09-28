@@ -1,4 +1,4 @@
-package com.fingy.citydata.scrape;
+package com.fingy.zoznam.scrape;
 
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -11,30 +11,27 @@ import org.junit.Test;
 
 import com.fingy.scrape.queue.ScraperLinksQueue;
 
-public class CityPageScraperTest {
+public class SingleResultPageScraperTest {
 
-    private static final String CITY_PAGE_HTM_LOCATION = "test_pages/city-page.htm";
+    private static final String PAGE_LOCATION = "results.htm";
 
-    private ScraperLinksQueue linksQueue = new ScraperLinksQueue();
-    private CityPageScraper cityPageScraper = new CityPageScraper("", linksQueue);
+    private final ScraperLinksQueue linksQueue = new ScraperLinksQueue();
+    private final SingleResultPageScraper scraper = new SingleResultPageScraper("", linksQueue);
 
     @Test
     public void testScrapePage() throws Exception {
         String pageToScrape = FileUtils.readFileToString(getPageFile());
         Document page = Jsoup.parse(pageToScrape);
-        page.setBaseUri(getBaseUri());
+        page.setBaseUri("http://telefonny.zoznam.sk");
 
         assertThat(linksQueue.getVisitedSize()).isZero();
-        assertThat(cityPageScraper.scrapePage(page)).hasSize(29);
+        assertThat(scraper.scrapePage(page)).isEqualTo(20);
+        assertThat(linksQueue.getQueuedLinks()).hasSize(20);
         assertThat(linksQueue.getVisitedSize()).isEqualTo(1);
     }
 
-    private String getBaseUri() {
-        return "http://www.city-data.com/aircraft";
-    }
-
     private File getPageFile() {
-        String filePath = getClass().getClassLoader().getResource(CITY_PAGE_HTM_LOCATION).getFile();
+        String filePath = getClass().getClassLoader().getResource(PAGE_LOCATION).getFile();
         return new File(filePath);
     }
 

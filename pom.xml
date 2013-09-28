@@ -18,6 +18,7 @@
 		<module>scraper-micromedex</module>
 		<module>scraper-yellowpages</module>
 		<module>scraper-mouseprice.com</module>
+		<module>scraper-zoznam.sk</module>
 	</modules>
 
 	<properties>
