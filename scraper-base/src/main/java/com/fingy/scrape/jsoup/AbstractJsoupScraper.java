@@ -39,12 +39,12 @@ public abstract class AbstractJsoupScraper<T> extends AbstractScraper<T> {
     protected abstract T scrapePage(Document page);
 
     @Override
-    protected T scrapeLink(final String scrapeUrl) {
+    protected T scrapeLink() {
         if (isScrapeCompromised()) {
             throw new ScrapeException("Session expired");
         }
         try {
-            final Document page = getPage(scrapeUrl);
+            final Document page = getPage();
             return scrapePage(page);
         } catch (Exception e) {
             processException(e);
@@ -56,8 +56,8 @@ public abstract class AbstractJsoupScraper<T> extends AbstractScraper<T> {
         // do nothing
     }
 
-    protected Document getPage(final String scrapeUrl) throws IOException {
-        return JsoupParserUtil.getPageFromUrlWithCookies(scrapeUrl, getCookies());
+    protected Document getPage() throws IOException {
+        return JsoupParserUtil.getPageFromUrlWithCookies(getScrapeUrl(), getCookies());
     }
 
     public Map<String, String> getCookies() {

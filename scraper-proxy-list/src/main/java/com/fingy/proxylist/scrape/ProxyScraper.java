@@ -25,12 +25,12 @@ public class ProxyScraper extends AbstractScraper<Collection<ProxyInfo>> {
 
     @Override
     @SuppressWarnings("unchecked")
-    protected Collection<ProxyInfo> scrapeLink(String scrapeUrl) {
+    protected Collection<ProxyInfo> scrapeLink() {
         List<ProxyInfo> proxies = new ArrayList<>();
 
         try {
             WebClient webClient = new WebClient();
-            HtmlPage page = webClient.getPage(scrapeUrl);
+            HtmlPage page = webClient.getPage(getScrapeUrl());
             List<DomElement> rows = (List<DomElement>) page.getByXPath("/html/body/div/div/table/tbody/tr");
             for (DomElement domElement : rows) {
                 DomNodeList<DomNode> columns = domElement.getChildNodes();

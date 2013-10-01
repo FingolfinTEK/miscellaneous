@@ -17,7 +17,7 @@ public abstract class AbstractScraper<T> implements Callable<T> {
 		this.scrapeUrl = scrapeUrl;
 	}
 
-	protected abstract T scrapeLink(String scrapeUrl);
+	protected abstract T scrapeLink();
 
 	public String getScrapeUrl() {
 		return scrapeUrl;
@@ -25,7 +25,7 @@ public abstract class AbstractScraper<T> implements Callable<T> {
 
 	public T call() {
 		try {
-			final T scrapedData =  scrapeLink(scrapeUrl);
+			final T scrapedData =  scrapeLink();
 			logger.debug("Successfully scraped link " + scrapeUrl);
 			return scrapedData;
 		} catch (ScrapeException e) {

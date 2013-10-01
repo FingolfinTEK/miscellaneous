@@ -23,7 +23,7 @@ public class MangaInfoScraper extends AbstractEHentaiJsoupScraper<MangaInfo> {
     protected MangaInfo scrapePage(Document page) {
         if (page.text().contains("Content Warning")) {
             String viewGalleryUrl = page.select("html body div:eq(2) a").attr("href");
-            return scrapeLink(viewGalleryUrl);
+            return scrapeLink();
         }
 
         String title = page.title();
@@ -58,7 +58,7 @@ public class MangaInfoScraper extends AbstractEHentaiJsoupScraper<MangaInfo> {
     private String scrapeCoverImageUrlFromPage(Document page) {
         String imagePageUrl = page.select("div#gdt div.gdtm div a").first().attr("href");
         try {
-            Document imagePage = getPage(imagePageUrl);
+            Document imagePage = getPage();
             return imagePage.getElementById("img").attr("src");
         } catch (IOException e) {
             logger.error("Error fetching image from page " + imagePageUrl, e);

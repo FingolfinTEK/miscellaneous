@@ -56,7 +56,6 @@ public class ZoznamGUIRunner extends JFrame {
     private final JTextField scrapeUrl;
     private final JButton btnStartScrape;
     private final JButton btnStopScrape;
-    private final JButton btnClearLog;
     private final JCheckBox chckbxUseTor;
 
     private String detailsFile;
@@ -173,7 +172,7 @@ public class ZoznamGUIRunner extends JFrame {
         });
         panel.add(btnResetState, "5, 1");
 
-        btnClearLog = new JButton("Clear Log");
+        JButton btnClearLog = new JButton("Clear Log");
         btnClearLog.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {

@@ -15,8 +15,8 @@ public abstract class AbstractZoznamScraper<T> extends AbstractWorkQueueAwareScr
     }
 
     @Override
-    protected Document getPage(final String scrapeUrl) throws IOException {
-        return HtmlUnitParserUtil.getPageFromUrlWithoutJavaScriptSupport(scrapeUrl);
+    protected Document getPage() throws IOException {
+        return HtmlUnitParserUtil.getPageFromUrlWithoutJavaScriptSupport(getScrapeUrl());
     }
 
 }

@@ -21,7 +21,7 @@ public abstract class AbstractEHentaiJsoupScraper<T> extends AbstractJsoupScrape
     }
 
     @Override
-    protected Document getPage(final String scrapeUrl) throws IOException {
+    protected Document getPage() throws IOException {
         try {
             Document page = HtmlUnitParserUtil.getPageFromUrlWithoutJavaScriptSupport(scrapeUrl);
 

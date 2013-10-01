@@ -28,7 +28,7 @@ public abstract class AbstractMousePriceScraper<T> extends AbstractJsoupScraper<
     }
 
     @Override
-    protected Document getPage(final String scrapeUrl) throws IOException {
+    protected Document getPage() throws IOException {
         return JsoupParserUtil.getPageFromUrlWithTimeout(scrapeUrl, 30000);
     }
 }

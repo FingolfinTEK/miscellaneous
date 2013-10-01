@@ -1,0 +1,420 @@
+<N>
+    <Configuration>
+        <Show>All</Show>
+        <All>All</All>
+        <Line>Line</Line>
+        <Cell>Cell</Cell>
+    </Configuration>
+    <Reshet>
+        <Code>8</Code>
+        <Name>מירס</Name>
+        <T>Cell</T>
+        <Title>3 תוצאות ברשת מירס</Title>
+        <InfoImg>pix.gif</InfoImg>
+        <p>
+            <OrdinalNum>81</OrdinalNum>
+            <PrivateName>חמד אדיב</PrivateName>
+            <Address>מחנה שועפט 10, ירושלים</Address>
+            <tmpAddress>מחנה שועפט</tmpAddress>
+            <tmpHouseNum>10</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>PAf5WsKIV8Y5evS4JyuDgeNzbfUVrF0p4MVeaOz8TcM=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>82</OrdinalNum>
+            <PrivateName>חמד אדיב</PrivateName>
+            <Address>מחנה שועפט 10, ירושלים</Address>
+            <tmpAddress>מחנה שועפט</tmpAddress>
+            <tmpHouseNum>10</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>pQOSbwBz/y98eAFz8TJQ22eN+5cTBi9pkU6CW/mP4Dw=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>83</OrdinalNum>
+            <PrivateName>עבאסי אדיב</PrivateName>
+            <Address>סלואן המרכזית 24, ירושלים</Address>
+            <tmpAddress>סלואן המרכזית</tmpAddress>
+            <tmpHouseNum>24</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>mMGiD2uWmg2yx1XnaEYvWnBT5m7vv751rxmyt51gKtE=</PhoneId>
+        </p>
+    </Reshet>
+    <Reshet>
+        <Code>10</Code>
+        <Name>סלקום מפ``א</Name>
+        <T>Cell</T>
+        <Title>0 תוצאות ברשת סלקום מפ''א</Title>
+        <InfoImg>pix.gif</InfoImg>
+    </Reshet>
+    <Reshet>
+        <Code>11</Code>
+        <Name>פרטנר נייח</Name>
+        <T>Cell</T>
+        <Title>0 תוצאות ברשת פרטנר נייח</Title>
+        <InfoImg>pix.gif</InfoImg>
+    </Reshet>
+    <Reshet>
+        <Code>13</Code>
+        <Name>012 סמייל</Name>
+        <T>Cell</T>
+        <Title>0 תוצאות ברשת 012 סמייל</Title>
+        <InfoImg>pix.gif</InfoImg>
+    </Reshet>
+    <Reshet>
+        <Code>14</Code>
+        <Name>גלובקול</Name>
+        <T>Cell</T>
+        <Title>0 תוצאות ברשת גלובקול</Title>
+        <InfoImg>pix.gif</InfoImg>
+    </Reshet>
+    <Reshet>
+        <Code>15</Code>
+        <Name>בזק בינל`</Name>
+        <T>Cell</T>
+        <Title>0 תוצאות ברשת בזק בינל'</Title>
+        <InfoImg>pix.gif</InfoImg>
+    </Reshet>
+    <Reshet>
+        <Code>1</Code>
+        <Name>בזק</Name>
+        <T>Line</T>
+        <Title>15 תוצאות ברשת בזק</Title>
+        <InfoImg>icon_144.gif</InfoImg>
+        <p>
+            <OrdinalNum>11</OrdinalNum>
+            <PrivateName>מרכז שירות אדיב</PrivateName>
+            <Address>הרקמה 7, ירושלים</Address>
+            <tmpAddress>הרקמה</tmpAddress>
+            <tmpHouseNum>7</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>sWiW8+4KJHO7YtXGm3N2Yci1rTRrc1GJej63csB8lSA=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>12</OrdinalNum>
+            <PrivateName>אדיב את אלכס שרותי רכב בע"מ</PrivateName>
+            <Address>מעשה חושב 9, ירושלים</Address>
+            <tmpAddress>מעשה חושב</tmpAddress>
+            <tmpHouseNum>9</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>GxiDOxek0q7jkdYwEzKwtJRhf7fTcnzKxne6+w/Mswo=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>13</OrdinalNum>
+            <PrivateName>מרכז שירות אדיב , ארמוזה בע"מ</PrivateName>
+            <Address>הרקמה 7, ירושלים</Address>
+            <tmpAddress>הרקמה</tmpAddress>
+            <tmpHouseNum>7</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>EQiDY9zMJE3WPbcfB7Ny3dst4VoJw2a1QezSDIgQ5ds=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>14</OrdinalNum>
+            <PrivateName>מרכז שירות אדיב</PrivateName>
+            <Address>הרקמה 7, ירושלים</Address>
+            <tmpAddress>הרקמה</tmpAddress>
+            <tmpHouseNum>7</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>ySuFhp/8yERAS9NMv7Hdd68W7EuPBMXEkJjYNmEp5w8=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>15</OrdinalNum>
+            <PrivateName>צונה אדיב ופלורי</PrivateName>
+            <Address>תורן חיים 9, ירושלים</Address>
+            <tmpAddress>תורן חיים</tmpAddress>
+            <tmpHouseNum>9</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>vanBgc55iFXNqCXmKzLS2Q==</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>16</OrdinalNum>
+            <PrivateName>סנדוקה אדיב</PrivateName>
+            <Address>בית חנינא 85 4876, ירושלים</Address>
+            <tmpAddress>בית חנינא 85</tmpAddress>
+            <tmpHouseNum>4876</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>gmha6q0E+62MJ0sVhdKXhw==</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>17</OrdinalNum>
+            <PrivateName>ערב(אל) מלון - אל עדיאן אדיב</PrivateName>
+            <Address>דרך בית הבד 0, ירושלים</Address>
+            <tmpAddress>דרך בית הבד</tmpAddress>
+            <tmpHouseNum>0</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>NjFy2ZYFPlljEVHdJOZisQ==</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>18</OrdinalNum>
+            <PrivateName>אדיב גאדא</PrivateName>
+            <Address>ראס אל עמוד 83 6118, ירושלים</Address>
+            <tmpAddress>ראס אל עמוד 83</tmpAddress>
+            <tmpHouseNum>6118</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>FHog/9dgoC1nI5iTSwbQBFv7s5PQ1YTxoSnhWS0iuyw=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>19</OrdinalNum>
+            <PrivateName>משה אדיב ולבנה</PrivateName>
+            <Address>הצוף 21, ירושלים</Address>
+            <tmpAddress>הצוף</tmpAddress>
+            <tmpHouseNum>21</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>FGCvQI7pfaHABI0HXUdweA==</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>110</OrdinalNum>
+            <PrivateName>חמאד אדיב</PrivateName>
+            <Address>צור בחר 0, ירושלים</Address>
+            <tmpAddress>צור בחר</tmpAddress>
+            <tmpHouseNum>0</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>aK9Wh4xYf/n+Fv6wsrkopA==</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>111</OrdinalNum>
+            <PrivateName>אדיב הישאם</PrivateName>
+            <Address>ראס אל עמוד 0, ירושלים</Address>
+            <tmpAddress>ראס אל עמוד</tmpAddress>
+            <tmpHouseNum>0</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>gY9uCl4V32o0NKI3T4P5sg==</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>112</OrdinalNum>
+            <PrivateName>אדיב חוסאם עבד</PrivateName>
+            <Address>ראס אל עמוד 0, ירושלים</Address>
+            <tmpAddress>ראס אל עמוד</tmpAddress>
+            <tmpHouseNum>0</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>sbpyNE+Xhv9jpzu/89RJ0Q==</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>113</OrdinalNum>
+            <PrivateName>גודה עבדאל קאדר אדיב</PrivateName>
+            <Address>מוטה 11, ירושלים</Address>
+            <tmpAddress>מוטה</tmpAddress>
+            <tmpHouseNum>11</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>WJmjb00uoSdXJQAe58nr9Q==</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>114</OrdinalNum>
+            <PrivateName>אדייב אלכסנדר</PrivateName>
+            <Address>נדבה יוסף 9, ירושלים</Address>
+            <tmpAddress>נדבה יוסף</tmpAddress>
+            <tmpHouseNum>9</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>Rvlzu10VgHV/Ilkl2miyaQ==</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>115</OrdinalNum>
+            <PrivateName>מרכז שירות אדיב</PrivateName>
+            <Address>הרקמה 7, ירושלים</Address>
+            <tmpAddress>הרקמה</tmpAddress>
+            <tmpHouseNum>7</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>m+g18uCB1+R2zLySwNo1mA7znIrsJXD9d/GT9o7qhNo=</PhoneId>
+        </p>
+    </Reshet>
+    <Reshet>
+        <Code>3</Code>
+        <Name>סלקום</Name>
+        <T>Cell</T>
+        <Title>7 תוצאות ברשת סלקום</Title>
+        <InfoImg>pix.gif</InfoImg>
+        <p>
+            <OrdinalNum>31</OrdinalNum>
+            <PrivateName>סלמן אדיב</PrivateName>
+            <Address>יוסי בן יועזר 2, ירושלים</Address>
+            <tmpAddress>יוסי בן יועזר</tmpAddress>
+            <tmpHouseNum>2</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>XVco7p4vai/4y1DgR9gacXWunYZAxWovKLLJyt7U9zQ=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>32</OrdinalNum>
+            <PrivateName>אדיב מיקי</PrivateName>
+            <Address>0, ירושלים</Address>
+            <tmpAddress></tmpAddress>
+            <tmpHouseNum>0</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>nUfPvX68n5cmOv9Kjjd0JgX8r02LQI9im5TJlD2Lxq4=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>33</OrdinalNum>
+            <PrivateName>עביד אדיב</PrivateName>
+            <Address>0, ירושלים</Address>
+            <tmpAddress></tmpAddress>
+            <tmpHouseNum>0</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>Er1I+wXZTlCWJIvtOHjbFdfmFhAh78X64Xt9k3BJTxQ=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>34</OrdinalNum>
+            <PrivateName>אדיב הלסי</PrivateName>
+            <Address>0, ירושלים</Address>
+            <tmpAddress></tmpAddress>
+            <tmpHouseNum>0</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>jG89r7v+gmK/NnCmskCEG5n6ghYx60NgHPfHoLsOd04=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>35</OrdinalNum>
+            <PrivateName>אדיב מוופק</PrivateName>
+            <Address>0, ירושלים</Address>
+            <tmpAddress></tmpAddress>
+            <tmpHouseNum>0</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>MB6FoTjbg5xLa/1d2mTbNqxtneeeyTwFEtULi2cOq+k=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>36</OrdinalNum>
+            <PrivateName>אדיב מוופק</PrivateName>
+            <Address>0, ירושלים</Address>
+            <tmpAddress></tmpAddress>
+            <tmpHouseNum>0</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>MB6FoTjbg5xLa/1d2mTbNsd+Vh7XHDqW0f0YPhDt6nk=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>37</OrdinalNum>
+            <PrivateName>אדיב סלים</PrivateName>
+            <Address>0, ירושלים</Address>
+            <tmpAddress></tmpAddress>
+            <tmpHouseNum>0</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>GyY+z1wqfGjDPbwiynLEuA0PptlC1VKKCGFO9Z40MoY=</PhoneId>
+        </p>
+    </Reshet>
+    <Reshet>
+        <Code>4</Code>
+        <Name>פלאפון</Name>
+        <T>Cell</T>
+        <Title>7 תוצאות ברשת פלאפון</Title>
+        <InfoImg>pix.gif</InfoImg>
+        <p>
+            <OrdinalNum>41</OrdinalNum>
+            <PrivateName>א.גבאי - אדיב גבאי .</PrivateName>
+            <Address>שכ גבעת שאול 0, ירושלים</Address>
+            <tmpAddress>שכ גבעת שאול</tmpAddress>
+            <tmpHouseNum>0</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>xeH8Tb1V1uztRZPQExKW0X2MjJdABNnVS4KGNOjAhJ4=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>42</OrdinalNum>
+            <PrivateName>אדיב שריף</PrivateName>
+            <Address>0, ירושלים</Address>
+            <tmpAddress></tmpAddress>
+            <tmpHouseNum>0</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>/rK/n/EcmujG1lMvXmmm/lwREuac741+wqCkGWM7lCI=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>43</OrdinalNum>
+            <PrivateName>עאבדון אדיב</PrivateName>
+            <Address>שער שכם 0, ירושלים</Address>
+            <tmpAddress>שער שכם</tmpAddress>
+            <tmpHouseNum>0</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>zWV4OwCnh+thEIeXfOcFd/Z/BnmiCNd2sjpSbruDlWE=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>44</OrdinalNum>
+            <PrivateName>עאבדין אדיב</PrivateName>
+            <Address>שער שכם 0, ירושלים</Address>
+            <tmpAddress>שער שכם</tmpAddress>
+            <tmpHouseNum>0</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>TZ8MJrBxm9tZJAIgmtVZQFr6HPVicEL21FzEmpOwot8=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>45</OrdinalNum>
+            <PrivateName>אדיב צביה</PrivateName>
+            <Address>מורגנטאו הנרי 60, ירושלים</Address>
+            <tmpAddress>מורגנטאו הנרי</tmpAddress>
+            <tmpHouseNum>60</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>6n880r7Hp64a6yL/otViOE/Kfl2c8JkjWF4ZfdFVGnY=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>46</OrdinalNum>
+            <PrivateName>אדיב כמאלה</PrivateName>
+            <Address>מוטה 0, ירושלים</Address>
+            <tmpAddress>מוטה</tmpAddress>
+            <tmpHouseNum>0</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>/rK/n/EcmujG1lMvXmmm/lyCgq/68Jzd0l/HZIRwrms=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>47</OrdinalNum>
+            <PrivateName>חסן אדיב אדיב</PrivateName>
+            <Address>מוטה 0, ירושלים</Address>
+            <tmpAddress>מוטה</tmpAddress>
+            <tmpHouseNum>0</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>7rbTX1zXhPxlBGVwf8QSYbPD+Hw45gNCCZPgaXivuQE=</PhoneId>
+        </p>
+    </Reshet>
+    <Reshet>
+        <Code>5</Code>
+        <Name>אורנג`</Name>
+        <T>Cell</T>
+        <Title>3 תוצאות ברשת אורנג'</Title>
+        <InfoImg>pix.gif</InfoImg>
+        <p>
+            <OrdinalNum>51</OrdinalNum>
+            <PrivateName>עידו אדיב</PrivateName>
+            <Address>ברוריה 9, ירושלים</Address>
+            <tmpAddress>ברוריה</tmpAddress>
+            <tmpHouseNum>9</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>uV2+JZxaLvxJ8kqUxi2fu3tfwVY6+Xbgf+88qGRSt+4=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>52</OrdinalNum>
+            <PrivateName>אדייב אלכסנדר</PrivateName>
+            <Address>הרב פניז'ל 509, ירושלים</Address>
+            <tmpAddress>הרב פניז'ל</tmpAddress>
+            <tmpHouseNum>509</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>RyLKrscHUUjKpohWSzBzmKFK3q0b79lt6NfM9g4ouxU=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>53</OrdinalNum>
+            <PrivateName>אדייב ויטאלי</PrivateName>
+            <Address>שד` נוה יעקב 210, ירושלים</Address>
+            <tmpAddress>שד` נוה יעקב</tmpAddress>
+            <tmpHouseNum>210</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>zwnAiH2bI9vLPn4kcU3rB1MWyavaOJoFOfsZsJ4BQaw=</PhoneId>
+        </p>
+    </Reshet>
+    <Reshet>
+        <Code>7</Code>
+        <Name>הוט</Name>
+        <T>Line</T>
+        <Title>2 תוצאות ברשת הוט</Title>
+        <InfoImg>pix.gif</InfoImg>
+        <p>
+            <OrdinalNum>71</OrdinalNum>
+            <PrivateName>אדיב מיקי</PrivateName>
+            <Address>שמעוני 8, ירושלים</Address>
+            <tmpAddress>שמעוני</tmpAddress>
+            <tmpHouseNum>8</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>zEnTlQmsJWCnL3h9DiJdapOHc685DFvS3TqDcFX9NU4=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>72</OrdinalNum>
+            <PrivateName>עידו אדיב</PrivateName>
+            <Address>ברוריה 9, ירושלים</Address>
+            <tmpAddress>ברוריה</tmpAddress>
+            <tmpHouseNum>9</tmpHouseNum>
+            <tmpVillageName>ירושלים</tmpVillageName>
+            <PhoneId>lYCAE/u4hLPpz4W8GoECTj/vO5gvCEGaJa69tcMmWOo=</PhoneId>
+        </p>
+    </Reshet>
+    <Summary>נמצאו 37 תוצאות עבור אדיב בירושלים</Summary>
+    <searchId>m6Dp3WU24tFV/tW3j3mgcHaKOt9W8bka7y4YXWbH4wMxHeWF/CvqdrCmB7TJIgkt</searchId>
+</N>
