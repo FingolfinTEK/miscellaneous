@@ -1,121 +1,151 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<artifactId>scraper-parent</artifactId>
-		<groupId>com.fingy</groupId>
-		<version>0.0.1-SNAPSHOT</version>
-	</parent>
-	<artifactId>scraper-base</artifactId>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>scraper-parent</artifactId>
+        <groupId>com.fingy</groupId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+    <artifactId>scraper-base</artifactId>
 
-	<properties>
-		<version.jgoodies.forms>1.2.1</version.jgoodies.forms>
-		<version.jgoodies.looks>2.2.2</version.jgoodies.looks>
-		<version.jsoup>1.7.2</version.jsoup>
-		<version.lombok>0.12.0</version.lombok>
-		<version.poi>3.9</version.poi>
-		<version.xml-apis>1.4.01</version.xml-apis>
-	</properties>
+    <properties>
+        <version.commons-io>2.4</version.commons-io>
+        <version.gson>2.2.4</version.gson>
+        <version.htmlunit>2.12</version.htmlunit>
+        <version.httpclient>4.2.3</version.httpclient>
+        <version.jgoodies.forms>1.2.1</version.jgoodies.forms>
+        <version.jgoodies.looks>2.2.2</version.jgoodies.looks>
+        <version.jsoup>1.7.2</version.jsoup>
+        <version.lombok>0.12.0</version.lombok>
+        <version.poi>3.9</version.poi>
+        <version.xml-apis>1.4.01</version.xml-apis>
+    </properties>
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>com.jgoodies</groupId>
-				<artifactId>forms</artifactId>
-				<version>${version.jgoodies.forms}</version>
-			</dependency>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>${version.gson}</version>
+            </dependency>
 
-			<dependency>
-				<groupId>com.jgoodies</groupId>
-				<artifactId>looks</artifactId>
-				<version>${version.jgoodies.looks}</version>
-			</dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${version.commons-io}</version>
+            </dependency>
 
-			<dependency>
-				<groupId>org.jsoup</groupId>
-				<artifactId>jsoup</artifactId>
-				<version>${version.jsoup}</version>
-			</dependency>
+            <dependency>
+                <groupId>com.jgoodies</groupId>
+                <artifactId>forms</artifactId>
+                <version>${version.jgoodies.forms}</version>
+            </dependency>
 
-			<dependency>
-				<groupId>org.projectlombok</groupId>
-				<artifactId>lombok</artifactId>
-				<version>${version.lombok}</version>
-			</dependency>
+            <dependency>
+                <groupId>com.jgoodies</groupId>
+                <artifactId>looks</artifactId>
+                <version>${version.jgoodies.looks}</version>
+            </dependency>
 
-			<dependency>
-				<groupId>org.apache.poi</groupId>
-				<artifactId>poi</artifactId>
-				<version>${version.poi}</version>
-			</dependency>
+            <dependency>
+                <groupId>net.sourceforge.htmlunit</groupId>
+                <artifactId>htmlunit</artifactId>
+                <version>${version.htmlunit}</version>
+            </dependency>
 
-			<dependency>
-				<groupId>org.apache.poi</groupId>
-				<artifactId>poi-ooxml</artifactId>
-				<version>${version.poi}</version>
-			</dependency>
+            <dependency>
+                <groupId>org.jsoup</groupId>
+                <artifactId>jsoup</artifactId>
+                <version>${version.jsoup}</version>
+            </dependency>
 
-			<dependency>
-				<groupId>xml-apis</groupId>
-				<artifactId>xml-apis</artifactId>
-				<version>${version.xml-apis}</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${version.lombok}</version>
+            </dependency>
 
-	<dependencies>
-		<dependency>
-			<groupId>com.jgoodies</groupId>
-			<artifactId>forms</artifactId>
-		</dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${version.httpclient}</version>
+            </dependency>
 
-		<dependency>
-			<groupId>com.jgoodies</groupId>
-			<artifactId>looks</artifactId>
-		</dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi</artifactId>
+                <version>${version.poi}</version>
+            </dependency>
 
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.4</version>
-		</dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>${version.poi}</version>
+            </dependency>
 
-		<dependency>
-			<groupId>org.jsoup</groupId>
-			<artifactId>jsoup</artifactId>
-		</dependency>
+            <dependency>
+                <groupId>xml-apis</groupId>
+                <artifactId>xml-apis</artifactId>
+                <version>${version.xml-apis}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-		</dependency>
+    <dependencies>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi-ooxml</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>com.jgoodies</groupId>
+            <artifactId>forms</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>4.2.3</version>
-		</dependency>
+        <dependency>
+            <groupId>com.jgoodies</groupId>
+            <artifactId>looks</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>net.sourceforge.htmlunit</groupId>
-			<artifactId>htmlunit</artifactId>
-			<version>2.12</version>
-		</dependency>
+        <dependency>
+            <groupId>net.sourceforge.htmlunit</groupId>
+            <artifactId>htmlunit</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>xml-apis</groupId>
-			<artifactId>xml-apis</artifactId>
-		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>
