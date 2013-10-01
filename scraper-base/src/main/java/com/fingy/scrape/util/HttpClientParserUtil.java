@@ -141,6 +141,6 @@ public class HttpClientParserUtil {
         HttpResponse response = client.execute(post);
         HttpEntity entity = response.getEntity();
         final byte[] content = IOHelper.readContent(entity.getContent(), TruncatedChunkException.class);
-        return new String(content, "UTF-8");
+        return new String(content, "windows-1255");
     }
 }
