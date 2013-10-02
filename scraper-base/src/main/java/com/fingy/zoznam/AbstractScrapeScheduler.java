@@ -6,11 +6,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import com.fingy.scrape.AbstractScraper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fingy.adultwholesale.scrape.AbstractAdultItemJsoupScraper;
-import com.fingy.adultwholesale.scrape.AdultItemJsoupScraper;
 import com.fingy.concurrent.ExecutorsUtil;
 import com.fingy.scrape.ScrapeResult;
 
@@ -56,7 +55,7 @@ public abstract class AbstractScrapeScheduler<T> {
     }
 
     private void initializeScraper() {
-        AdultItemJsoupScraper.setScrapeCompromised(false);
+        AbstractScraper.setScrapeCompromised(false);
         context.initialize();
         doSpecificInitialization();
     }
@@ -66,7 +65,7 @@ public abstract class AbstractScrapeScheduler<T> {
     private void submitScrapingTasksWhileThereIsEnoughWork() {
 
         while (context.stillHaveLinksToBeScraped(CATEGORY_TIMEOUT)) {
-            if (AbstractAdultItemJsoupScraper.isScrapeCompromised()) {
+            if (AbstractScraper.isScrapeCompromised()) {
                 logger.trace("Session expired, breaking");
                 break;
             }

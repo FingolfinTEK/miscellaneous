@@ -19,12 +19,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import com.fingy.scrape.AbstractScraper;
 import org.apache.commons.io.FileUtils;
 import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
 
-import com.fingy.adultwholesale.scrape.AbstractAdultItemJsoupScraper;
 import com.fingy.adultwholesale.scrape.AdultItemCategoryJsoupScraper;
 import com.fingy.adultwholesale.scrape.AdultItemJsoupScraper;
 import com.fingy.concurrent.ExecutorsUtil;
@@ -94,7 +94,7 @@ public class AdultWholesaleScraperScheduler {
 		System.getProperties().setProperty("socksProxyHost", "127.0.0.1");
 		System.getProperties().setProperty("socksProxyPort", "9150");
 
-		AdultItemJsoupScraper.setScrapeCompromised(false);
+		AbstractScraper.setScrapeCompromised(false);
 		doLogin();
 
 		loadVisitedLinksFromFile();
@@ -150,7 +150,7 @@ public class AdultWholesaleScraperScheduler {
 	private void submitScrapingTasksWhileThereIsEnoughWork() {
 		System.out.println("AdultWholesaleScraperScheduler.submitScrapingTasksWhileThereIsEnoughWork()");
 		while (stillHaveLinksToBeScraped()) {
-			if (AbstractAdultItemJsoupScraper.isScrapeCompromised()) {
+			if (AbstractScraper.isScrapeCompromised()) {
 				System.out.println("Session expired, breaking");
 				break;
 			}

@@ -3,7 +3,6 @@ package com.fingy.zoznam.scrape;
 import org.jsoup.nodes.Document;
 
 import com.fingy.scrape.exception.ScrapeException;
-import com.fingy.scrape.jsoup.AbstractJsoupScraper;
 import com.fingy.scrape.queue.ScraperLinksQueue;
 import com.fingy.scrape.util.JsoupParserUtil;
 import com.fingy.zoznam.ContactInfo;
@@ -25,7 +24,7 @@ public class ContactInfoScraper extends AbstractZoznamScraper<ContactInfo> {
             return new ContactInfo(name, address, phoneNumber);
         }
 
-        AbstractJsoupScraper.setScrapeCompromised(true);
+        setScrapeCompromised(true);
         throw new ScrapeException("Scrape compromised");
     }
 }

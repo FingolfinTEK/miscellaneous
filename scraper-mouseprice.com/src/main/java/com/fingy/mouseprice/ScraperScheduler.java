@@ -15,12 +15,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import com.fingy.scrape.AbstractScraper;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fingy.adultwholesale.scrape.AbstractAdultItemJsoupScraper;
-import com.fingy.adultwholesale.scrape.AdultItemJsoupScraper;
 import com.fingy.concurrent.ExecutorsUtil;
 import com.fingy.mouseprice.scrape.HousePricesScraper;
 import com.fingy.scrape.ScrapeResult;
@@ -94,10 +93,10 @@ public class ScraperScheduler {
 
     private void submitScrapingTasksWhileThereIsEnoughWork() {
         Map<String, String> cookies = getCookiesFromStartPage();
-        AdultItemJsoupScraper.setScrapeCompromised(false);
+        AbstractScraper.setScrapeCompromised(false);
 
         while (stillHaveLinksToBeScraped()) {
-            if (AbstractAdultItemJsoupScraper.isScrapeCompromised()) {
+            if (AbstractScraper.isScrapeCompromised()) {
                 logger.trace("Session expired, breaking");
                 break;
             }

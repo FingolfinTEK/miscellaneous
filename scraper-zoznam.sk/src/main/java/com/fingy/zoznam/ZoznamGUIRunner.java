@@ -23,13 +23,13 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
+import com.fingy.scrape.AbstractScraper;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fingy.gui.AppendableJTextArea;
 import com.fingy.scrape.ScrapeResult;
-import com.fingy.scrape.jsoup.AbstractJsoupScraper;
 import com.fingy.scrape.security.AutoRefreshingHideMyAssProxyBasedScrapeDetectionOverrider;
 import com.fingy.scrape.security.ProxyBasedScrapeDetectionOverrider;
 import com.fingy.scrape.security.TorNetworkProxyBasedScrapeDetectionOverride;
@@ -147,7 +147,7 @@ public class ZoznamGUIRunner extends JFrame {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 shouldStop = true;
-                AbstractJsoupScraper.setScrapeCompromised(true);
+                AbstractScraper.setScrapeCompromised(true);
                 infoPane.appendLine("Stopping scrape process after the current iteration");
                 btnStopScrape.setEnabled(false);
             }
@@ -223,7 +223,7 @@ public class ZoznamGUIRunner extends JFrame {
         }
 
         public void terminate() {
-            AbstractJsoupScraper.setScrapeCompromised(true);
+            AbstractScraper.setScrapeCompromised(true);
             shouldStop = true;
             finalizeContext();
         }
@@ -276,7 +276,7 @@ public class ZoznamGUIRunner extends JFrame {
                 ScrapeResult result = doScrape();
 
                 infoPane.appendLine("Finished scrape iteration");
-                infoPane.appendLine("Scrape was compromised: " + (AbstractJsoupScraper.isScrapeCompromised() && !shouldStop));
+                infoPane.appendLine("Scrape was compromised: " + (AbstractScraper.isScrapeCompromised() && !shouldStop));
                 infoPane.appendLine("Total contacts scraped: " + result.getScrapeSize());
 
                 queueSize = result.getQueueSize();

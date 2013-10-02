@@ -16,18 +16,16 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import com.fingy.scrape.AbstractScraper;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fingy.adultwholesale.scrape.AbstractAdultItemJsoupScraper;
-import com.fingy.adultwholesale.scrape.AdultItemJsoupScraper;
 import com.fingy.concurrent.ExecutorsUtil;
 import com.fingy.ehentai.scrape.IndexPageScraper;
 import com.fingy.ehentai.scrape.MangaInfoScraper;
 import com.fingy.ehentai.scrape.SearchPageMangaLinksScraper;
 import com.fingy.scrape.ScrapeResult;
-import com.fingy.scrape.jsoup.AbstractJsoupScraper;
 import com.fingy.scrape.queue.ScraperLinksQueue;
 
 public class EHentaiScraperScheduler {
@@ -114,10 +112,10 @@ public class EHentaiScraperScheduler {
     }
 
     private void submitScrapingTasksWhileThereIsEnoughWork() {
-        AdultItemJsoupScraper.setScrapeCompromised(false);
+        AbstractScraper.setScrapeCompromised(false);
 
         while (stillHaveLinksToBeScraped()) {
-            if (AbstractAdultItemJsoupScraper.isScrapeCompromised()) {
+            if (AbstractScraper.isScrapeCompromised()) {
                 logger.trace("Session expired, breaking");
                 break;
             }
@@ -166,7 +164,7 @@ public class EHentaiScraperScheduler {
     }
 
     private void awaitTerminationOfTheTasks() {
-        int timeout = AbstractJsoupScraper.isScrapeCompromised() ? 0 : queuedLinks.size();
+        int timeout = AbstractScraper.isScrapeCompromised() ? 0 : queuedLinks.size();
         ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(searchPageScrapingThreadPool, timeout, TimeUnit.SECONDS);
         ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(mangaInfoScrapingThreadPool, timeout, TimeUnit.SECONDS);
     }

@@ -1,16 +1,14 @@
 package com.fingy.pelephone.scrape;
 
 import com.fingy.pelephone.ContactInfo;
+import com.fingy.pelephone.scrape.util.ContactInfoXmlParser;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.fest.assertions.Assertions;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
 import java.net.URL;
 import java.util.List;
-import java.util.concurrent.Executors;
 
 public class ContactInfoXmlParserTest {
     @Test

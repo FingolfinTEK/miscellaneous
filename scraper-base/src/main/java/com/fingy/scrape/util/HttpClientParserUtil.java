@@ -10,14 +10,11 @@ import org.apache.http.TruncatedChunkException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.impl.cookie.BasicClientCookie;
@@ -33,7 +30,7 @@ import java.util.Map;
 
 public class HttpClientParserUtil {
 
-    private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0";
+    public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0";
 
     public static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
     public static final int EOF = -1;
@@ -45,6 +42,10 @@ public class HttpClientParserUtil {
             return getNewHttpClient();
         }
     };
+
+    public static DefaultHttpClient getClient() {
+        return httpClient.get();
+    }
 
     public static DefaultHttpClient getNewHttpClient() {
         try {
@@ -128,19 +129,10 @@ public class HttpClientParserUtil {
         }
     }
 
-    public static String postDataToUrlWithCookies(String searchUrl, String data, Map<String, String> cookies) throws IOException {
-        HttpPost post = new HttpPost(searchUrl);
-        post.setHeader("User-Agent", USER_AGENT);
-        post.setEntity(new StringEntity(data, ContentType.create("application/json", "UTF-8")));
-
-        DefaultHttpClient client = httpClient.get();
+    public static void addCookies(DefaultHttpClient client, Map<String, String> cookies) {
         CookieStore cookieStore = client.getCookieStore();
         for (Map.Entry<String, String> entry : cookies.entrySet()) {
             cookieStore.addCookie(new BasicClientCookie(entry.getKey(), entry.getValue()));
         }
-        HttpResponse response = client.execute(post);
-        HttpEntity entity = response.getEntity();
-        final byte[] content = IOHelper.readContent(entity.getContent(), TruncatedChunkException.class);
-        return new String(content, "windows-1255");
     }
 }
