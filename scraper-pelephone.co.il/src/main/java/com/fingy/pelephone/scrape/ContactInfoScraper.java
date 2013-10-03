@@ -4,7 +4,6 @@ import com.fingy.pelephone.ContactInfo;
 import com.fingy.scrape.AbstractScraper;
 import com.fingy.scrape.exception.ScrapeException;
 import com.fingy.scrape.util.HttpClientParserUtil;
-import com.fingy.scrape.util.JsoupParserUtil;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -12,12 +11,8 @@ import com.google.gson.JsonParser;
 import java.util.List;
 import java.util.Map;
 
-import static org.jsoup.Connection.Response;
-
 public class ContactInfoScraper extends AbstractScraper<List<ContactInfo>> {
-    private static final String START_URL = "https://www.pelephone.co" +
-            ".il//digital/3G/Corporate/digital/support/general_info/find_number/.aspx";
-    private static final String SEARCH_URL = "https://www.pelephone.co.il/digital/ws/144.asmx/B144Search";
+    private static final String SEARCH_URL = "http://www.pelephone.co.il/digital/ws/144.asmx/B144Search";
     private static final String SEARCH_DATA_FORMAT = "{name:\"%s\", city: \"%s\", street: \"\", house: \"\", " +
             "CaptchaImage: \"null\"}";
 
@@ -25,7 +20,7 @@ public class ContactInfoScraper extends AbstractScraper<List<ContactInfo>> {
     private String name;
 
     public ContactInfoScraper(String city, String name) {
-        super(START_URL);
+        super(SEARCH_URL);
         this.city = city;
         this.name = name;
     }
@@ -33,21 +28,8 @@ public class ContactInfoScraper extends AbstractScraper<List<ContactInfo>> {
     @Override
     protected List<ContactInfo> scrapeLink() {
         try {
-            Response response = JsoupParserUtil.getResponseFromUrl(getScrapeUrl());
-            Map<String, String> cookies = response.cookies();
-            String jsonData = HttpClientParserUtil.postDataToUrlWithCookies(SEARCH_URL,
-                    String.format(SEARCH_DATA_FORMAT, name, city), cookies);
-            logger.debug("Received response from server " + jsonData);
-            List<ContactInfo> contactInfos = parseContactsFromResponse(jsonData);
-            for (ContactInfo contact : contactInfos) {
-                String net = contact.getReshet();
-                String id = contact.getOrdinalIdForAjax();
-                String queryData = String.format("{net:\"%s\", id: \"%s\",cap:\"\"}", net, id);
-                String jsonPhoneData = HttpClientParserUtil.postDataToUrlWithCookies("http://www.pelephone.co" +
-                        ".il/digital/ws/144.asmx/GetSearch", queryData, cookies);
-                contact.setTelephoneNumber(parseJson(jsonPhoneData));
-            }
-            return contactInfos;
+            String jsonData = HttpClientParserUtil.postDataToUrlWithCookies(SEARCH_URL, String.format(SEARCH_DATA_FORMAT, name, city));
+            return parseContactsFromResponse(jsonData);
         } catch (Exception e) {
             throw new ScrapeException(e);
         }
@@ -55,7 +37,6 @@ public class ContactInfoScraper extends AbstractScraper<List<ContactInfo>> {
 
     private List<ContactInfo> parseContactsFromResponse(String jsonData) {
         String xmlResults = parseJson(jsonData);
-        logger.debug("Extracted XML from response " + xmlResults);
         ContactInfoXmlParser xmlParser = new ContactInfoXmlParser();
         return xmlParser.parse(xmlResults);
     }

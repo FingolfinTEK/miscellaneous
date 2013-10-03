@@ -21,6 +21,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.impl.cookie.BasicClientCookie;
+import org.apache.http.params.CoreConnectionPNames;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -81,6 +82,8 @@ public class HttpClientParserUtil {
 
     private static DefaultHttpClient createDefaultHttpClient(PoolingClientConnectionManager manager) {
         DefaultHttpClient defaultHttpClient = new DefaultHttpClient(manager);
+        defaultHttpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 10000);
+        defaultHttpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 10000);
         addProxyIfNeeded(defaultHttpClient);
         return defaultHttpClient;
     }
@@ -128,19 +131,24 @@ public class HttpClientParserUtil {
         }
     }
 
-    public static String postDataToUrlWithCookies(String searchUrl, String data, Map<String, String> cookies) throws IOException {
+    public static String postDataToUrlWithCookies(String searchUrl, String data) throws IOException {
         HttpPost post = new HttpPost(searchUrl);
         post.setHeader("User-Agent", USER_AGENT);
         post.setEntity(new StringEntity(data, ContentType.create("application/json", "UTF-8")));
 
         DefaultHttpClient client = httpClient.get();
-        CookieStore cookieStore = client.getCookieStore();
-        for (Map.Entry<String, String> entry : cookies.entrySet()) {
-            cookieStore.addCookie(new BasicClientCookie(entry.getKey(), entry.getValue()));
-        }
+        addProxyIfNeeded(client);
         HttpResponse response = client.execute(post);
         HttpEntity entity = response.getEntity();
         final byte[] content = IOHelper.readContent(entity.getContent(), TruncatedChunkException.class);
         return new String(content, "windows-1255");
+    }
+
+    public static DefaultHttpClient getClient() {
+        return httpClient.get();
+    }
+
+    public static void resetClient() {
+        httpClient.set(getNewHttpClient());
     }
 }

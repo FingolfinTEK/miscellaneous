@@ -6,6 +6,146 @@
         <Cell>Cell</Cell>
     </Configuration>
     <Reshet>
+        <Code>10</Code>
+        <Name>סלקום מפ``א</Name>
+        <T>Cell</T>
+        <Title>0 תוצאות ברשת סלקום מפ''א</Title>
+        <InfoImg>pix.gif</InfoImg>
+    </Reshet>
+    <Reshet>
+        <Code>11</Code>
+        <Name>פרטנר נייח</Name>
+        <T>Cell</T>
+        <Title>14 תוצאות ברשת פרטנר נייח</Title>
+        <InfoImg>pix.gif</InfoImg>
+        <p>
+            <OrdinalNum>111</OrdinalNum>
+            <PrivateName>פרץ משה</PrivateName>
+            <Address>אחד העם 9, נתניה</Address>
+            <tmpAddress>אחד העם</tmpAddress>
+            <tmpHouseNum>9</tmpHouseNum>
+            <tmpVillageName>נתניה</tmpVillageName>
+            <PhoneId>yAZ25cNvi9clQwt1SssArBLw8gB3d1rdo66wQL/OGLY=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>112</OrdinalNum>
+            <PrivateName>פרץ משה</PrivateName>
+            <Address>אחד העם 9, נתניה</Address>
+            <tmpAddress>אחד העם</tmpAddress>
+            <tmpHouseNum>9</tmpHouseNum>
+            <tmpVillageName>נתניה</tmpVillageName>
+            <PhoneId>yAZ25cNvi9clQwt1SssArDry747l+dmHiIQK7iVgjC0=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>113</OrdinalNum>
+            <PrivateName>רביבי משה</PrivateName>
+            <Address>סוקולוב 60, נתניה</Address>
+            <tmpAddress>סוקולוב</tmpAddress>
+            <tmpHouseNum>60</tmpHouseNum>
+            <tmpVillageName>נתניה</tmpVillageName>
+            <PhoneId>wWcHPfyk+MRriKtxI0IavYXVoVsixU/OTK90BMOAmEo=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>114</OrdinalNum>
+            <PrivateName>אילוז משה ארז</PrivateName>
+            <Address>הולנד 42, נתניה</Address>
+            <tmpAddress>הולנד</tmpAddress>
+            <tmpHouseNum>42</tmpHouseNum>
+            <tmpVillageName>נתניה</tmpVillageName>
+            <PhoneId>S7TCkNPz9dw97xxBV3tR8c5h8PcW7w/CNIcsAqfoWwY=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>115</OrdinalNum>
+            <PrivateName>אילוז משה ארז</PrivateName>
+            <Address>הולנד 42, נתניה</Address>
+            <tmpAddress>הולנד</tmpAddress>
+            <tmpHouseNum>42</tmpHouseNum>
+            <tmpVillageName>נתניה</tmpVillageName>
+            <PhoneId>VhdVc2nsLhoHZanQ6z5cN42L4TPTj3bb8jeGZyE8V1Q=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>116</OrdinalNum>
+            <PrivateName>סגל משה</PrivateName>
+            <Address>לסקוב חיים 3, נתניה</Address>
+            <tmpAddress>לסקוב חיים</tmpAddress>
+            <tmpHouseNum>3</tmpHouseNum>
+            <tmpVillageName>נתניה</tmpVillageName>
+            <PhoneId>LPnm7aYxbRv/r8VESlGdid5AyNmP+RO7ZIHEV/C2SS8=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>117</OrdinalNum>
+            <PrivateName>לסרי משה</PrivateName>
+            <Address>ד"ר פרח יהודה 8, נתניה</Address>
+            <tmpAddress>ד"ר פרח יהודה</tmpAddress>
+            <tmpHouseNum>8</tmpHouseNum>
+            <tmpVillageName>נתניה</tmpVillageName>
+            <PhoneId>/y1sr+BS+Nbv1kz7mgz3HtVclnxO/p+g6Jb2mGmgn9E=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>118</OrdinalNum>
+            <PrivateName>עמר משה</PrivateName>
+            <Address>בני בנימין 11, נתניה</Address>
+            <tmpAddress>בני בנימין</tmpAddress>
+            <tmpHouseNum>11</tmpHouseNum>
+            <tmpVillageName>נתניה</tmpVillageName>
+            <PhoneId>2UksYObtBHrXExNaL1T+gfTIBC7HaYva22giPyzV1xc=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>119</OrdinalNum>
+            <PrivateName>דואני משה</PrivateName>
+            <Address>אבן עזרא 27, נתניה</Address>
+            <tmpAddress>אבן עזרא</tmpAddress>
+            <tmpHouseNum>27</tmpHouseNum>
+            <tmpVillageName>נתניה</tmpVillageName>
+            <PhoneId>GxiDOxek0q7jkdYwEzKwtOSGcaObPFdHcOI6654rSlk=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>1110</OrdinalNum>
+            <PrivateName>עמוסי משה</PrivateName>
+            <Address>רזיאל 29, נתניה</Address>
+            <tmpAddress>רזיאל</tmpAddress>
+            <tmpHouseNum>29</tmpHouseNum>
+            <tmpVillageName>נתניה</tmpVillageName>
+            <PhoneId>JE0fZUHG8mL6vI5iPzbBsfL6d5CVj0xEG1w5NhyfQNw=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>1111</OrdinalNum>
+            <PrivateName>נתנוביץ משה</PrivateName>
+            <Address>שד גולדה מאיר 15, נתניה</Address>
+            <tmpAddress>שד גולדה מאיר</tmpAddress>
+            <tmpHouseNum>15</tmpHouseNum>
+            <tmpVillageName>נתניה</tmpVillageName>
+            <PhoneId>Kq/17AEKHrQNphIoZTEC4oyus7Ull9/Z6dl89efI9xQ=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>1112</OrdinalNum>
+            <PrivateName>לוין משה</PrivateName>
+            <Address>יהודה הלוי 40, נתניה</Address>
+            <tmpAddress>יהודה הלוי</tmpAddress>
+            <tmpHouseNum>40</tmpHouseNum>
+            <tmpVillageName>נתניה</tmpVillageName>
+            <PhoneId>/+KgNLFW1OQVR9Nfg1cpryA0XiK+oVkkTUNRum9CrxA=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>1113</OrdinalNum>
+            <PrivateName>זוהר משה</PrivateName>
+            <Address>שד` ז`בוטינסקי 15, נתניה</Address>
+            <tmpAddress>שד` ז`בוטינסקי</tmpAddress>
+            <tmpHouseNum>15</tmpHouseNum>
+            <tmpVillageName>נתניה</tmpVillageName>
+            <PhoneId>qEx4IcmO2DcEifw36Wlkt8SZGD9ji6gviA1IHkA5Kek=</PhoneId>
+        </p>
+        <p>
+            <OrdinalNum>1114</OrdinalNum>
+            <PrivateName>לייטמן משה</PrivateName>
+            <Address>הרב טביב 2, נתניה</Address>
+            <tmpAddress>הרב טביב</tmpAddress>
+            <tmpHouseNum>2</tmpHouseNum>
+            <tmpVillageName>נתניה</tmpVillageName>
+            <PhoneId>IvD4NnfE/0f+1bgxF2rIPRS0ZMU8yVxO0SOIXkc47TY=</PhoneId>
+        </p>
+    </Reshet>
+    <Reshet>
         <Code>13</Code>
         <Name>012 סמייל</Name>
         <T>Cell</T>
@@ -1049,146 +1189,6 @@
             <PhoneId>6ebZj09OPB9XCot9yz4dGQEv5usGMGRvJep9WhLhQDw=</PhoneId>
         </p>
     </Reshet>
-    <Reshet>
-        <Code>10</Code>
-        <Name>סלקום מפ``א</Name>
-        <T>Cell</T>
-        <Title>0 תוצאות ברשת סלקום מפ''א</Title>
-        <InfoImg>pix.gif</InfoImg>
-    </Reshet>
-    <Reshet>
-        <Code>11</Code>
-        <Name>פרטנר נייח</Name>
-        <T>Cell</T>
-        <Title>14 תוצאות ברשת פרטנר נייח</Title>
-        <InfoImg>pix.gif</InfoImg>
-        <p>
-            <OrdinalNum>111</OrdinalNum>
-            <PrivateName>פרץ משה</PrivateName>
-            <Address>אחד העם 9, נתניה</Address>
-            <tmpAddress>אחד העם</tmpAddress>
-            <tmpHouseNum>9</tmpHouseNum>
-            <tmpVillageName>נתניה</tmpVillageName>
-            <PhoneId>yAZ25cNvi9clQwt1SssArBLw8gB3d1rdo66wQL/OGLY=</PhoneId>
-        </p>
-        <p>
-            <OrdinalNum>112</OrdinalNum>
-            <PrivateName>פרץ משה</PrivateName>
-            <Address>אחד העם 9, נתניה</Address>
-            <tmpAddress>אחד העם</tmpAddress>
-            <tmpHouseNum>9</tmpHouseNum>
-            <tmpVillageName>נתניה</tmpVillageName>
-            <PhoneId>yAZ25cNvi9clQwt1SssArDry747l+dmHiIQK7iVgjC0=</PhoneId>
-        </p>
-        <p>
-            <OrdinalNum>113</OrdinalNum>
-            <PrivateName>רביבי משה</PrivateName>
-            <Address>סוקולוב 60, נתניה</Address>
-            <tmpAddress>סוקולוב</tmpAddress>
-            <tmpHouseNum>60</tmpHouseNum>
-            <tmpVillageName>נתניה</tmpVillageName>
-            <PhoneId>wWcHPfyk+MRriKtxI0IavYXVoVsixU/OTK90BMOAmEo=</PhoneId>
-        </p>
-        <p>
-            <OrdinalNum>114</OrdinalNum>
-            <PrivateName>אילוז משה ארז</PrivateName>
-            <Address>הולנד 42, נתניה</Address>
-            <tmpAddress>הולנד</tmpAddress>
-            <tmpHouseNum>42</tmpHouseNum>
-            <tmpVillageName>נתניה</tmpVillageName>
-            <PhoneId>S7TCkNPz9dw97xxBV3tR8c5h8PcW7w/CNIcsAqfoWwY=</PhoneId>
-        </p>
-        <p>
-            <OrdinalNum>115</OrdinalNum>
-            <PrivateName>אילוז משה ארז</PrivateName>
-            <Address>הולנד 42, נתניה</Address>
-            <tmpAddress>הולנד</tmpAddress>
-            <tmpHouseNum>42</tmpHouseNum>
-            <tmpVillageName>נתניה</tmpVillageName>
-            <PhoneId>VhdVc2nsLhoHZanQ6z5cN42L4TPTj3bb8jeGZyE8V1Q=</PhoneId>
-        </p>
-        <p>
-            <OrdinalNum>116</OrdinalNum>
-            <PrivateName>סגל משה</PrivateName>
-            <Address>לסקוב חיים 3, נתניה</Address>
-            <tmpAddress>לסקוב חיים</tmpAddress>
-            <tmpHouseNum>3</tmpHouseNum>
-            <tmpVillageName>נתניה</tmpVillageName>
-            <PhoneId>LPnm7aYxbRv/r8VESlGdid5AyNmP+RO7ZIHEV/C2SS8=</PhoneId>
-        </p>
-        <p>
-            <OrdinalNum>117</OrdinalNum>
-            <PrivateName>לסרי משה</PrivateName>
-            <Address>ד"ר פרח יהודה 8, נתניה</Address>
-            <tmpAddress>ד"ר פרח יהודה</tmpAddress>
-            <tmpHouseNum>8</tmpHouseNum>
-            <tmpVillageName>נתניה</tmpVillageName>
-            <PhoneId>/y1sr+BS+Nbv1kz7mgz3HtVclnxO/p+g6Jb2mGmgn9E=</PhoneId>
-        </p>
-        <p>
-            <OrdinalNum>118</OrdinalNum>
-            <PrivateName>עמר משה</PrivateName>
-            <Address>בני בנימין 11, נתניה</Address>
-            <tmpAddress>בני בנימין</tmpAddress>
-            <tmpHouseNum>11</tmpHouseNum>
-            <tmpVillageName>נתניה</tmpVillageName>
-            <PhoneId>2UksYObtBHrXExNaL1T+gfTIBC7HaYva22giPyzV1xc=</PhoneId>
-        </p>
-        <p>
-            <OrdinalNum>119</OrdinalNum>
-            <PrivateName>דואני משה</PrivateName>
-            <Address>אבן עזרא 27, נתניה</Address>
-            <tmpAddress>אבן עזרא</tmpAddress>
-            <tmpHouseNum>27</tmpHouseNum>
-            <tmpVillageName>נתניה</tmpVillageName>
-            <PhoneId>GxiDOxek0q7jkdYwEzKwtOSGcaObPFdHcOI6654rSlk=</PhoneId>
-        </p>
-        <p>
-            <OrdinalNum>1110</OrdinalNum>
-            <PrivateName>עמוסי משה</PrivateName>
-            <Address>רזיאל 29, נתניה</Address>
-            <tmpAddress>רזיאל</tmpAddress>
-            <tmpHouseNum>29</tmpHouseNum>
-            <tmpVillageName>נתניה</tmpVillageName>
-            <PhoneId>JE0fZUHG8mL6vI5iPzbBsfL6d5CVj0xEG1w5NhyfQNw=</PhoneId>
-        </p>
-        <p>
-            <OrdinalNum>1111</OrdinalNum>
-            <PrivateName>נתנוביץ משה</PrivateName>
-            <Address>שד גולדה מאיר 15, נתניה</Address>
-            <tmpAddress>שד גולדה מאיר</tmpAddress>
-            <tmpHouseNum>15</tmpHouseNum>
-            <tmpVillageName>נתניה</tmpVillageName>
-            <PhoneId>Kq/17AEKHrQNphIoZTEC4oyus7Ull9/Z6dl89efI9xQ=</PhoneId>
-        </p>
-        <p>
-            <OrdinalNum>1112</OrdinalNum>
-            <PrivateName>לוין משה</PrivateName>
-            <Address>יהודה הלוי 40, נתניה</Address>
-            <tmpAddress>יהודה הלוי</tmpAddress>
-            <tmpHouseNum>40</tmpHouseNum>
-            <tmpVillageName>נתניה</tmpVillageName>
-            <PhoneId>/+KgNLFW1OQVR9Nfg1cpryA0XiK+oVkkTUNRum9CrxA=</PhoneId>
-        </p>
-        <p>
-            <OrdinalNum>1113</OrdinalNum>
-            <PrivateName>זוהר משה</PrivateName>
-            <Address>שד` ז`בוטינסקי 15, נתניה</Address>
-            <tmpAddress>שד` ז`בוטינסקי</tmpAddress>
-            <tmpHouseNum>15</tmpHouseNum>
-            <tmpVillageName>נתניה</tmpVillageName>
-            <PhoneId>qEx4IcmO2DcEifw36Wlkt8SZGD9ji6gviA1IHkA5Kek=</PhoneId>
-        </p>
-        <p>
-            <OrdinalNum>1114</OrdinalNum>
-            <PrivateName>לייטמן משה</PrivateName>
-            <Address>הרב טביב 2, נתניה</Address>
-            <tmpAddress>הרב טביב</tmpAddress>
-            <tmpHouseNum>2</tmpHouseNum>
-            <tmpVillageName>נתניה</tmpVillageName>
-            <PhoneId>IvD4NnfE/0f+1bgxF2rIPRS0ZMU8yVxO0SOIXkc47TY=</PhoneId>
-        </p>
-    </Reshet>
     <Summary>נמצאו 123 תוצאות עבור משה בנתניה</Summary>
-    <searchId>sBQiB7ELsizd8esIo3ixG8Up8gZcUaX4qpR3xddFw4YQM83KkvaKZ8xwi7tbp8K7</searchId>
+    <searchId>sBQiB7ELsizd8esIo3ixG8Up8gZcUaX4qpR3xddFw4Y5MdeaweXxQ5uWjv4e/Y6h</searchId>
 </N>
