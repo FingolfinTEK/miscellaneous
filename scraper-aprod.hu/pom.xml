@@ -30,7 +30,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>com.fingy.aprod.GUIRunner</mainClass>
+							<mainClass>com.fingy.aprod.AprodHuGUIRunner</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

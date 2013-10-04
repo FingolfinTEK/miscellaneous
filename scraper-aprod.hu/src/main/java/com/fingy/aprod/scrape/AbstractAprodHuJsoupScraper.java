@@ -3,6 +3,7 @@ package com.fingy.aprod.scrape;
 import java.io.IOException;
 import java.util.Map;
 
+import com.fingy.scrape.AbstractScraper;
 import com.fingy.scrape.util.HtmlUnitParserUtil;
 import com.fingy.scrape.util.HttpClientParserUtil;
 import org.jsoup.nodes.Document;
@@ -24,7 +25,7 @@ public abstract class AbstractAprodHuJsoupScraper<T> extends AbstractJsoupScrape
 		try {
 			return HttpClientParserUtil.getPageFromUrl(scrapeUrl);
 		} catch (IOException e) {
-			AbstractAprodHuJsoupScraper.setScrapeCompromised(true);
+            AbstractJsoupScraper.setScrapeCompromised(true);
 			throw e;
 		}
 	}

@@ -42,7 +42,6 @@ public class Contact implements Comparable<Contact> {
 	@Override
 	public int hashCode() {
 		HashCodeBuilder hashCodeBuilder = new HashCodeBuilder();
-		hashCodeBuilder.append(category);
 		hashCodeBuilder.append(name);
 		hashCodeBuilder.append(phoneNumber);
 		return hashCodeBuilder.toHashCode();
@@ -61,7 +60,6 @@ public class Contact implements Comparable<Contact> {
 		}
 		Contact other = (Contact) obj;
 		EqualsBuilder equalsBuilder = new EqualsBuilder();
-		equalsBuilder.append(category, other.category);
 		equalsBuilder.append(name, other.name);
 		equalsBuilder.append(phoneNumber, other.phoneNumber);
 		return equalsBuilder.isEquals();

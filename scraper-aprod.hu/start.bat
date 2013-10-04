@@ -1,1 +1,1 @@
-%~dp0\Java\bin\java -cp scraper-aprod.hu-0.0.1-SNAPSHOT.jar com.fingy.aprod.GUIRunner
+%~dp0\Java\bin\java -cp scraper-aprod.hu-0.0.1-SNAPSHOT.jar com.fingy.aprod.AprodHuGUIRunner

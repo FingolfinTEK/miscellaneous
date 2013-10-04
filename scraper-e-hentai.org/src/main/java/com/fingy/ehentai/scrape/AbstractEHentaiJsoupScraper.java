@@ -23,7 +23,7 @@ public abstract class AbstractEHentaiJsoupScraper<T> extends AbstractJsoupScrape
     @Override
     protected Document getPage() throws IOException {
         try {
-            Document page = HtmlUnitParserUtil.getPageFromUrlWithoutJavaScriptSupport(scrapeUrl);
+            Document page = HtmlUnitParserUtil.getPageFromUrlWithoutJavaScriptSupport(getScrapeUrl());
 
             if (!page.text().startsWith(BANNED_IP_MESSAGE_START)) {
                 return page;
