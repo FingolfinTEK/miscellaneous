@@ -17,7 +17,7 @@ import com.fingy.scrape.queue.ScraperLinksQueue;
 import com.fingy.scrape.util.HttpClientParserUtil;
 import com.fingy.scrape.util.JsoupParserUtil;
 
-public class ContactJsoupScraper extends AbstractAprodHttpClientJsoupScraper<Contact> {
+public class ContactJsoupScraper extends AbstractAprodHuJsoupScraper<Contact> {
 
 	private static final String NOT_AVAILABLE = "N/A";
 	private static final String PHONE_NUMBER_URL_FORMAT = "http://aprod.hu/ajax/misc/contact/phone/%s/";
@@ -52,12 +52,12 @@ public class ContactJsoupScraper extends AbstractAprodHttpClientJsoupScraper<Con
 	}
 
 	private String scrapeNameFromPage(Document page) {
-		return JsoupParserUtil.getTagTextFromCssQuery(page, "#ad_active.content div.userbox p.x-large2 span.block").trim();
+		return JsoupParserUtil.getTagTextFromCssQuery(page, "#ad_active p.userdetails span.block").trim();
 	}
 
 	private String scrapePhoneNumberFromPage(Document page) {
 		String phoneNumber = NOT_AVAILABLE;
-		Elements phoneLinks = page.select("#contact_methods div.overh a.link-phone");
+		Elements phoneLinks = page.select("#contact_methods a.link-phone");
 		if (!phoneLinks.isEmpty()) {
 			Element phoneLink = phoneLinks.first();
 			phoneNumber = processPhoneLink(phoneNumber, phoneLink);
@@ -109,6 +109,6 @@ public class ContactJsoupScraper extends AbstractAprodHttpClientJsoupScraper<Con
 	}
 
 	public static void main(String[] args) throws IOException {
-		System.out.println(new ContactJsoupScraper("http://aprod.hu/hirdetes/szekrenysor-ID17cmw.html#aab5e98961", new ScraperLinksQueue()).call());
+		System.out.println(new ContactJsoupScraper("http://aprod.hu/hirdetes/dohanyboltnak-uzlethelyiseg-kiado-benzinkuton-ID13WEp.html#aab5e98961", new ScraperLinksQueue()).call());
 	}
 }

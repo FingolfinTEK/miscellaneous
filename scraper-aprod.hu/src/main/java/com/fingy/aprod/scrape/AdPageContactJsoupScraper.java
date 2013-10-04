@@ -12,7 +12,7 @@ import org.jsoup.select.Elements;
 
 import com.fingy.scrape.queue.ScraperLinksQueue;
 
-public class AdPageContactJsoupScraper extends AbstractAprodHttpClientJsoupScraper<String> {
+public class AdPageContactJsoupScraper extends AbstractAprodHuJsoupScraper<String> {
 
 	public AdPageContactJsoupScraper(String scrapeUrl, ScraperLinksQueue linksQueue) {
 		super(Collections.<String, String> emptyMap(), scrapeUrl, linksQueue);

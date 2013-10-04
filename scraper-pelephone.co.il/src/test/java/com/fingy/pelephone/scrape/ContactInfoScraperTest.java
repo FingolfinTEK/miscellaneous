@@ -1,6 +1,7 @@
 package com.fingy.pelephone.scrape;
 
 import com.fingy.pelephone.ContactInfo;
+import com.fingy.scrape.security.AutoRefreshingHideMyAssProxyBasedScrapeDetectionOverrider;
 import com.fingy.scrape.security.HideMyAssProxyBasedScrapeDetectionOverrider;
 import com.fingy.scrape.security.ProxyBasedScrapeDetectionOverrider;
 import com.fingy.scrape.security.TorNetworkProxyBasedScrapeDetectionOverride;
@@ -19,7 +20,7 @@ import java.util.Random;
 
 public class ContactInfoScraperTest {
     private static final String START_URL = "http://www.pelephone.co.il//digital/3G/Corporate/digital/support/general_info/find_number/.aspx";
-    private ProxyBasedScrapeDetectionOverrider detectionOverrider = new HideMyAssProxyBasedScrapeDetectionOverrider();
+    private ProxyBasedScrapeDetectionOverrider detectionOverrider = new AutoRefreshingHideMyAssProxyBasedScrapeDetectionOverrider(180000);
     private String name = "משה";
     private String city = "נתניה";
 
