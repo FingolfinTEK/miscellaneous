@@ -34,7 +34,7 @@ import com.fingy.scrape.queue.ScraperLinksQueue;
 public class AprodScraperScheduler {
 	private static final String AD_LINK_REGEX = ".*aprod\\.hu/hirdetes/.*";
 
-	private static final int DEFAULT_TERMINATION_AWAIT_INTERVAL_MINUTES = 60;
+	private static final int DEFAULT_TERMINATION_AWAIT_INTERVAL_MINUTES = 20;
 	private static final int CATEGORY_TIMEOUT = 20000;
 	private static final int AVAILABLE_PROCESSORS = Runtime.getRuntime().availableProcessors();
 
@@ -91,7 +91,7 @@ public class AprodScraperScheduler {
 			awaitTerminationOfTheTasks();
 			collectAndSaveResults();
 		} catch (Exception e) {
-			logger.error("Exception occured", e);
+			logger.error("Exception occurred", e);
 		} finally {
 			saveVisitedLinksToFile();
 			queuedSize = saveQueuedLinksToFile();

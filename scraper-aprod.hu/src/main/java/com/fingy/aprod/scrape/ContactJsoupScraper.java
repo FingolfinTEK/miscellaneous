@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.fingy.scrape.util.HtmlUnitParserUtil;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -14,7 +15,6 @@ import com.fingy.aprod.Contact;
 import com.fingy.aprod.scrape.exception.SessionExpiredException;
 import com.fingy.scrape.jsoup.AbstractJsoupScraper;
 import com.fingy.scrape.queue.ScraperLinksQueue;
-import com.fingy.scrape.util.HttpClientParserUtil;
 import com.fingy.scrape.util.JsoupParserUtil;
 
 public class ContactJsoupScraper extends AbstractAprodHuJsoupScraper<Contact> {
@@ -24,11 +24,11 @@ public class ContactJsoupScraper extends AbstractAprodHuJsoupScraper<Contact> {
 	private static final Pattern PHONE_ID_REGEX = Pattern.compile(".+'id':'(\\w+)'.+");
 
 	public ContactJsoupScraper(String scrapeUrl, ScraperLinksQueue linksQueue) {
-		super(Collections.<String, String> emptyMap(), scrapeUrl, linksQueue);
+		super(scrapeUrl, Collections.<String, String> emptyMap(), linksQueue);
 	}
 
 	public ContactJsoupScraper(Map<String, String> cookies, String scrapeUrl, ScraperLinksQueue linksQueue) {
-		super(cookies, scrapeUrl, linksQueue);
+		super(scrapeUrl, cookies, linksQueue);
 	}
 
 	@Override
@@ -38,11 +38,11 @@ public class ContactJsoupScraper extends AbstractAprodHuJsoupScraper<Contact> {
 		String phoneNumber = scrapePhoneNumberFromPage(page);
 
 		if (shouldNotExpireSession(phoneNumber)) {
-			linksQueue.markVisited(getScrapeUrl());
+			getLinksQueue().markVisited(getScrapeUrl());
 			return new Contact(category, name, phoneNumber);
 		}
 
-		linksQueue.addIfNotVisited(getScrapeUrl());
+		getLinksQueue().addIfNotVisited(getScrapeUrl());
 		AbstractJsoupScraper.setScrapeCompromised(true);
 		throw new SessionExpiredException(getScrapeUrl());
 	}
@@ -77,7 +77,7 @@ public class ContactJsoupScraper extends AbstractAprodHuJsoupScraper<Contact> {
 	private String getPhoneNumberByAjax(String requestId) {
 		try {
 			String phoneNumberUrl = String.format(PHONE_NUMBER_URL_FORMAT, requestId);
-			String phoneNumberString = HttpClientParserUtil.getPageAsStringFromUrl(phoneNumberUrl);
+			String phoneNumberString = HtmlUnitParserUtil.getPageFromUrlWithoutJavaScriptSupportUsingClient(getWebClient(), phoneNumberUrl).text();
 			return cleanPhoneNumber(phoneNumberString);
 		} catch (IOException e) {
 			logger.error("Exception scraping phone number", e);

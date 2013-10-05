@@ -15,17 +15,17 @@ import com.fingy.scrape.queue.ScraperLinksQueue;
 public class AdPageContactJsoupScraper extends AbstractAprodHuJsoupScraper<String> {
 
 	public AdPageContactJsoupScraper(String scrapeUrl, ScraperLinksQueue linksQueue) {
-		super(Collections.<String, String> emptyMap(), scrapeUrl, linksQueue);
+		super(scrapeUrl, Collections.<String, String> emptyMap(), linksQueue);
 	}
 
 	public AdPageContactJsoupScraper(Map<String, String> cookies, String scrapeUrl, ScraperLinksQueue linksQueue) {
-		super(cookies, scrapeUrl, linksQueue);
+		super(scrapeUrl, cookies, linksQueue);
 	}
 
 	@Override
 	protected String scrapePage(Document page) {
 		Collection<String> adLinksFromPage = getAdLinksFromPage(page);
-		linksQueue.addAllIfNotVisited(adLinksFromPage);
+		getLinksQueue().addAllIfNotVisited(adLinksFromPage);
 		return getScrapeUrl();
 	}
 

@@ -1,33 +1,41 @@
 package com.fingy.aprod.scrape;
 
+import com.fingy.scrape.AbstractWorkQueueAwareScraper;
+import com.fingy.scrape.jsoup.AbstractJsoupScraper;
+import com.fingy.scrape.queue.ScraperLinksQueue;
+import com.fingy.scrape.util.HtmlUnitParserUtil;
+import com.gargoylesoftware.htmlunit.WebClient;
+import org.jsoup.nodes.Document;
+
 import java.io.IOException;
 import java.util.Map;
 
-import com.fingy.scrape.AbstractScraper;
-import com.fingy.scrape.util.HtmlUnitParserUtil;
-import com.fingy.scrape.util.HttpClientParserUtil;
-import org.jsoup.nodes.Document;
+public abstract class AbstractAprodHuJsoupScraper<T> extends AbstractWorkQueueAwareScraper<T> {
 
-import com.fingy.scrape.jsoup.AbstractJsoupScraper;
-import com.fingy.scrape.queue.ScraperLinksQueue;
+    private ThreadLocal<WebClient> webClientHolder = new WebClientThreadLocal();
 
-public abstract class AbstractAprodHuJsoupScraper<T> extends AbstractJsoupScraper<T> {
+    public WebClient getWebClient() {
+        return webClientHolder.get();
+    }
 
-	protected ScraperLinksQueue linksQueue;
+    public AbstractAprodHuJsoupScraper(String scrapeUrl, Map<String, String> cookies, ScraperLinksQueue linksQueue) {
+        super(scrapeUrl, cookies, linksQueue);
+    }
 
-	public AbstractAprodHuJsoupScraper(Map<String, String> cookies, String scrapeUrl, ScraperLinksQueue linksQueue) {
-		super(cookies, scrapeUrl);
-		this.linksQueue = linksQueue;
-	}
-
-	@Override
-	protected Document getPage(String scrapeUrl) throws IOException {
-		try {
-			return HttpClientParserUtil.getPageFromUrl(scrapeUrl);
-		} catch (IOException e) {
+    @Override
+    protected Document getPage() throws IOException {
+        try {
+            return HtmlUnitParserUtil.getHtmlPageFromUrlWithoutJavaScriptSupportUsingClient(webClientHolder.get(), getScrapeUrl());
+        } catch (IOException e) {
             AbstractJsoupScraper.setScrapeCompromised(true);
-			throw e;
-		}
-	}
+            throw e;
+        }
+    }
 
+    private static class WebClientThreadLocal extends ThreadLocal<WebClient> {
+        @Override
+        protected WebClient initialValue() {
+            return HtmlUnitParserUtil.getWebClientWithProxyEnabledIfNeeded();
+        }
+    }
 }

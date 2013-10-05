@@ -12,11 +12,11 @@ import com.fingy.scrape.queue.ScraperLinksQueue;
 public class FirstAdPageJsoupScraper extends AbstractAprodHuJsoupScraper<String> {
 
 	public FirstAdPageJsoupScraper(String scrapeUrl, ScraperLinksQueue linksQueue) {
-		super(Collections.<String, String> emptyMap(), scrapeUrl, linksQueue);
+		super(scrapeUrl, Collections.<String, String> emptyMap(), linksQueue);
 	}
 
 	public FirstAdPageJsoupScraper(Map<String, String> cookies, String scrapeUrl, ScraperLinksQueue linksQueue) {
-		super(cookies, scrapeUrl, linksQueue);
+		super(scrapeUrl, cookies, linksQueue);
 	}
 
 	@Override
@@ -24,10 +24,10 @@ public class FirstAdPageJsoupScraper extends AbstractAprodHuJsoupScraper<String>
 		String scrapeUrl = getScrapeUrl();
 		Integer lastPageNumber = getLastPageNumber(page);
 
-		linksQueue.addIfNotVisited(scrapeUrl);
+		getLinksQueue().addIfNotVisited(scrapeUrl);
 		for(int i = 2; i <= lastPageNumber; i++) {
 			String pageLink = scrapeUrl + (scrapeUrl.contains("?") ? "&" : "?") + "page=" + i;
-			linksQueue.addIfNotVisited(pageLink);
+			getLinksQueue().addIfNotVisited(pageLink);
 		}
 
 		return scrapeUrl;
