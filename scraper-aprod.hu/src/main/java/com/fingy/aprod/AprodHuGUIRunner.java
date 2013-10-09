@@ -1,7 +1,24 @@
 package com.fingy.aprod;
 
-import java.awt.Dimension;
-import java.awt.EventQueue;
+import com.fingy.aprod.criteria.Category;
+import com.fingy.aprod.criteria.City;
+import com.fingy.gui.AppendableJTextArea;
+import com.fingy.scrape.context.ScrapeContext;
+import com.fingy.scrape.context.ScrapeResult;
+import com.fingy.scrape.jsoup.AbstractJsoupScraper;
+import com.fingy.scrape.security.ProxyBasedScrapeDetectionOverrider;
+import com.fingy.scrape.security.TorNetworkProxyBasedScrapeDetectionOverride;
+import com.jgoodies.forms.factories.FormFactory;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.RowSpec;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.swing.plaf.nimbus.NimbusLookAndFeel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -9,35 +26,6 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
-
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.SwingWorker;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.plaf.nimbus.NimbusLookAndFeel;
-
-import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fingy.aprod.criteria.Category;
-import com.fingy.aprod.criteria.City;
-import com.fingy.gui.AppendableJTextArea;
-import com.fingy.scrape.ScrapeResult;
-import com.fingy.scrape.security.util.TorUtil;
-import com.jgoodies.forms.factories.FormFactory;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.RowSpec;
 
 public class AprodHuGUIRunner extends JFrame {
 
@@ -50,32 +38,31 @@ public class AprodHuGUIRunner extends JFrame {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final boolean shouldUseTor = true;
     private boolean shouldStop;
 
     private final JTextField contactsFilePath;
     private final AppendableJTextArea infoPane;
     private final JComboBox<Category> categoryCombo;
+    private final JComboBox<City> cityCombo;
     private final JButton btnStartScrape;
     private final JButton btnStopScrape;
-    private final JButton btnClearLog;
 
     private File contacts = new File(DEFAULT_CONTACTS_FILE);
-    private final JComboBox<City> cityCombo;
+    private ScraperWorker scraperWorker;
 
     public AprodHuGUIRunner() {
         setPreferredSize(new Dimension(600, 400));
         setTitle("aprod.hu Scraper");
         getContentPane().setLayout(new FormLayout(
-                                           new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC,
-                                                   FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"),
-                                                   FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC,
-                                                   FormFactory.RELATED_GAP_COLSPEC, }, new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC,
-                                                   FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                                                   FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                                                   FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                                                   RowSpec.decode("default:grow"), FormFactory.RELATED_GAP_ROWSPEC,
-                                                   RowSpec.decode("max(11dlu;default)"), FormFactory.RELATED_GAP_ROWSPEC, }));
+                new ColumnSpec[]{FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC,
+                        FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"),
+                        FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC,
+                        FormFactory.RELATED_GAP_COLSPEC,}, new RowSpec[]{FormFactory.RELATED_GAP_ROWSPEC,
+                FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                RowSpec.decode("default:grow"), FormFactory.RELATED_GAP_ROWSPEC,
+                RowSpec.decode("max(11dlu;default)"), FormFactory.RELATED_GAP_ROWSPEC,}));
 
         JLabel lblOutputFileName = new JLabel("Output file name:");
         getContentPane().add(lblOutputFileName, "2, 2, right, default");
@@ -108,7 +95,7 @@ public class AprodHuGUIRunner extends JFrame {
         JLabel lblScrapeCity = new JLabel("Scrape city:");
         getContentPane().add(lblScrapeCity, "2, 4, right, default");
 
-        cityCombo = new JComboBox<City>();
+        cityCombo = new JComboBox<>();
         cityCombo.setModel(new DefaultComboBoxModel<>(City.values()));
         cityCombo.setSelectedItem(City.BUDAPEST);
         getContentPane().add(cityCombo, "4, 4, fill, default");
@@ -116,8 +103,8 @@ public class AprodHuGUIRunner extends JFrame {
         JLabel lblScrapeCategory = new JLabel("Scrape category:");
         getContentPane().add(lblScrapeCategory, "2, 6, right, default");
 
-        categoryCombo = new JComboBox<Category>();
-        categoryCombo.setModel(new DefaultComboBoxModel<Category>(Category.values()));
+        categoryCombo = new JComboBox<>();
+        categoryCombo.setModel(new DefaultComboBoxModel<>(Category.values()));
         categoryCombo.setSelectedItem(Category.ALL);
         getContentPane().add(categoryCombo, "4, 6, fill, default");
 
@@ -132,9 +119,9 @@ public class AprodHuGUIRunner extends JFrame {
 
         JPanel panel = new JPanel();
         getContentPane().add(panel, "4, 10, 3, 1, fill, fill");
-        panel.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,
+        panel.setLayout(new FormLayout(new ColumnSpec[]{FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,
                 FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,
-                FormFactory.DEFAULT_COLSPEC, }, new RowSpec[] { FormFactory.DEFAULT_ROWSPEC, }));
+                FormFactory.DEFAULT_COLSPEC,}, new RowSpec[]{FormFactory.DEFAULT_ROWSPEC,}));
 
         btnStartScrape = new JButton("Start scrape");
         btnStartScrape.addActionListener(new ActionListener() {
@@ -142,7 +129,9 @@ public class AprodHuGUIRunner extends JFrame {
             public void actionPerformed(final ActionEvent e) {
                 btnStartScrape.setEnabled(false);
                 btnStopScrape.setEnabled(true);
-                new ScraperWorker().execute();
+
+                scraperWorker = new ScraperWorker();
+                scraperWorker.execute();
             }
         });
         panel.add(btnStartScrape, "1, 1");
@@ -155,6 +144,7 @@ public class AprodHuGUIRunner extends JFrame {
                 shouldStop = true;
                 infoPane.appendLine("Stopping scrape process after the current iteration");
                 btnStopScrape.setEnabled(false);
+                scraperWorker.terminate();
             }
         });
         panel.add(btnStopScrape, "3, 1");
@@ -164,8 +154,8 @@ public class AprodHuGUIRunner extends JFrame {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 int option = JOptionPane.showConfirmDialog(AprodHuGUIRunner.this,
-                                                           "This will delete internal data. Are you sure you wish to continue?",
-                                                           "Confirm scraper reset", JOptionPane.OK_CANCEL_OPTION);
+                        "This will delete internal data. Are you sure you wish to continue?",
+                        "Confirm scraper reset", JOptionPane.OK_CANCEL_OPTION);
 
                 if (option == JOptionPane.OK_OPTION) {
                     FileUtils.deleteQuietly(new File(VISITED_TXT_FILE_NAME));
@@ -177,7 +167,7 @@ public class AprodHuGUIRunner extends JFrame {
         });
         panel.add(btnResetState, "5, 1");
 
-        btnClearLog = new JButton("Clear Log");
+        final JButton btnClearLog = new JButton("Clear Log");
         btnClearLog.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -189,7 +179,7 @@ public class AprodHuGUIRunner extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(final WindowEvent e) {
-                TorUtil.stopTor();
+                if (scraperWorker != null) scraperWorker.terminate();
                 System.exit(0);
             }
         });
@@ -212,31 +202,6 @@ public class AprodHuGUIRunner extends JFrame {
         });
     }
 
-    public void runScrape() {
-        try {
-            shouldStop = false;
-            setUpTorIfNeeded();
-
-            for (int i = 0; i < RETRY_COUNT; i++) {
-                scrapeWhileThereAreResults();
-            }
-
-            stopTor();
-        } catch (Exception e) {
-            logger.error("Exception occured", e);
-        }
-    }
-
-    private void setUpTorIfNeeded() {
-        if (shouldUseTor) {
-            TorUtil.stopTor();
-            TorUtil.startAndUseTorAsProxy();
-            sleep(45000);
-        } else {
-            TorUtil.disableSocksProxy();
-        }
-    }
-
     private void sleep(final int millis) {
         try {
             String sleepMessage = String.format("Waiting %d seconds", millis / 1000);
@@ -247,37 +212,66 @@ public class AprodHuGUIRunner extends JFrame {
         }
     }
 
-    private void scrapeWhileThereAreResults() throws ExecutionException, IOException, InterruptedException {
-        int queueSize = 1;
-        while (queueSize > 0 && !shouldStop) {
-            City city = (City) cityCombo.getSelectedItem();
-            Category category = (Category) categoryCombo.getSelectedItem();
-
-            infoPane.appendLine("Starting new scrape iteration for city " + city + " and category " + category);
-
-            String startUrl = String.format(category.getLink(), city.getUrlName());
-            ScrapeResult result = new AprodScraperScheduler(startUrl, contacts.getAbsolutePath(), VISITED_TXT_FILE_NAME,
-                    QUEUED_TXT_FILE_NAME).doScrape();
-
-            infoPane.appendLine("Finished scrape iteration; total contacts scraped: " + result.getScrapeSize());
-
-            queueSize = result.getQueueSize();
-            TorUtil.requestNewIdentity();
-            sleep(10000);
-        }
-    }
-
-    private void stopTor() {
-        if (shouldUseTor) {
-            TorUtil.stopTor();
-        }
-    }
-
     private final class ScraperWorker extends SwingWorker<Object, Object> {
+        private ProxyBasedScrapeDetectionOverrider scrapeDetectionOverrider = new TorNetworkProxyBasedScrapeDetectionOverride();
+
         @Override
         protected Object doInBackground() throws Exception {
             runScrape();
             return null;
+        }
+
+        public void terminate() {
+            AbstractJsoupScraper.setScrapeCompromised(true);
+            shouldStop = true;
+            scrapeDetectionOverrider.destroyContext();
+        }
+
+        public void runScrape() {
+            try {
+                shouldStop = false;
+                scrapeDetectionOverrider.initializeContext();
+
+                for (int i = 0; i < RETRY_COUNT; i++) {
+                    scrapeWhileThereAreResults();
+                }
+
+                scrapeDetectionOverrider.destroyContext();
+            } catch (Exception e) {
+                logger.error("Exception occured", e);
+            }
+        }
+
+        private void scrapeWhileThereAreResults() throws ExecutionException, IOException, InterruptedException {
+            int queueSize = 1;
+            while (queueSize > 0 && !shouldStop) {
+                City city = (City) cityCombo.getSelectedItem();
+                Category category = (Category) categoryCombo.getSelectedItem();
+
+                infoPane.appendLine("Starting new scrape iteration for city " + city + " and category " + category);
+
+                setUpProxy();
+                ScrapeResult result = doScrape(city, category);
+
+                infoPane.appendLine("Finished scrape iteration");
+                infoPane.appendLine("Scrape was compromised: " + (AbstractJsoupScraper.isScrapeCompromised() && !shouldStop));
+                infoPane.appendLine("Total contacts scraped: " + result.getScrapeSize());
+
+                queueSize = result.getQueueSize();
+            }
+        }
+
+        private void setUpProxy() {
+            scrapeDetectionOverrider.setUpProxy();
+            sleep(2000);
+        }
+
+        private ScrapeResult doScrape(City city, Category category) {
+            String startUrl = String.format(category.getLink(), city.getUrlName());
+            ScrapeContext context = new ScrapeContext(contacts.getAbsolutePath(), VISITED_TXT_FILE_NAME, QUEUED_TXT_FILE_NAME, new ContactLoader());
+            ScrapeResult result = new AprodScraperScheduler(startUrl, context).doScrape();
+            context.save();
+            return result;
         }
 
         @Override

@@ -15,14 +15,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 public class HtmlUnitParserUtil {
 
-    public static Document getPageFromUrl(final String url) throws IOException {
-        WebClient webClient = getWebClientWithProxyEnabledIfNeeded();
-
-        Document parsedPage = getHtmlPageFromUrlUsingClient(webClient, url);
-
-        webClient.closeAllWindows();
-        return parsedPage;
-    }
+    private static final int DEFAULT_TIMEOUT = 30000;
 
     public static Document getPageFromUrlWithoutJavaScriptSupport(final String url) throws IOException {
         WebClient webClient = getWebClientWithProxyEnabledIfNeeded();
@@ -58,7 +51,9 @@ public class HtmlUnitParserUtil {
             return new WebClient(BrowserVersion.FIREFOX_17, host, Integer.parseInt(port));
         }
 
-        return new WebClient(BrowserVersion.FIREFOX_17);
+        WebClient webClient = new WebClient(BrowserVersion.FIREFOX_17);
+        webClient.getOptions().setTimeout(DEFAULT_TIMEOUT);
+        return webClient;
     }
 
     private static boolean isHttpProxySet() {
@@ -67,13 +62,11 @@ public class HtmlUnitParserUtil {
 
     public static Document getHtmlPageFromUrlUsingClient(final WebClient webClient, final String url) throws IOException {
         HtmlPage page = webClient.getPage(url);
-        Document parsedPage = Jsoup.parse(page.asXml());
-        return parsedPage;
+        return Jsoup.parse(page.asXml());
     }
 
     public static Document getPageFromUrlUsingClient(final WebClient webClient, final String url) throws IOException {
         Page page = webClient.getPage(url);
-        Document parsedPage = Jsoup.parse(page.getWebResponse().getContentAsString());
-        return parsedPage;
+        return Jsoup.parse(page.getWebResponse().getContentAsString());
     }
 }

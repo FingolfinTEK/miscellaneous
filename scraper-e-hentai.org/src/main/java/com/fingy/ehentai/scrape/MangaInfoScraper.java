@@ -9,7 +9,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.fingy.ehentai.MangaInfo;
-import com.fingy.scrape.queue.ScraperLinksQueue;
+import com.fingy.scrape.context.ScraperLinksQueue;
 
 public class MangaInfoScraper extends AbstractEHentaiJsoupScraper<MangaInfo> {
 

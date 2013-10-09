@@ -2,12 +2,13 @@ package com.fingy.aprod;
 
 import java.util.regex.Pattern;
 
+import com.fingy.scrape.context.ScrapeDetails;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class Contact implements Comparable<Contact> {
+public class Contact extends ScrapeDetails implements Comparable<Contact> {
 
 	private static final String N_A = "N/A";
 	private static final String ILLEGAL_PHONE_NUMBER_REGEX = ".*[a-zA-Z]+.*";
@@ -91,7 +92,6 @@ public class Contact implements Comparable<Contact> {
 		try {
 			return new Contact(data[0], data[1], data[2]);
 		} catch (ArrayIndexOutOfBoundsException ex) {
-			System.out.println("Contact.fromString() " + contactData);
 			throw ex;
 		}
 	}

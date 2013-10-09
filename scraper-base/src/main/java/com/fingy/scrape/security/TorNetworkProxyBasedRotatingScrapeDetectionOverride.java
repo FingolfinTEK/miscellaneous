@@ -1,8 +1,19 @@
 package com.fingy.scrape.security;
 
-public class TorNetworkProxyBasedRefreshingScrapeDetectionOverride extends TorNetworkProxyBasedScrapeDetectionOverride {
+public class TorNetworkProxyBasedRotatingScrapeDetectionOverride extends TorNetworkProxyBasedScrapeDetectionOverride {
 
-    private final Thread proxyRefreshingThread = new ProxyRefreshingThread();
+    private static final int DEFAULT_TIMEOUT_MILLIS = 180000;
+    private final Thread proxyRefreshingThread;
+
+    public TorNetworkProxyBasedRotatingScrapeDetectionOverride() {
+        this(DEFAULT_TIMEOUT_MILLIS);
+    }
+
+    public TorNetworkProxyBasedRotatingScrapeDetectionOverride(final int timeoutMillis) {
+        proxyRefreshingThread = new ProxyRefreshingThread(timeoutMillis);
+    }
+
+
 
     @Override
     public void initializeContext() {
@@ -17,10 +28,11 @@ public class TorNetworkProxyBasedRefreshingScrapeDetectionOverride extends TorNe
     }
 
     private class ProxyRefreshingThread extends Thread {
-        private static final int DEFAULT_TIMEOUT_MILLIS = 180000;
+        private final int timeoutMillis;
 
-        public ProxyRefreshingThread() {
+        public ProxyRefreshingThread(final int timeoutMillis) {
             setDaemon(true);
+            this.timeoutMillis = timeoutMillis;
         }
 
         @Override

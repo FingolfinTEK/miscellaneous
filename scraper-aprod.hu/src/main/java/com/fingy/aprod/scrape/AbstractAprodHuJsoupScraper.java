@@ -2,7 +2,7 @@ package com.fingy.aprod.scrape;
 
 import com.fingy.scrape.AbstractWorkQueueAwareScraper;
 import com.fingy.scrape.jsoup.AbstractJsoupScraper;
-import com.fingy.scrape.queue.ScraperLinksQueue;
+import com.fingy.scrape.context.ScraperLinksQueue;
 import com.fingy.scrape.util.HtmlUnitParserUtil;
 import com.gargoylesoftware.htmlunit.WebClient;
 import org.jsoup.nodes.Document;

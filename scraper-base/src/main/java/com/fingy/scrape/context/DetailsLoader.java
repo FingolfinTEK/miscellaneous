@@ -1,4 +1,4 @@
-package com.fingy.zoznam;
+package com.fingy.scrape.context;
 
 public interface DetailsLoader<T> {
 

@@ -29,7 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fingy.gui.AppendableJTextArea;
-import com.fingy.scrape.ScrapeResult;
+import com.fingy.scrape.context.ScrapeResult;
 import com.fingy.scrape.jsoup.AbstractJsoupScraper;
 import com.fingy.scrape.security.AutoRefreshingHideMyAssProxyBasedScrapeDetectionOverrider;
 import com.fingy.scrape.security.ProxyBasedScrapeDetectionOverrider;
@@ -279,9 +279,6 @@ public class MousePriceGUIRunner extends JFrame {
             createScrapeDetectionOverrider();
             scrapeDetectionOverrider.initializeContext();
             ScraperScheduler.loadScrapeContext(detailsFile, VISITED_TXT_FILE_NAME, QUEUED_TXT_FILE_NAME);
-            if (shouldUseTor()) {
-                sleep(45000);
-            }
         }
 
         private boolean shouldUseTor() {

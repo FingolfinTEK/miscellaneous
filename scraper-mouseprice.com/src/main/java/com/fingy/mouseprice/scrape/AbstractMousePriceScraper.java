@@ -6,7 +6,7 @@ import java.util.Map;
 import org.jsoup.nodes.Document;
 
 import com.fingy.scrape.jsoup.AbstractJsoupScraper;
-import com.fingy.scrape.queue.ScraperLinksQueue;
+import com.fingy.scrape.context.ScraperLinksQueue;
 import com.fingy.scrape.util.JsoupParserUtil;
 
 public abstract class AbstractMousePriceScraper<T> extends AbstractJsoupScraper<T> {

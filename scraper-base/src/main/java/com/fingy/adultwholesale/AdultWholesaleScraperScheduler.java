@@ -28,7 +28,7 @@ import com.fingy.adultwholesale.scrape.AbstractAdultItemJsoupScraper;
 import com.fingy.adultwholesale.scrape.AdultItemCategoryJsoupScraper;
 import com.fingy.adultwholesale.scrape.AdultItemJsoupScraper;
 import com.fingy.concurrent.ExecutorsUtil;
-import com.fingy.scrape.queue.ScraperLinksQueue;
+import com.fingy.scrape.context.ScraperLinksQueue;
 
 public class AdultWholesaleScraperScheduler {
 

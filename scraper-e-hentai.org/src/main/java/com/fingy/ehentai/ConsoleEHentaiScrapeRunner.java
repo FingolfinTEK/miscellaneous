@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import com.fingy.proxylist.ProxyInfo;
 import com.fingy.proxylist.ProxyListScraperScheduler;
 import com.fingy.proxylist.ProxyType;
-import com.fingy.scrape.ScrapeResult;
+import com.fingy.scrape.context.ScrapeResult;
 
 public class ConsoleEHentaiScrapeRunner {
 

@@ -14,7 +14,7 @@ import org.jsoup.select.Elements;
 import com.fingy.aprod.Contact;
 import com.fingy.aprod.scrape.exception.SessionExpiredException;
 import com.fingy.scrape.jsoup.AbstractJsoupScraper;
-import com.fingy.scrape.queue.ScraperLinksQueue;
+import com.fingy.scrape.context.ScraperLinksQueue;
 import com.fingy.scrape.util.JsoupParserUtil;
 
 public class ContactJsoupScraper extends AbstractAprodHuJsoupScraper<Contact> {

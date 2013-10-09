@@ -1,28 +1,25 @@
-package com.fingy.zoznam;
-
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package com.fingy.scrape;
 
 import com.fingy.adultwholesale.scrape.AbstractAdultItemJsoupScraper;
 import com.fingy.adultwholesale.scrape.AdultItemJsoupScraper;
 import com.fingy.concurrent.ExecutorsUtil;
-import com.fingy.scrape.ScrapeResult;
+import com.fingy.scrape.context.ScrapeContext;
+import com.fingy.scrape.context.ScrapeDetails;
+import com.fingy.scrape.context.ScrapeResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public abstract class AbstractScrapeScheduler<T> {
+import java.util.concurrent.*;
+
+public abstract class AbstractScrapeScheduler<T extends ScrapeDetails> {
 
     private static final int DEFAULT_TERMINATION_AWAIT_INTERVAL_MINUTES = 5;
-    private static final int CATEGORY_TIMEOUT = 3000;
+    private static final int DETAILS_AWAIT_TIMEOUT = 3000;
 
     private static Logger logger = LoggerFactory.getLogger(AbstractScrapeScheduler.class);
 
-    private final ExecutorService workGeneratingScrapingThreadPool = createThreadPool();
-    private final ExecutorService detailsScrapingThreadPool = createThreadPool();
+    private final ExecutorService workGeneratingScrapingThreadPool = createWorkGeneratingThreadPool();
+    private final ExecutorService detailsScrapingThreadPool = createDetailsScrapingThreadPool();
     private final ExecutorCompletionService<T> detailsScrapingCompletionService = new ExecutorCompletionService<>(detailsScrapingThreadPool);
 
     protected final ScrapeContext context;
@@ -37,6 +34,18 @@ public abstract class AbstractScrapeScheduler<T> {
 
     public ExecutorCompletionService<T> getDetailsScrapingCompletionService() {
         return detailsScrapingCompletionService;
+    }
+
+    protected ExecutorService createWorkGeneratingThreadPool() {
+        return createThreadPool();
+    }
+
+    protected ExecutorService createDetailsScrapingThreadPool() {
+        return createThreadPool();
+    }
+
+    protected ThreadPoolExecutor createThreadPool() {
+        return ExecutorsUtil.createThreadPool(1);
     }
 
     public ScrapeResult doScrape() {
@@ -65,7 +74,7 @@ public abstract class AbstractScrapeScheduler<T> {
 
     private void submitScrapingTasksWhileThereIsEnoughWork() {
 
-        while (context.stillHaveLinksToBeScraped(CATEGORY_TIMEOUT)) {
+        while (context.stillHaveLinksToBeScraped(DETAILS_AWAIT_TIMEOUT)) {
             if (AbstractAdultItemJsoupScraper.isScrapeCompromised()) {
                 logger.trace("Session expired, breaking");
                 break;
@@ -92,21 +101,15 @@ public abstract class AbstractScrapeScheduler<T> {
     protected abstract boolean isDetailsLink(final String link);
 
     private void awaitTerminationOfTheTasks() {
+        ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(workGeneratingScrapingThreadPool, DEFAULT_TERMINATION_AWAIT_INTERVAL_MINUTES,
+                TimeUnit.MINUTES);
         ExecutorsUtil.shutDownExecutorServiceAndAwaitTermination(detailsScrapingThreadPool, DEFAULT_TERMINATION_AWAIT_INTERVAL_MINUTES,
-                                                                 TimeUnit.MINUTES);
+                TimeUnit.MINUTES);
     }
 
     private void collectResults() {
         awaitTerminationOfTheTasks();
-        ExecutorCompletionService<T> completionService = detailsScrapingCompletionService;
-        context.collectResultsFromCompletionService(completionService);
-    }
-
-    public ThreadPoolExecutor createThreadPool() {
-        LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>(5000);
-        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(5, 10, 1, TimeUnit.HOURS, workQueue);
-        threadPoolExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-        return threadPoolExecutor;
+        context.collectResultsFromCompletionService(detailsScrapingCompletionService);
     }
 
 }

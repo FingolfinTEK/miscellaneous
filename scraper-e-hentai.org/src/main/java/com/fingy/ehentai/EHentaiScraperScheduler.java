@@ -26,9 +26,9 @@ import com.fingy.concurrent.ExecutorsUtil;
 import com.fingy.ehentai.scrape.IndexPageScraper;
 import com.fingy.ehentai.scrape.MangaInfoScraper;
 import com.fingy.ehentai.scrape.SearchPageMangaLinksScraper;
-import com.fingy.scrape.ScrapeResult;
+import com.fingy.scrape.context.ScrapeResult;
 import com.fingy.scrape.jsoup.AbstractJsoupScraper;
-import com.fingy.scrape.queue.ScraperLinksQueue;
+import com.fingy.scrape.context.ScraperLinksQueue;
 
 public class EHentaiScraperScheduler {
 

@@ -27,7 +27,7 @@
 		</encoder>
 	</appender>
 
-	<logger name="com.fingy.aprod" level="TRACE" />
+	<logger name="com.fingy" level="TRACE" />
 
 	<root level="WARN">
 		<appender-ref ref="FILE" />

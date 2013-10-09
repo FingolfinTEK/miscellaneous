@@ -7,7 +7,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import com.fingy.aprod.criteria.Category;
-import com.fingy.scrape.queue.ScraperLinksQueue;
+import com.fingy.scrape.context.ScraperLinksQueue;
 
 public class FirstAdPageJsoupScraper extends AbstractAprodHuJsoupScraper<String> {
 

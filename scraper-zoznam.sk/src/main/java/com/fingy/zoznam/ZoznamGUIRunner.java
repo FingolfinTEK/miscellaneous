@@ -23,12 +23,13 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
+import com.fingy.scrape.context.ScrapeContext;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fingy.gui.AppendableJTextArea;
-import com.fingy.scrape.ScrapeResult;
+import com.fingy.scrape.context.ScrapeResult;
 import com.fingy.scrape.jsoup.AbstractJsoupScraper;
 import com.fingy.scrape.security.AutoRefreshingHideMyAssProxyBasedScrapeDetectionOverrider;
 import com.fingy.scrape.security.ProxyBasedScrapeDetectionOverrider;
@@ -254,9 +255,6 @@ public class ZoznamGUIRunner extends JFrame {
         private void initContext() {
             createScrapeDetectionOverrider();
             scrapeDetectionOverrider.initializeContext();
-            if (shouldUseTor()) {
-                sleep(45000);
-            }
         }
 
         private boolean shouldUseTor() {

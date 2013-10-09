@@ -7,7 +7,7 @@ import org.jsoup.nodes.Document;
 import com.fingy.adultwholesale.AdultItem;
 import com.fingy.scrape.exception.ScrapeException;
 import com.fingy.scrape.jsoup.AbstractJsoupScraper;
-import com.fingy.scrape.queue.ScraperLinksQueue;
+import com.fingy.scrape.context.ScraperLinksQueue;
 
 public abstract class AbstractAdultItemJsoupScraper extends AbstractJsoupScraper<AdultItem> {
 

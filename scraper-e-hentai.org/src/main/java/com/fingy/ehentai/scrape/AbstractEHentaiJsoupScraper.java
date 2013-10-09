@@ -6,7 +6,7 @@ import org.jsoup.nodes.Document;
 
 import com.fingy.scrape.exception.ScrapeException;
 import com.fingy.scrape.jsoup.AbstractJsoupScraper;
-import com.fingy.scrape.queue.ScraperLinksQueue;
+import com.fingy.scrape.context.ScraperLinksQueue;
 import com.fingy.scrape.util.HtmlUnitParserUtil;
 
 public abstract class AbstractEHentaiJsoupScraper<T> extends AbstractJsoupScraper<T> {
