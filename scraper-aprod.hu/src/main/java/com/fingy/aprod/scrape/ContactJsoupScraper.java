@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.fingy.scrape.util.HtmlUnitParserUtil;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -13,22 +14,21 @@ import org.jsoup.select.Elements;
 import com.fingy.aprod.Contact;
 import com.fingy.aprod.scrape.exception.SessionExpiredException;
 import com.fingy.scrape.jsoup.AbstractJsoupScraper;
-import com.fingy.scrape.queue.ScraperLinksQueue;
-import com.fingy.scrape.util.HttpClientParserUtil;
+import com.fingy.scrape.context.ScraperLinksQueue;
 import com.fingy.scrape.util.JsoupParserUtil;
 
-public class ContactJsoupScraper extends AbstractAprodHttpClientJsoupScraper<Contact> {
+public class ContactJsoupScraper extends AbstractAprodHuJsoupScraper<Contact> {
 
 	private static final String NOT_AVAILABLE = "N/A";
 	private static final String PHONE_NUMBER_URL_FORMAT = "http://aprod.hu/ajax/misc/contact/phone/%s/";
 	private static final Pattern PHONE_ID_REGEX = Pattern.compile(".+'id':'(\\w+)'.+");
 
 	public ContactJsoupScraper(String scrapeUrl, ScraperLinksQueue linksQueue) {
-		super(Collections.<String, String> emptyMap(), scrapeUrl, linksQueue);
+		super(scrapeUrl, Collections.<String, String> emptyMap(), linksQueue);
 	}
 
 	public ContactJsoupScraper(Map<String, String> cookies, String scrapeUrl, ScraperLinksQueue linksQueue) {
-		super(cookies, scrapeUrl, linksQueue);
+		super(scrapeUrl, cookies, linksQueue);
 	}
 
 	@Override
@@ -38,11 +38,11 @@ public class ContactJsoupScraper extends AbstractAprodHttpClientJsoupScraper<Con
 		String phoneNumber = scrapePhoneNumberFromPage(page);
 
 		if (shouldNotExpireSession(phoneNumber)) {
-			linksQueue.markVisited(getScrapeUrl());
+			getLinksQueue().markVisited(getScrapeUrl());
 			return new Contact(category, name, phoneNumber);
 		}
 
-		linksQueue.addIfNotVisited(getScrapeUrl());
+		getLinksQueue().addIfNotVisited(getScrapeUrl());
 		AbstractJsoupScraper.setScrapeCompromised(true);
 		throw new SessionExpiredException(getScrapeUrl());
 	}
@@ -52,12 +52,12 @@ public class ContactJsoupScraper extends AbstractAprodHttpClientJsoupScraper<Con
 	}
 
 	private String scrapeNameFromPage(Document page) {
-		return JsoupParserUtil.getTagTextFromCssQuery(page, "#ad_active.content div.userbox p.x-large2 span.block").trim();
+		return JsoupParserUtil.getTagTextFromCssQuery(page, "#ad_active p.userdetails span.block").trim();
 	}
 
 	private String scrapePhoneNumberFromPage(Document page) {
 		String phoneNumber = NOT_AVAILABLE;
-		Elements phoneLinks = page.select("#contact_methods div.overh a.link-phone");
+		Elements phoneLinks = page.select("#contact_methods a.link-phone");
 		if (!phoneLinks.isEmpty()) {
 			Element phoneLink = phoneLinks.first();
 			phoneNumber = processPhoneLink(phoneNumber, phoneLink);
@@ -77,7 +77,7 @@ public class ContactJsoupScraper extends AbstractAprodHttpClientJsoupScraper<Con
 	private String getPhoneNumberByAjax(String requestId) {
 		try {
 			String phoneNumberUrl = String.format(PHONE_NUMBER_URL_FORMAT, requestId);
-			String phoneNumberString = HttpClientParserUtil.getPageAsStringFromUrl(phoneNumberUrl);
+			String phoneNumberString = HtmlUnitParserUtil.getPageFromUrlWithoutJavaScriptSupportUsingClient(getWebClient(), phoneNumberUrl).text();
 			return cleanPhoneNumber(phoneNumberString);
 		} catch (IOException e) {
 			logger.error("Exception scraping phone number", e);
@@ -109,6 +109,6 @@ public class ContactJsoupScraper extends AbstractAprodHttpClientJsoupScraper<Con
 	}
 
 	public static void main(String[] args) throws IOException {
-		System.out.println(new ContactJsoupScraper("http://aprod.hu/hirdetes/szekrenysor-ID17cmw.html#aab5e98961", new ScraperLinksQueue()).call());
+		System.out.println(new ContactJsoupScraper("http://aprod.hu/hirdetes/dohanyboltnak-uzlethelyiseg-kiado-benzinkuton-ID13WEp.html#aab5e98961", new ScraperLinksQueue()).call());
 	}
 }

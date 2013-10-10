@@ -10,7 +10,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.Test;
 
-import com.fingy.scrape.queue.ScraperLinksQueue;
+import com.fingy.scrape.context.ScraperLinksQueue;
 
 public class IndexPageScraperTest {
 

@@ -6,7 +6,7 @@ import java.util.List;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import com.fingy.scrape.queue.ScraperLinksQueue;
+import com.fingy.scrape.context.ScraperLinksQueue;
 
 public class SingleResultPageScraper extends AbstractZoznamScraper<Integer> {
 

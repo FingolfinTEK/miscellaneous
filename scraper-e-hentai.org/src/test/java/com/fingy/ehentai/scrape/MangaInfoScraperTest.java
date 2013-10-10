@@ -11,7 +11,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.fingy.ehentai.MangaInfo;
-import com.fingy.scrape.queue.ScraperLinksQueue;
+import com.fingy.scrape.context.ScraperLinksQueue;
 
 @Ignore
 public class MangaInfoScraperTest {

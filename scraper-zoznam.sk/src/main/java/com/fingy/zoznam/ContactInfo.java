@@ -1,6 +1,8 @@
 package com.fingy.zoznam;
 
-public class ContactInfo {
+import com.fingy.scrape.context.ScrapeDetails;
+
+public class ContactInfo extends ScrapeDetails {
 
     private String name;
     private String address;

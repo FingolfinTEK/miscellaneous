@@ -8,14 +8,19 @@ public class TorNetworkProxyBasedScrapeDetectionOverride implements ProxyBasedSc
     public void initializeContext() {
         TorUtil.stopTor();
         TorUtil.startAndUseTorAsProxy();
+        sleep(45000);
+    }
+
+    private void sleep(int millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {}
     }
 
     @Override
     public void setUpProxy() {
         TorUtil.requestNewIdentity();
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {}
+        sleep(1000);
     }
 
     @Override

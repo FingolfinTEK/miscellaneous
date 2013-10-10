@@ -2,7 +2,7 @@ package com.fingy.zoznam.scrape;
 
 import org.jsoup.nodes.Document;
 
-import com.fingy.scrape.queue.ScraperLinksQueue;
+import com.fingy.scrape.context.ScraperLinksQueue;
 import com.fingy.scrape.util.JsoupParserUtil;
 
 public class SearchResultsScraper extends AbstractZoznamScraper<Integer> {

@@ -4,6 +4,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import com.fingy.scrape.AbstractScrapeScheduler;
+import com.fingy.scrape.context.ScrapeContext;
 import com.fingy.zoznam.scrape.ContactInfoScraper;
 import com.fingy.zoznam.scrape.SearchResultsScraper;
 import com.fingy.zoznam.scrape.SingleResultPageScraper;

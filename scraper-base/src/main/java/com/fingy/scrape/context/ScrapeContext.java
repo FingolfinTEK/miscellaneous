@@ -1,4 +1,4 @@
-package com.fingy.zoznam;
+package com.fingy.scrape.context;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,8 +13,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fingy.scrape.queue.ScraperLinksQueue;
 
 public class ScrapeContext {
 
@@ -143,7 +141,7 @@ public class ScrapeContext {
         return !linksQueue.delayedIsEmpty(timeout);
     }
 
-    public <T> void collectResultsFromCompletionService(final ExecutorCompletionService<T> completionService) {
+    public <T extends ScrapeDetails> void collectResultsFromCompletionService(final ExecutorCompletionService<T> completionService) {
         long timeout = 10;
         for (int i = 0; i < queuedLinks.size(); i++) {
             try {

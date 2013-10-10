@@ -5,14 +5,13 @@
         <artifactId>scraper-parent</artifactId>
 		<groupId>com.fingy</groupId>
 		<version>0.0.1-SNAPSHOT</version>
-		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>scraper-aprod.hu</artifactId>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.fingy</groupId>
-			<artifactId>scraper</artifactId>
+			<artifactId>scraper-base</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
@@ -30,7 +29,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>com.fingy.aprod.GUIRunner</mainClass>
+							<mainClass>com.fingy.aprod.AprodHuGUIRunner</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

@@ -10,22 +10,22 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import com.fingy.scrape.queue.ScraperLinksQueue;
+import com.fingy.scrape.context.ScraperLinksQueue;
 
-public class AdPageContactJsoupScraper extends AbstractAprodHttpClientJsoupScraper<String> {
+public class AdPageContactJsoupScraper extends AbstractAprodHuJsoupScraper<String> {
 
 	public AdPageContactJsoupScraper(String scrapeUrl, ScraperLinksQueue linksQueue) {
-		super(Collections.<String, String> emptyMap(), scrapeUrl, linksQueue);
+		super(scrapeUrl, Collections.<String, String> emptyMap(), linksQueue);
 	}
 
 	public AdPageContactJsoupScraper(Map<String, String> cookies, String scrapeUrl, ScraperLinksQueue linksQueue) {
-		super(cookies, scrapeUrl, linksQueue);
+		super(scrapeUrl, cookies, linksQueue);
 	}
 
 	@Override
 	protected String scrapePage(Document page) {
 		Collection<String> adLinksFromPage = getAdLinksFromPage(page);
-		linksQueue.addAllIfNotVisited(adLinksFromPage);
+		getLinksQueue().addAllIfNotVisited(adLinksFromPage);
 		return getScrapeUrl();
 	}
 

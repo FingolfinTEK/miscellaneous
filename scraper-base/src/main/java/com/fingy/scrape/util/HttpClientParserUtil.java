@@ -8,29 +8,28 @@ import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.TruncatedChunkException;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.CookieStore;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
-import org.apache.http.impl.cookie.BasicClientCookie;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
+import org.apache.http.params.CoreConnectionPNames;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Map;
 
 public class HttpClientParserUtil {
 
-    public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0";
+    private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0";
 
     public static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
     public static final int EOF = -1;
@@ -42,10 +41,6 @@ public class HttpClientParserUtil {
             return getNewHttpClient();
         }
     };
-
-    public static DefaultHttpClient getClient() {
-        return httpClient.get();
-    }
 
     public static DefaultHttpClient getNewHttpClient() {
         try {
@@ -82,6 +77,8 @@ public class HttpClientParserUtil {
 
     private static DefaultHttpClient createDefaultHttpClient(PoolingClientConnectionManager manager) {
         DefaultHttpClient defaultHttpClient = new DefaultHttpClient(manager);
+        defaultHttpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 90000);
+        defaultHttpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 90000);
         addProxyIfNeeded(defaultHttpClient);
         return defaultHttpClient;
     }
@@ -91,15 +88,13 @@ public class HttpClientParserUtil {
         String proxyHost = System.getProperty("http.proxyHost");
 
         if (proxyPort != null && proxyHost != null) {
-            HttpHost proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort));
-            defaultHttpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
+            configureClientToUseProxy(defaultHttpClient, proxyPort, proxyHost);
         }
     }
 
-    public static Document getPageFromUrl(String scrapeUrl) throws IOException, ClientProtocolException {
-        HttpEntity entity = getEntityFromUrl(scrapeUrl);
-        final byte[] content = IOHelper.readContent(entity.getContent(), TruncatedChunkException.class);
-        return Jsoup.parse(new String(content, "UTF-8"), "");
+    private static void configureClientToUseProxy(DefaultHttpClient defaultHttpClient, String proxyPort, String proxyHost) {
+        HttpHost proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort));
+        defaultHttpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
     }
 
     private static HttpEntity getEntityFromUrl(String scrapeUrl) throws IOException, ClientProtocolException {
@@ -129,10 +124,30 @@ public class HttpClientParserUtil {
         }
     }
 
-    public static void addCookies(DefaultHttpClient client, Map<String, String> cookies) {
-        CookieStore cookieStore = client.getCookieStore();
-        for (Map.Entry<String, String> entry : cookies.entrySet()) {
-            cookieStore.addCookie(new BasicClientCookie(entry.getKey(), entry.getValue()));
-        }
+    public static String postDataToUrlWithCookies(String searchUrl, String data) throws IOException {
+        HttpPost post = new HttpPost(searchUrl);
+        post.setHeader("User-Agent", USER_AGENT);
+        post.setEntity(new StringEntity(data, ContentType.create("application/json", "UTF-8")));
+
+        DefaultHttpClient client = httpClient.get();
+        addProxyIfNeeded(client);
+        HttpResponse response = client.execute(post);
+        HttpEntity entity = response.getEntity();
+        final byte[] content = IOHelper.readContent(entity.getContent(), TruncatedChunkException.class);
+        return new String(content, "windows-1255");
+    }
+
+    public static DefaultHttpClient getClient() {
+        return httpClient.get();
+    }
+
+    public static void resetClient() {
+        httpClient.set(getNewHttpClient());
+    }
+
+    public static void resetClientWithProxy(String proxyHost, String proxyPort) {
+        DefaultHttpClient client = getNewHttpClient();
+        configureClientToUseProxy(client, proxyPort, proxyHost);
+        httpClient.set(client);
     }
 }

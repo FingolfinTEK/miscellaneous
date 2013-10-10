@@ -1,5 +1,7 @@
 package com.fingy.pelephone;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class ContactInfo {
     private String reshet;
     private String ordinalId;
@@ -57,5 +59,20 @@ public class ContactInfo {
 
     public String getOrdinalIdForAjax() {
         return ordinalId.substring(reshet.length(), ordinalId.length());
+    }
+
+    public boolean hasValidPhoneNumber() {
+        return StringUtils.isNotBlank(telephoneNumber) && !"cap".equals(telephoneNumber);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(name);
+        builder.append("§");
+        builder.append(address);
+        builder.append("§");
+        builder.append(telephoneNumber);
+        return builder.toString();
     }
 }

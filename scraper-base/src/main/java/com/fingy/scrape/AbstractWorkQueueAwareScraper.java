@@ -3,7 +3,7 @@ package com.fingy.scrape;
 import java.util.Map;
 
 import com.fingy.scrape.jsoup.AbstractJsoupScraper;
-import com.fingy.scrape.queue.ScraperLinksQueue;
+import com.fingy.scrape.context.ScraperLinksQueue;
 
 public abstract class AbstractWorkQueueAwareScraper<T> extends AbstractJsoupScraper<T> {
 

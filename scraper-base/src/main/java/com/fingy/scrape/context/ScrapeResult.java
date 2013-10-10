@@ -1,4 +1,4 @@
-package com.fingy.scrape;
+package com.fingy.scrape.context;
 
 public class ScrapeResult {
 

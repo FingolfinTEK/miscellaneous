@@ -11,7 +11,7 @@ import org.jsoup.select.Elements;
 
 import com.fingy.mouseprice.RealEstateInfo;
 import com.fingy.scrape.exception.ScrapeException;
-import com.fingy.scrape.queue.ScraperLinksQueue;
+import com.fingy.scrape.context.ScraperLinksQueue;
 import com.fingy.scrape.util.JsoupParserUtil;
 
 public class HousePricesScraper extends AbstractMousePriceScraper<List<RealEstateInfo>> {

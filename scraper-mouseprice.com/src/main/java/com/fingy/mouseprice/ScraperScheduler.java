@@ -22,8 +22,8 @@ import org.slf4j.LoggerFactory;
 
 import com.fingy.concurrent.ExecutorsUtil;
 import com.fingy.mouseprice.scrape.HousePricesScraper;
-import com.fingy.scrape.ScrapeResult;
-import com.fingy.scrape.queue.ScraperLinksQueue;
+import com.fingy.scrape.context.ScrapeResult;
+import com.fingy.scrape.context.ScraperLinksQueue;
 import com.fingy.scrape.util.JsoupParserUtil;
 
 public class ScraperScheduler {

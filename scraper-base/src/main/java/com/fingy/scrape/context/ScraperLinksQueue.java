@@ -1,4 +1,4 @@
-package com.fingy.scrape.queue;
+package com.fingy.scrape.context;
 
 import java.util.Collection;
 import java.util.Collections;
