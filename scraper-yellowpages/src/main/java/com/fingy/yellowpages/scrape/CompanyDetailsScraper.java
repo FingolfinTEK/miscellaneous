@@ -33,24 +33,24 @@ public class CompanyDetailsScraper extends AbstractYellowPagesScraper<CompanyDet
     }
 
     private String parseNameFromPage(final Document page) {
-        return JsoupParserUtil.getTagTextFromCssQuery(page, "div#basic-info div.vcard h1.fn a.url");
+        return JsoupParserUtil.getTagTextFromCssQuery(page, "div#mip div.business-card h1");
     }
 
     private String parseAddressFromPage(final Document page) {
-        return JsoupParserUtil.getTagTextFromCssQuery(page, "div#basic-info div.vcard p.primary-location span.listing-address");
+        return JsoupParserUtil.getTagTextFromCssQuery(page, "div#mip div.contact p.city-state");
     }
 
     private String parsePhoneNumberFromPage(final Document page) {
-        return JsoupParserUtil.getTagTextFromCssQuery(page, "div#basic-info div.vcard p.phone");
+        return JsoupParserUtil.getTagTextFromCssQuery(page, "div#mip div.contact p.phone");
     }
 
     private String parseWebsiteFromPage(final Document page) {
-        Element emailTag = JsoupParserUtil.getTagFromCssQuery(page, "div#basic-info div.vcard a.primary-website");
+        Element emailTag = JsoupParserUtil.getTagFromCssQuery(page, "div#mip div.business-card a.visit-website");
         return emailTag == null ? "N/A" : emailTag.attr("href");
     }
 
     private String parseEmailFromPage(final Document page) {
-        Element emailTag = JsoupParserUtil.getTagFromCssQuery(page, "div#basic-info div.vcard a.track-email-business");
+        Element emailTag = JsoupParserUtil.getTagFromCssQuery(page, "div#mip div.business-card a.email-business");
         return emailTag == null ? "N/A" : emailTag.attr("href").replace("mailto:", "");
     }
 

@@ -28,7 +28,7 @@ import com.fingy.yellowpages.scrape.CompanyDetailsScraper;
 import com.fingy.yellowpages.scrape.CustomSearchScraper;
 
 public class ScraperScheduler {
-    private static final String SEARCH_FORMAT = "http://www.yellowpages.com/search?tracks=true&search_terms=%s&geo_location_terms=%s";
+    private static final String SEARCH_FORMAT = "http://www.yellowpages.com/%s/%s";
 
     private static final int DEFAULT_TERMINATION_AWAIT_INTERVAL_MINUTES = 15;
     private static final int CATEGORY_TIMEOUT = 180000;
@@ -76,7 +76,7 @@ public class ScraperScheduler {
             loadQueuedLinksFromFile();
 
             HtmlUnitParserUtil.getPageFromUrlWithoutJavaScriptSupport(CustomSearchScraper.WWW_YELLOWPAGES_COM);
-            submitSearchPageScrapingTask(String.format(SEARCH_FORMAT, searchTerm, searchLocation));
+            submitSearchPageScrapingTask(String.format(SEARCH_FORMAT, searchLocation, searchTerm));
 
             submitScrapingTasksWhileThereIsEnoughWork();
             awaitTerminationOfTheTasks();
