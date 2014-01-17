@@ -27,8 +27,9 @@ public class CustomSearchScraper extends AbstractYellowPagesScraper<Integer> {
     }
 
     private void addOtherPages(final Document page) {
-        Element totalResultsElement = page.select("div#results div.pagination div.result-totals strong").last();
-        Integer totalResults = Integer.parseInt(totalResultsElement.text());
+        String totalResultsText = page.select("div#results div.pagination div.result-totals").first().text();
+        totalResultsText = totalResultsText.replaceAll("(Showing \\d+-\\d+ of)|results", "").trim();
+        Integer totalResults = Integer.parseInt(totalResultsText);
         Integer totalPages = totalResults / 30 + Math.min(1, totalResults % 30);
 
         for (int i = 2; i < totalPages; i++) {
@@ -39,7 +40,6 @@ public class CustomSearchScraper extends AbstractYellowPagesScraper<Integer> {
 	private String generatePageUrl(Document page, int i) {
 		Element pageLinks = page.select("div#results div.pagination div.page-navigation ol.track-pagination li a").first();
 		String url = pageLinks.attr("href");
-		String replaceAll = url.replaceAll("page=(\\d+)", "page=" + i);
-		return WWW_YELLOWPAGES_COM + replaceAll;
+		return url.replaceAll("page=(\\d+)", "page=" + i);
 	}
 }

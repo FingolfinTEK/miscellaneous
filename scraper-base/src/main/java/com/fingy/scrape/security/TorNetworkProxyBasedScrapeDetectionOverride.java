@@ -14,7 +14,9 @@ public class TorNetworkProxyBasedScrapeDetectionOverride implements ProxyBasedSc
     private void sleep(int millis) {
         try {
             Thread.sleep(millis);
-        } catch (InterruptedException e) {}
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

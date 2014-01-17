@@ -73,7 +73,6 @@ public abstract class AbstractScrapeScheduler<T extends ScrapeDetails> {
     protected abstract void doSpecificInitialization();
 
     private void submitScrapingTasksWhileThereIsEnoughWork() {
-
         while (context.stillHaveLinksToBeScraped(DETAILS_AWAIT_TIMEOUT)) {
             if (AbstractAdultItemJsoupScraper.isScrapeCompromised()) {
                 logger.trace("Session expired, breaking");
