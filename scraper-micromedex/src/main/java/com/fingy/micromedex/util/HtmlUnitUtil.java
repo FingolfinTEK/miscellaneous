@@ -15,8 +15,8 @@ import com.gargoylesoftware.htmlunit.util.Cookie;
 
 public class HtmlUnitUtil {
 	public static final String START_URL = "http://www.micromedexsolutions.com/home/dispatch";
-	public static final String USERNAME = "TRI1";
-	public static final String PASSWORD = "33tybs@h";
+	public static final String USERNAME = "MDE1";
+	public static final String PASSWORD = "PrecE4eS";
 
 	public static Map<String, String> getCookiesAsMap(WebClient client) {
 		Map<String, String> cookiesAsMap = new HashMap<>();
